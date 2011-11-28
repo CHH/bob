@@ -1,0 +1,25 @@
+<?php
+namespace Bobfile;
+
+desc('Creates a self-contained "bob" executable');
+task('executable', function() {
+    $script = <<<EOF
+#!/usr/bin/env php
+%s
+EOF;
+
+    $bobSrc = file_get_contents(__DIR__.'/bin/bob.php');
+
+    @file_put_contents(__DIR__.'/bin/bob', sprintf($script, $bobSrc));
+    chmod(__DIR__.'/bin/bob', 0755);
+});
+
+task('foo', function() {
+
+});
+
+desc('Foo Bar Baz');
+task('bar', function() {
+
+});
+
