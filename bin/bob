@@ -65,8 +65,7 @@ namespace Bob
 
             // Run first defined task if called without arguments
             if (empty($this->argv)) {
-                $this->execute(key($this->tasks));
-                exit(0);
+                exit($this->execute(key($this->tasks)));
             }
 
             if ($this->argv[0] == '-t') {
