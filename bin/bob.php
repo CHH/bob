@@ -1,22 +1,16 @@
 <?php
 
+// Bobfile DSL
 namespace Bobfile
 {
-    $GLOBALS['_bob'] = array(
-        'tasks' => array(),
-        'descriptions' => array()
-    );
-
     function task($name, $callback)
     {
-        global $_bob;
-        $_bob['tasks'][$name] = $callback;
+        \Bob\App()->task($name, $callback);
     }
 
     function desc($text)
     {
-        global $_bob;
-        $_bob['descriptions'][count($_bob['tasks'])] = $text;
+        \Bob\App()->desc($text);
     }
 }
 
@@ -27,67 +21,92 @@ namespace Bob
         echo "[bob] $line\n";
     }
 
-    function tasks($definition)
+    function App()
     {
-        if (!file_exists($definition)) {
-            printLn(sprintf('Error: No Bobfile found in %s', $definition));
-            exit(1);
+        static $instance;
+        if (null === $instance) $instance = new Application;
+        return $instance;
+    }
+
+    class Application
+    {
+        var $tasks = array();
+        var $descriptions = array();
+        var $argv = array();
+
+        function task($name, $callback)
+        {
+            $this->tasks[$name] = $callback;
+            return $this;
         }
 
-        include $definition;
-        return $GLOBALS['_bob']['tasks'];
-    }
+        function desc($text)
+        {
+            $this->descriptions[count($this->tasks)] = $text;
+            return $this;
+        }
 
-    function listTasks($tasks, $descs)
-    {
-        $i = 0;
-        foreach ($tasks as $name => $task) {
-            $desc = isset($descs[$i]) ? $descs[$i] : '';
-            echo "$name";
-            if ($desc) echo ": $desc";
-            echo "\n";
-            ++$i;
+        function run()
+        {
+            $cwd = $_SERVER['PWD'];
+            $definition = "$cwd/Bobfile";
+            $this->argv = $_SERVER['argv'];
+
+            // Remove the script name
+            array_shift($this->argv);
+
+            if (!file_exists($definition)) {
+                printLn(sprintf('Error: No Bobfile found in %s', $definition));
+                exit(1);
+            }
+
+            include $definition;
+
+            // Run first defined task if called without arguments
+            if (empty($this->argv)) {
+                $this->execute(key($this->tasks));
+                exit(0);
+            }
+
+            if ($this->argv[0] == '-t') {
+                $this->listTasks();
+                exit(0);
+            }
+
+            $task = array_shift($this->argv);
+            exit($this->execute($task));
+        }
+
+        function listTasks()
+        {
+            $i = 0;
+            foreach ($this->tasks as $name => $task) {
+                $desc = isset($this->descriptions[$i]) ? $this->descriptions[$i] : '';
+                echo "$name";
+                if ($desc) echo ": $desc";
+                echo "\n";
+                ++$i;
+            }
+        }
+
+        function execute($name)
+        {
+            if (!isset($this->tasks[$name])) {
+                printLn(sprintf('Task "%s" not found', $name));
+                exit(1);
+            }
+
+            $task = $this->tasks[$name];
+
+            printLn(sprintf('Running Task "%s"', $name));
+            $start = microtime(true);
+            $return = call_user_func($task, $this);
+            printLn(sprintf('Finished in %f seconds', microtime(true) - $start));
+
+            return $return;
         }
     }
 
-    function execute($tasks, $name)
-    {
-        if (!isset($tasks[$name])) {
-            printLn(sprintf('Task "%s" not found', $name));
-            exit(1);
-        }
-
-        $task = $tasks[$name];
-
-        printLn(sprintf('Running Task "%s"', $name));
-        $start = microtime(true);
-
-        call_user_func($task, $tasks);
-
-        printLn(sprintf('Finished in %f seconds', microtime(true) - $start));
-    }
-
-    /*
-     * Main Script
-     */
-    $cwd = $_SERVER['PWD'];
-    $tasks = tasks("$cwd/Bobfile");
-    $ARGV = $_SERVER['argv'];
-
-    array_shift($ARGV);
-
-    // Run first defined task if called without arguments
-    if (empty($ARGV)) {
-        execute($tasks, key($tasks));
-        exit(0);
-    }
-
-    switch ($ARGV[0]) {
-        case '-t':
-            listTasks($tasks, $GLOBALS['_bob']['descriptions']);
-            exit(0);
-        default:
-            execute($tasks, $ARGV[0]);
-    }
+    // Start the application
+    App()->run();
 }
-
