@@ -1,4 +1,9 @@
 <?php
+/*
+ * Put the Bobfile into the "Bobfile" namespace,
+ * otherwise you would've to call the `task` and
+ * `desc` functions with a `Bob\` prefix.
+ */
 namespace Bobfile;
 
 desc('Creates a self-contained "bob" executable');
@@ -9,6 +14,8 @@ task('executable', function() {
 EOF;
 
     $bobSrc = file_get_contents(__DIR__.'/bin/bob.php');
+
+    echo "Writing executable to bin/bob\n";
 
     @file_put_contents(__DIR__.'/bin/bob', sprintf($script, $bobSrc));
     chmod(__DIR__.'/bin/bob', 0755);
