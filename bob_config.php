@@ -14,6 +14,10 @@ EOF;
     chmod(__DIR__.'/bin/bob', 0755);
 });
 
+task('install', function() {
+    $prefix = isset($_ENV['PREFIX']) ? $_ENV['PREFIX'] : '/usr/local';
+});
+
 /*
  * Each Task consists of an optional `desc()` call
  * with a meaningful Task description, and a call to

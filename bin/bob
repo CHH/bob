@@ -50,14 +50,14 @@ namespace Bob
         function run()
         {
             $cwd = $_SERVER['PWD'];
-            $definition = "$cwd/Bobfile";
+            $definition = "$cwd/bob_config.php";
             $this->argv = $_SERVER['argv'];
 
             // Remove the script name
             array_shift($this->argv);
 
             if (!file_exists($definition)) {
-                printLn(sprintf('Error: No Bobfile found in %s', $definition));
+                printLn(sprintf('Error: No bob_config.php found in %s', $definition));
                 exit(1);
             }
 
