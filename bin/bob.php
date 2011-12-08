@@ -80,6 +80,7 @@ class Application
             echo "$name\n";
             if ($desc) {
                 foreach (explode("\n", $desc) as $descLine) {
+                    $descLine = ltrim($descLine);
                     echo "    $descLine\n";
                 }
             }
