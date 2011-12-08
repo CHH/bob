@@ -65,7 +65,3 @@ task('greet', function($app) {
     echo "Hello World $name!\n";
 });
 
-task('bar', function() {
-
-});
-
