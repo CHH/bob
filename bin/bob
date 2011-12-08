@@ -78,9 +78,12 @@ class Application
         $i = 0;
         foreach ($this->tasks as $name => $task) {
             $desc = isset($this->descriptions[$i]) ? $this->descriptions[$i] : '';
-            echo "$name";
-            if ($desc) echo ": $desc";
-            echo "\n";
+            echo "$name\n";
+            if ($desc) {
+                foreach (explode("\n", $desc) as $descLine) {
+                    echo "    $descLine\n";
+                }
+            }
             ++$i;
         }
     }

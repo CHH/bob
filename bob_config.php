@@ -21,6 +21,8 @@ EOF;
     chmod(__DIR__.'/bin/bob', 0755);
 });
 
+desc('Installs the bob executable in $PREFIX/bin, $PREFIX is an 
+Environment Variable and defaults to /usr/local');
 task('install', function($app) {
     $app->execute('executable');
 
