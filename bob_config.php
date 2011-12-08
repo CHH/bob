@@ -15,14 +15,25 @@ EOF;
 
     $bobSrc = file_get_contents(__DIR__.'/bin/bob.php');
 
-    echo "Writing executable to bin/bob\n";
+    printLn("Writing executable to bin/bob");
 
     @file_put_contents(__DIR__.'/bin/bob', sprintf($script, $bobSrc));
     chmod(__DIR__.'/bin/bob', 0755);
 });
 
-task('install', function() {
-    $prefix = isset($_ENV['PREFIX']) ? $_ENV['PREFIX'] : '/usr/local';
+task('install', function($app) {
+    $app->execute('executable');
+
+    $prefix = isset($_SERVER['PREFIX']) ? $_SERVER['PREFIX'] : '/usr/local';
+
+    printLn(sprintf('Installing the "bob" executable in %s', $prefix));
+
+    if (!is_dir("$prefix/bin")) {
+        mkdir("$prefix/bin");
+    }
+
+    copy(__DIR__.'/bin/bob', "$prefix/bin/bob");
+    chmod("$prefix/bin/bob", 0755);
 });
 
 /*

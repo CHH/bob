@@ -99,15 +99,15 @@ class Application
         try {
             printLn(sprintf('Running Task "%s"', $name));
             $start = microtime(true);
-            $this->execute($name);
+            $return = $this->execute($name);
             printLn(sprintf('Finished in %f seconds', microtime(true) - $start));
+
+            return $return;
 
         } catch (\Exception $e) {
             println($e->getMessage());
-            exit(1);
+            return 1;
         }
-
-        return $return;
     }
 }
 
