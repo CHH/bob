@@ -1,10 +1,10 @@
 <?php
 /*
- * Put the Bobfile into the "Bobfile" namespace,
+ * Put the bob_config.php into the "Bob" namespace,
  * otherwise you would've to call the `task` and
  * `desc` functions with a `Bob\` prefix.
  */
-namespace Bobfile;
+namespace Bob;
 
 desc('Creates a self-contained "bob" executable');
 task('executable', function() {
