@@ -6,6 +6,37 @@
  */
 namespace Bob;
 
+desc('Creates a composer.json in the root of the project');
+task('composer', function() {
+    $authors = new \SplFileObject(__DIR__.'/AUTHORS.txt');
+    $json = array();
+
+    $json['name'] = 'chh/bob';
+    $json['description'] = 'A simple and messy build tool for PHP projects';
+    $json['keywords'] = array('build');
+    $json['license'] = array('MIT');
+    $json['homepage'] = 'https://github.com/CHH/Bob';
+
+    foreach ($authors as $author) {
+        if (preg_match('/^(.+) <(.+)>$/', $author, $matches)) {
+            $json['authors'][] = array(
+                'name' => $matches[1],
+                'email' => $matches[2]
+            );
+        }
+    }
+
+    $json['requires'] = array(
+        'php' => '>=5.3.0'
+    );
+
+    $json['bin'] = array(
+        'bin/bob'
+    );
+
+    @file_put_contents(__DIR__.'/composer.json', json_encode($json));
+});
+
 desc('Creates a self-contained "bob" executable');
 task('executable', function() {
     $script = <<<EOF
