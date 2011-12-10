@@ -34,7 +34,10 @@ task('composer', function() {
         'bin/bob'
     );
 
-    @file_put_contents(__DIR__.'/composer.json', json_encode($json));
+    @file_put_contents(
+        __DIR__.'/composer.json', 
+        json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+    );
 });
 
 desc('Creates a self-contained "bob" executable');
