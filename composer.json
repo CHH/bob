@@ -1,0 +1,20 @@
+{
+    "name": "chh/bob",
+    "description": "A simple and messy build tool",
+    "keywords": "build",
+    "license": "MIT",
+    "homepage": "https://github.com/CHH/Bob",
+    "authors": [
+        {
+            "name": "Christoph Hochstrasser",
+            "email": "christoph.hochstrasser@gmail.com",
+            "homepage": "http://christophh.net"
+        }
+    ],
+    "requires": {
+        "php": ">=5.3.0"
+    },
+    "bin": [
+        "bin/bob"
+    ]
+}
