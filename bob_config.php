@@ -26,7 +26,7 @@ task('composer', function() {
         }
     }
 
-    $json['requires'] = array(
+    $json['require'] = array(
         'php' => '>=5.3.0'
     );
 
