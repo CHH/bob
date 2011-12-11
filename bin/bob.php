@@ -86,3 +86,4 @@ if (isset($ARGV[0])) {
 
 $app->argv = $ARGV;
 exit(runTask($task));
+
