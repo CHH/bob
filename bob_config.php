@@ -46,9 +46,21 @@ task('dist', function() {
         unlink(__DIR__.'/bin/bob.phar');
     }
 
+    $stub = <<<'EOF'
+#!/usr/bin/env php
+<?php
+
+Phar::mapPhar('bob.phar');
+
+require 'phar://bob.phar/bin/bob.php';
+
+__HALT_COMPILER();
+EOF;
+
     $phar = new \Phar(__DIR__.'/bin/bob.phar', 0, 'bob.phar');
     $phar->buildFromDirectory(__DIR__, '/(bin\/|lib\/)(.*)\.php$/');
-    $phar->setStub($phar->createDefaultStub('bin/bob.php', 'bin/bob.php'));
+    $phar['LICENSE.txt'] = file_get_contents(__DIR__.'/LICENSE.txt');
+    $phar->setStub($stub);
 
     printLn(sprintf('Generated Archive "bin/bob.phar" with %d entries', count($phar)));
 });

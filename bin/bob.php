@@ -2,7 +2,7 @@
 
 namespace Bob;
 
-require_once __DIR__.'/../lib/Bob.php';
+require_once __DIR__.'/../lib/bob.php';
 
 function App()
 {
