@@ -38,6 +38,8 @@ class Application
     var $descriptions = array();
     var $argv = array();
 
+    var $definitionPath;
+
     function task($name, $callback)
     {
         $this->tasks[$name] = $callback;
@@ -50,56 +52,21 @@ class Application
         return $this;
     }
 
-    function run()
+    function loadDefinition()
     {
-        $cwd = $_SERVER['PWD'];
-        $definition = "$cwd/bob_config.php";
-        $this->argv = $_SERVER['argv'];
+        if (!$this->definitionPath) {
+            $this->definitionPath = getcwd();
+        }
 
-        // Remove the script name
-        array_shift($this->argv);
+        $definition = "{$this->definitionPath}/bob_config.php";
 
         if (!file_exists($definition)) {
-            printLn(sprintf('Error: No bob_config.php found in %s', $definition));
-            exit(1);
+            throw new \Exception(sprintf(
+                'Error: No bob_config.php found in %s', $definition)
+            );
         }
 
         include $definition;
-
-        // Run first defined task if called without arguments
-        if (empty($this->argv)) {
-            exit($this->runTask(key($this->tasks)));
-        }
-
-        if ($this->argv[0] == '-t') {
-            $this->listTasks();
-            exit(0);
-        }
-
-        $task = array_shift($this->argv);
-        exit($this->runTask($task));
-    }
-
-    function listTasks()
-    {
-        $i = 0;
-        foreach ($this->tasks as $name => $task) {
-            $desc = isset($this->descriptions[$i]) ? $this->descriptions[$i] : '';
-            echo "$name";
-
-            if ($i === 0) {
-                echo " (Default)";
-            }
-
-            echo "\n";
-            if ($desc) {
-                foreach (explode("\n", $desc) as $descLine) {
-                    $descLine = ltrim($descLine);
-                    echo "    $descLine\n";
-                }
-            }
-            ++$i;
-        }
     }
 
     function execute($name)
@@ -110,21 +77,5 @@ class Application
 
         $task = $this->tasks[$name];
         return call_user_func($task, $this);
-    }
-
-    function runTask($name)
-    {
-        try {
-            printLn(sprintf('Running Task "%s"', $name));
-            $start = microtime(true);
-            $return = $this->execute($name);
-            printLn(sprintf('Finished in %f seconds', microtime(true) - $start));
-
-            return $return;
-
-        } catch (\Exception $e) {
-            println($e->getMessage());
-            return 1;
-        }
     }
 }
