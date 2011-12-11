@@ -8,11 +8,10 @@ namespace Bob;
 
 desc('Creates a composer.json in the root of the project');
 task('composer', function() {
-    $authorsFile = new \SplFileObject(__DIR__.'/AUTHORS.txt');
     $authors = array();
 
-    foreach ($authorsFile as $author) {
-        if (preg_match('/^(.+) <(.+)>$/', $author, $matches)) {
+    foreach (new \SplFileObject(__DIR__.'/AUTHORS.txt') as $line) {
+        if (preg_match('/^(.+) <(.+)>$/', $line, $matches)) {
             $authors[] = array(
                 'name' => $matches[1],
                 'email' => $matches[2]
