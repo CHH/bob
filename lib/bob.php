@@ -1,28 +1,35 @@
-#!/usr/bin/env php
 <?php
 
 namespace Bob;
-
-function task($name, $callback)
-{
-    App()->task($name, $callback);
-}
-
-function desc($text)
-{
-    App()->desc($text);
-}
 
 function printLn($line)
 {
     echo "[bob] $line\n";
 }
 
-function App()
+// Renders a PHP template
+function template($file, $vars = array())
 {
-    static $instance;
-    if (null === $instance) $instance = new Application;
-    return $instance;
+    if (!file_exists($file)) {
+        throw \InvalidArgumentException(sprintf(
+            'File %s does not exist.', $file
+        ));
+    }
+
+    $template = function($__file, $__vars) {
+        foreach ($__vars as $var => $value) {
+            $$var = $value;
+        }
+        unset($__vars, $var, $value);
+
+        ob_start();
+        include($__file);
+        $rendered = ob_get_clean();
+
+        return $rendered;
+    };
+
+    return $template($file, $vars);
 }
 
 class Application
@@ -78,7 +85,13 @@ class Application
         $i = 0;
         foreach ($this->tasks as $name => $task) {
             $desc = isset($this->descriptions[$i]) ? $this->descriptions[$i] : '';
-            echo "$name\n";
+            echo "$name";
+
+            if ($i === 0) {
+                echo " (Default)";
+            }
+
+            echo "\n";
             if ($desc) {
                 foreach (explode("\n", $desc) as $descLine) {
                     $descLine = ltrim($descLine);
@@ -115,6 +128,3 @@ class Application
         }
     }
 }
-
-// Start the application
-App()->run();

@@ -1,6 +1,6 @@
 <?php
 /*
- * Put the bob_config.php into the "Bob" namespace,
+ * Put the `bob_config.php` into the "Bob" namespace,
  * otherwise you would've to call the `task` and
  * `desc` functions with a `Bob\` prefix.
  */
@@ -31,45 +31,26 @@ task('composer', function() {
     );
 
     $json['bin'] = array(
-        'bin/bob'
+        'bin/bob.phar'
     );
 
     @file_put_contents(
-        __DIR__.'/composer.json', 
+        __DIR__.'/composer.json',
         json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
     );
 });
 
-desc('Creates a self-contained "bob" executable');
-task('executable', function() {
-    $script = <<<EOF
-#!/usr/bin/env php
-%s
-EOF;
-
-    $bobSrc = file_get_contents(__DIR__.'/bin/bob.php');
-
-    printLn("Writing executable to bin/bob");
-
-    @file_put_contents(__DIR__.'/bin/bob', sprintf($script, $bobSrc));
-    chmod(__DIR__.'/bin/bob', 0755);
-});
-
-desc('Installs the bob executable in $PREFIX/bin, $PREFIX is an
-      Environment Variable and defaults to /usr/local');
-task('install', function($app) {
-    $app->execute('executable');
-
-    $prefix = isset($_SERVER['PREFIX']) ? $_SERVER['PREFIX'] : '/usr/local';
-
-    printLn(sprintf('Installing the "bob" executable in %s', $prefix));
-
-    if (!is_dir("$prefix/bin")) {
-        mkdir("$prefix/bin");
+desc('Creates a distributable PHAR file');
+task('dist', function() {
+    if (file_exists(__DIR__.'/bin/bob.phar')) {
+        unlink(__DIR__.'/bin/bob.phar');
     }
 
-    copy(__DIR__.'/bin/bob', "$prefix/bin/bob");
-    chmod("$prefix/bin/bob", 0755);
+    $phar = new \Phar(__DIR__.'/bin/bob.phar', 0, 'bob.phar');
+    $phar->buildFromDirectory(__DIR__, '/(bin\/|lib\/)(.*)\.php$/');
+    $phar->setStub($phar->createDefaultStub('bin/bob.php', 'bin/bob.php'));
+
+    printLn(sprintf('Generated Archive "bin/bob.phar" with %d entries', count($phar)));
 });
 
 /*
