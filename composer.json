@@ -6,12 +6,7 @@
     ],
     "license": "MIT",
     "homepage": "https://github.com/CHH/Bob",
-    "authors": [
-    {
-        "name": "Christoph Hochstrasser",
-        "email": "christoph.hochstrasser@gmail.com"
-    }
-],
+    "authors": [{"name":"Christoph Hochstrasser","email":"christoph.hochstrasser@gmail.com"}],
     "require": {
         "php": ">=5.3.0"
     },

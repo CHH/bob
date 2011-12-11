@@ -21,7 +21,7 @@ task('composer', function() {
     }
 
     $json = template(__DIR__.'/composer.json.php', array(
-        'authors' => json_encode($authors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+        'authors' => json_encode($authors, JSON_UNESCAPED_SLASHES)
     ));
 
     @file_put_contents(__DIR__.'/composer.json', $json);
