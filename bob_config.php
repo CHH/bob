@@ -66,8 +66,7 @@ EOF;
  * for the task, the script name and task name are already
  * removed.
  */
-desc('Says "Hello World <name>!"
-      Usage: greet <name>');
+desc('Says "Hello World NAME!"', 'greet NAME');
 task('greet', function($app) {
     if (count($app->argv) < 1) {
         echo "greet expects at least one name as arguments\n";

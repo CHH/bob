@@ -36,6 +36,7 @@ class Application
 {
     var $tasks = array();
     var $descriptions = array();
+    var $usages = array();
     var $argv = array();
 
     function task($name, $callback)
@@ -44,9 +45,14 @@ class Application
         return $this;
     }
 
-    function desc($text)
+    function desc($text, $usage = null)
     {
         $this->descriptions[count($this->tasks)] = $text;
+
+        if ($usage) {
+            $this->usages[count($this->tasks)] = $usage;
+        }
+
         return $this;
     }
 
