@@ -4,9 +4,7 @@
     "keywords": [
         "build"
     ],
-    "license": [
-        "MIT"
-    ],
+    "license": "MIT",
     "homepage": "https://github.com/CHH/Bob",
     "authors": <?php echo $authors ?>,
     "require": {
