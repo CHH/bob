@@ -59,8 +59,16 @@ function desc($text)
     $app->desc($text);
 }
 
-$app->loadDefinition();
+$CWD  = $_SERVER['PWD'];
 $ARGV = $_SERVER['argv'];
+$definition = "$CWD/bob_config.php";
+
+if (!file_exists($definition)) {
+    printLn(sprintf('Error: Definition %s not found', $definition));
+    exit(1);
+}
+
+include $definition;
 
 array_shift($ARGV);
 

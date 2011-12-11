@@ -38,8 +38,6 @@ class Application
     var $descriptions = array();
     var $argv = array();
 
-    var $definitionPath;
-
     function task($name, $callback)
     {
         $this->tasks[$name] = $callback;
@@ -50,23 +48,6 @@ class Application
     {
         $this->descriptions[count($this->tasks)] = $text;
         return $this;
-    }
-
-    function loadDefinition()
-    {
-        if (!$this->definitionPath) {
-            $this->definitionPath = getcwd();
-        }
-
-        $definition = "{$this->definitionPath}/bob_config.php";
-
-        if (!file_exists($definition)) {
-            throw new \Exception(sprintf(
-                'Error: No bob_config.php found in %s', $definition)
-            );
-        }
-
-        include $definition;
     }
 
     function execute($name)
