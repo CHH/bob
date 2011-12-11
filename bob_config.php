@@ -9,34 +9,34 @@ namespace Bob;
 desc('Creates a composer.json in the root of the project');
 task('composer', function() {
     $authors = new \SplFileObject(__DIR__.'/AUTHORS.txt');
-    $json = array();
+    $package = array();
 
-    $json['name'] = 'chh/bob';
-    $json['description'] = 'A simple and messy build tool for PHP projects';
-    $json['keywords'] = array('build');
-    $json['license'] = array('MIT');
-    $json['homepage'] = 'https://github.com/CHH/Bob';
+    $package['name'] = 'chh/bob';
+    $package['description'] = 'A simple and messy build tool for PHP projects';
+    $package['keywords'] = array('build');
+    $package['license'] = array('MIT');
+    $package['homepage'] = 'https://github.com/CHH/Bob';
 
     foreach ($authors as $author) {
         if (preg_match('/^(.+) <(.+)>$/', $author, $matches)) {
-            $json['authors'][] = array(
+            $package['authors'][] = array(
                 'name' => $matches[1],
                 'email' => $matches[2]
             );
         }
     }
 
-    $json['require'] = array(
+    $package['require'] = array(
         'php' => '>=5.3.0'
     );
 
-    $json['bin'] = array(
+    $package['bin'] = array(
         'bin/bob.phar'
     );
 
     @file_put_contents(
         __DIR__.'/composer.json',
-        json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+        json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
     );
 });
 
