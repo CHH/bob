@@ -8,12 +8,7 @@
         "MIT"
     ],
     "homepage": "https://github.com/CHH/Bob",
-    "authors": [
-    {
-        "name": "Christoph Hochstrasser",
-        "email": "christoph.hochstrasser@gmail.com"
-    }
-],
+    "authors": <?php echo $authors ?>,
     "require": {
         "php": ">=5.3.0"
     },

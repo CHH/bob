@@ -8,36 +8,23 @@ namespace Bob;
 
 desc('Creates a composer.json in the root of the project');
 task('composer', function() {
-    $authors = new \SplFileObject(__DIR__.'/AUTHORS.txt');
-    $package = array();
+    $authorsFile = new \SplFileObject(__DIR__.'/AUTHORS.txt');
+    $authors = array();
 
-    $package['name'] = 'chh/bob';
-    $package['description'] = 'A simple and messy build tool for PHP projects';
-    $package['keywords'] = array('build');
-    $package['license'] = array('MIT');
-    $package['homepage'] = 'https://github.com/CHH/Bob';
-
-    foreach ($authors as $author) {
+    foreach ($authorsFile as $author) {
         if (preg_match('/^(.+) <(.+)>$/', $author, $matches)) {
-            $package['authors'][] = array(
+            $authors[] = array(
                 'name' => $matches[1],
                 'email' => $matches[2]
             );
         }
     }
 
-    $package['require'] = array(
-        'php' => '>=5.3.0'
-    );
+    $json = template(__DIR__.'/composer.json.php', array(
+        'authors' => json_encode($authors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+    ));
 
-    $package['bin'] = array(
-        'bin/bob.phar'
-    );
-
-    @file_put_contents(
-        __DIR__.'/composer.json',
-        json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-    );
+    @file_put_contents(__DIR__.'/composer.json', $json);
 });
 
 desc('Creates a distributable PHAR file');
