@@ -44,9 +44,13 @@ __HALT_COMPILER();
 EOF;
 
     $phar = new \Phar(__DIR__.'/bin/bob.phar', 0, 'bob.phar');
+    $phar->startBuffering();
     $phar->buildFromDirectory(__DIR__, '/(bin\/|lib\/)(.*)\.php$/');
     $phar['LICENSE.txt'] = file_get_contents(__DIR__.'/LICENSE.txt');
     $phar->setStub($stub);
+    $phar->stopBuffering();
+
+    chmod(__DIR__.'/bin/bob.phar', 0555);
 
     printLn(sprintf('Generated Archive "bin/bob.phar" with %d entries', count($phar)));
 });
