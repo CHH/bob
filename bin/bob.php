@@ -4,23 +4,51 @@ namespace Bob;
 
 require_once __DIR__.'/../lib/bob.php';
 
+const E_TASK_NOT_FOUND = 85;
+const E_DEFINITION_NOT_FOUND = 86;
+
 $app = new Application;
+
+function usage()
+{
+    echo <<<HELPTEXT
+Usage: bob.php [-t|--tasks] <task>
+
+Arguments:
+  task:
+    Name of the Task to run, task names can be everything as
+    long as they don't contain spaces.
+
+Options:
+  -t|--tasks:
+    Displays a fancy list of tasks and their descriptions
+  -h|--help:
+    Displays this message
+
+HELPTEXT;
+}
 
 function runTask($name)
 {
     global $app;
 
+    if (!isset($app->tasks[$name])) {
+        printLn(sprintf('Error: Task "%s" not found.', $name));
+        return E_TASK_NOT_FOUND;
+    }
+
+    printLn(sprintf('Running Task "%s"', $name));
+
     try {
-        printLn(sprintf('Running Task "%s"', $name));
         $start = microtime(true);
         $return = $app->execute($name);
         printLn(sprintf('Finished in %f seconds', microtime(true) - $start));
-
-        return $return === null ? 0 : $return;
     } catch (\Exception $e) {
         println('Error: '.$e);
-        return 1;
+        $return = 1;
     }
+
+    return $return === null ? 0 : $return;
 }
 
 function listTasks()
@@ -67,7 +95,7 @@ $definition = "$CWD/bob_config.php";
 
 if (!file_exists($definition)) {
     printLn(sprintf('Error: Definition %s not found', $definition));
-    exit(1);
+    exit(E_DEFINITION_NOT_FOUND);
 }
 
 include $definition;
@@ -77,6 +105,11 @@ array_shift($ARGV);
 if (isset($ARGV[0])) {
     if ($ARGV[0] == '-t' or $ARGV[0] == '--tasks') {
         listTasks();
+        exit(0);
+    }
+
+    if ($ARGV[0] == '-h' or $ARGV[0] == '--help') {
+        usage();
         exit(0);
     }
 

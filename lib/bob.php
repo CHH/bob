@@ -32,6 +32,9 @@ function template($file, $vars = array())
     return $template($file, $vars);
 }
 
+class TaskNotFoundException extends \RuntimeException 
+{}
+
 class Application
 {
     var $tasks = array();
@@ -59,9 +62,10 @@ class Application
     function execute($name)
     {
         if (!isset($this->tasks[$name])) {
-            throw new \Exception(sprintf('Task "%s" not found.', $name));
+            throw new TaskNotFoundException(sprintf(
+                'Task "%s" not found.', $name
+            ));
         }
-
         $task = $this->tasks[$name];
         return call_user_func($task, $this);
     }
