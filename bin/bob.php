@@ -18,7 +18,7 @@ function runTask($name)
 
         return $return;
     } catch (\Exception $e) {
-        println($e->getMessage());
+        println('Error: '.$e->getMessage());
         return 1;
     }
 }
@@ -29,7 +29,7 @@ function listTasks()
 
     $i = 0;
     foreach ($app->tasks as $name => $task) {
-        $desc = isset($app->descriptions[$i]) ? $app->descriptions[$i] : '';
+        $desc  = isset($app->descriptions[$i]) ? $app->descriptions[$i] : '';
         $usage = isset($app->usages[$i]) ? $app->usages[$i] : $name;
 
         echo "$usage";
