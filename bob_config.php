@@ -24,6 +24,7 @@ task('composer', function() {
     ));
 
     @file_put_contents(__DIR__.'/composer.json', $json);
+    printLn('Created composer.json');
 });
 
 desc('Creates a distributable, self-contained and executable PHAR file');
