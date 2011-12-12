@@ -26,7 +26,7 @@ task('composer', function() {
     @file_put_contents(__DIR__.'/composer.json', $json);
 });
 
-desc('Creates a distributable PHAR file');
+desc('Creates a distributable, self-contained and executable PHAR file');
 task('dist', function() {
     if (file_exists(__DIR__.'/bin/bob.phar')) {
         unlink(__DIR__.'/bin/bob.phar');
