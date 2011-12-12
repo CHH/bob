@@ -18,7 +18,7 @@ function runTask($name)
 
         return $return;
     } catch (\Exception $e) {
-        println('Error: '.$e->getMessage());
+        println('Error: '.$e);
         return 1;
     }
 }
