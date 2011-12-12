@@ -16,7 +16,7 @@ function runTask($name)
         $return = $app->execute($name);
         printLn(sprintf('Finished in %f seconds', microtime(true) - $start));
 
-        return $return;
+        return $return === null ? 0 : $return;
     } catch (\Exception $e) {
         println('Error: '.$e);
         return 1;
