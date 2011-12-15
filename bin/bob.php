@@ -7,8 +7,27 @@ require_once __DIR__.'/../lib/bob.php';
 const E_TASK_NOT_FOUND = 85;
 const E_DEFINITION_NOT_FOUND = 86;
 
-$app = new Application;
+// Store all tasks, with their name as key
+// and the callback as value.
+$tasks = array();
 
+// Descriptions and usages are simple
+// lists. The `desc` function simply appends
+// to these lists.
+//
+// Therefore the call to `desc` _must_ happen
+// before a task is defined, so the indexes match
+// the order of the tasks in the `$tasks` array.
+$descriptions = array();
+$usages = array();
+
+$context = (object) array(
+    'argv' => $_SERVER['argv'],
+    'cwd'  => $_SERVER['PWD']
+);
+
+// You can output a usage message with the `-h` or `--help`
+// flags.
 function usage()
 {
     echo <<<HELPTEXT
@@ -28,20 +47,26 @@ Options:
 HELPTEXT;
 }
 
-function runTask($name)
+function execute($name)
 {
-    global $app;
+    global $tasks, $context;
 
-    if (!isset($app->tasks[$name])) {
+    if (!isset($tasks[$name])) {
         printLn(sprintf('Error: Task "%s" not found.', $name));
-        return E_TASK_NOT_FOUND;
+        exit(E_TASK_NOT_FOUND);
     }
 
+    $task = $tasks[$name];
+    return call_user_func($task, $context);
+}
+
+function runTask($name, $context = null)
+{
     printLn(sprintf('Running Task "%s"', $name));
 
     try {
         $start = microtime(true);
-        $return = $app->execute($name);
+        $return = execute($name, $context);
         printLn(sprintf('Finished in %f seconds', microtime(true) - $start));
     } catch (\Exception $e) {
         println('Error: '.$e);
@@ -53,12 +78,12 @@ function runTask($name)
 
 function listTasks()
 {
-    global $app;
+    global $tasks, $descriptions, $usages;
 
     $i = 0;
-    foreach ($app->tasks as $name => $task) {
-        $desc  = isset($app->descriptions[$i]) ? $app->descriptions[$i] : '';
-        $usage = isset($app->usages[$i]) ? $app->usages[$i] : $name;
+    foreach ($tasks as $name => $task) {
+        $desc  = isset($descriptions[$i]) ? $descriptions[$i] : '';
+        $usage = isset($usages[$i]) ? $usages[$i] : $name;
 
         echo "$usage";
 
@@ -79,19 +104,22 @@ function listTasks()
 
 function task($name, $callback)
 {
-    global $app;
-    $app->task($name, $callback);
+    global $tasks;
+    $tasks[$name] = $callback;
 }
 
 function desc($text, $usage = null)
 {
-    global $app;
-    $app->desc($text, $usage);
+    global $tasks, $descriptions, $usages;
+
+    $descriptions[count($tasks)] = $text;
+
+    if ($usage) {
+        $usages[count($tasks)] = $usage;
+    }
 }
 
-$CWD  = $_SERVER['PWD'];
-$ARGV = $_SERVER['argv'];
-$definition = "$CWD/bob_config.php";
+$definition = "{$context->cwd}/bob_config.php";
 
 if (!file_exists($definition)) {
     printLn(sprintf('Error: Definition %s not found', $definition));
@@ -100,25 +128,24 @@ if (!file_exists($definition)) {
 
 include $definition;
 
-array_shift($ARGV);
+array_shift($context->argv);
 
-if (isset($ARGV[0])) {
-    if ($ARGV[0] == '-t' or $ARGV[0] == '--tasks') {
+if (isset($context->argv[0])) {
+    if ($context->argv[0] == '-t' or $context->argv[0] == '--tasks') {
         listTasks();
         exit(0);
     }
 
-    if ($ARGV[0] == '-h' or $ARGV[0] == '--help') {
+    if ($context->argv[0] == '-h' or $context->argv[0] == '--help') {
         usage();
         exit(0);
     }
 
-    $task = $ARGV[0];
-    array_shift($ARGV);
+    $task = $context->argv[0];
+    array_shift($context->argv);
 } else {
-    $task = key($app->tasks);
+    $task = key($tasks);
 }
 
-$app->argv = $ARGV;
 exit(runTask($task));
 
