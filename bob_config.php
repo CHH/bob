@@ -46,7 +46,7 @@ EOF;
 
     $phar = new \Phar(__DIR__.'/bin/bob.phar', 0, 'bob.phar');
     $phar->startBuffering();
-    $phar->buildFromDirectory(__DIR__, '/(bin\/|lib\/)(.*)\.php$/');
+    $phar->buildFromDirectory(__DIR__, '/(bin\/|lib\/|vendor\/)(.*)\.php$/');
     $phar['LICENSE.txt'] = file_get_contents(__DIR__.'/LICENSE.txt');
     $phar->setStub($stub);
     $phar->stopBuffering();
@@ -73,12 +73,12 @@ EOF;
  */
 desc('Says "Hello World NAME!"', 'greet NAME');
 task('greet', function($app) {
-    if (count($app->argv) < 1) {
+    if (count($app->argv) < 2) {
         echo "greet expects at least one name as arguments\n";
         return 1;
     }
 
-    $name = $app->argv[0];
+    $name = $app->argv[1];
 
     echo "Hello World $name!\n";
 });

@@ -2,7 +2,10 @@
 
 namespace Bob;
 
+use Getopt;
+
 require_once __DIR__.'/../lib/bob.php';
+require_once __DIR__.'/../vendor/Getopt.php';
 
 const E_TASK_NOT_FOUND = 85;
 const E_DEFINITION_NOT_FOUND = 86;
@@ -31,7 +34,11 @@ $context = (object) array(
 function usage()
 {
     echo <<<HELPTEXT
-Usage: bob.php [-t|--tasks] <task>
+Usage:
+  bob.php
+  bob.php <task>
+  bob.php -t|--tasks
+  bob.php -h|--help
 
 Arguments:
   task:
@@ -119,7 +126,23 @@ function desc($text, $usage = null)
     }
 }
 
-$definition = "{$context->cwd}/bob_config.php";
+$optParser = new Getopt(array(
+    array('h', 'help', Getopt::NO_ARGUMENT),
+    array('t', 'tasks', Getopt::NO_ARGUMENT),
+    array('d', 'definition', Getopt::REQUIRED_ARGUMENT)
+));
+
+array_shift($context->argv);
+
+try {
+    $optParser->parse($context->argv);
+} catch (\UnexpectedValueException $e) {
+    usage();
+    exit(1);
+}
+
+$definitionName = $optParser->getOption('definition') ?: "bob_config.php";
+$definition = "{$context->cwd}/$definitionName";
 
 if (!file_exists($definition)) {
     printLn(sprintf('Error: Definition %s not found', $definition));
@@ -128,21 +151,18 @@ if (!file_exists($definition)) {
 
 include $definition;
 
-array_shift($context->argv);
+if ($optParser->getOption('tasks')) {
+    listTasks();
+    exit(0);
+}
 
-if (isset($context->argv[0])) {
-    if ($context->argv[0] == '-t' or $context->argv[0] == '--tasks') {
-        listTasks();
-        exit(0);
-    }
+if ($optParser->getOption('help')) {
+    usage();
+    exit(0);
+}
 
-    if ($context->argv[0] == '-h' or $context->argv[0] == '--help') {
-        usage();
-        exit(0);
-    }
-
-    $task = $context->argv[0];
-    array_shift($context->argv);
+if ($operands = $optParser->getOperands() and count($operands) > 0) {
+    $task = $operands[0];
 } else {
     $task = key($tasks);
 }
