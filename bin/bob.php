@@ -59,7 +59,7 @@ function execute($name)
     global $tasks, $context;
 
     if (!isset($tasks[$name])) {
-        printLn(sprintf('Error: Task "%s" not found.', $name));
+        printLn(sprintf('Error: Task "%s" not found.', $name), STDERR);
         exit(E_TASK_NOT_FOUND);
     }
 
@@ -69,12 +69,10 @@ function execute($name)
 
 function runTask($name, $context = null)
 {
-    printLn(sprintf('Running Task "%s"', $name));
-
     try {
         $start = microtime(true);
         $return = execute($name, $context);
-        printLn(sprintf('Finished in %f seconds', microtime(true) - $start));
+        printLn(sprintf('# %s|%fs', $name, microtime(true) - $start));
     } catch (\Exception $e) {
         println('Error: '.$e);
         $return = 1;
@@ -136,6 +134,7 @@ array_shift($context->argv);
 
 try {
     $optParser->parse($context->argv);
+
 } catch (\UnexpectedValueException $e) {
     usage();
     exit(1);
@@ -145,7 +144,7 @@ $definitionName = $optParser->getOption('definition') ?: "bob_config.php";
 $definition = "{$context->cwd}/$definitionName";
 
 if (!file_exists($definition)) {
-    printLn(sprintf('Error: Definition %s not found', $definition));
+    printLn(sprintf('Error: Definition %s not found', $definition), STDERR);
     exit(E_DEFINITION_NOT_FOUND);
 }
 

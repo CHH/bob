@@ -2,9 +2,15 @@
 
 namespace Bob;
 
-function printLn($line)
+function printLn($line, $stream = null)
 {
-    echo "[bob] $line\n";
+    $line = "$line\n";
+
+    if (is_resource($stream)) {
+        fwrite($stream, $line);
+    } else {
+        echo "$line";
+    }
 }
 
 // Renders a PHP template
