@@ -4,8 +4,8 @@ namespace Bob;
 
 use Getopt;
 
-require_once __DIR__.'/../lib/bob.php';
-require_once __DIR__.'/../vendor/Getopt.php';
+require __DIR__.'/../lib/bob.php';
+require __DIR__.'/../vendor/Getopt.php';
 
 const E_TASK_NOT_FOUND = 85;
 const E_DEFINITION_NOT_FOUND = 86;
@@ -36,7 +36,7 @@ function usage()
     echo <<<HELPTEXT
 Usage:
   bob.php
-  bob.php <task>
+  bob.php [-d|--definition <definition>] <task>
   bob.php -t|--tasks
   bob.php -h|--help
 
@@ -46,6 +46,9 @@ Arguments:
     long as they don't contain spaces.
 
 Options:
+  -d|--definition <definition>:
+    Lookup <definition> in the current working directory and
+    then load tasks from this file instead of "bob_config.php".
   -t|--tasks:
     Displays a fancy list of tasks and their descriptions
   -h|--help:
