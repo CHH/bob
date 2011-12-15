@@ -6,26 +6,8 @@
  */
 namespace Bob;
 
-desc('Creates a composer.json in the root of the project');
-task('composer', function() {
-    $authors = array();
-
-    foreach (new \SplFileObject(__DIR__.'/AUTHORS.txt') as $line) {
-        if (preg_match('/^(.+) <(.+)>$/', $line, $matches)) {
-            $authors[] = array(
-                'name' => $matches[1],
-                'email' => $matches[2]
-            );
-        }
-    }
-
-    $json = template(__DIR__.'/composer.json.php', array(
-        'authors' => json_encode($authors, JSON_UNESCAPED_SLASHES)
-    ));
-
-    @file_put_contents(__DIR__.'/composer.json', $json);
-    printLn('Created composer.json');
-});
+// You can pull in other tasks by simply requiring the file
+require __DIR__.'/bob_composer_config.php';
 
 desc('Creates a distributable, self-contained and executable PHAR file');
 task('dist', function() {

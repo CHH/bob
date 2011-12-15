@@ -1,16 +1,22 @@
 {
-    "name": "chh/bob",
-    "description": "A simple and messy build tool for PHP projects",
-    "keywords": [
-        "build"
-    ],
-    "license": "MIT",
-    "homepage": "https://github.com/CHH/Bob",
-    "authors": [{"name":"Christoph Hochstrasser","email":"christoph.hochstrasser@gmail.com"}],
+    "name": "chh\/bob",
     "require": {
         "php": ">=5.3.0"
     },
+    "description": "A tiny and messy build tool for PHP projects.",
+    "keywords": [
+        "keyword"
+    ],
+    "license": "MIT",
+    "homepage": "http:\/\/example.com",
+    "version": "master-dev",
+    "authors": [
+        {
+            "name": "Christoph Hochstrasser",
+            "email": "christoph.hochstrasser@gmail.com"
+        }
+    ],
     "bin": [
-        "bin/bob.phar"
+        "bin\/bob.phar"
     ]
 }
