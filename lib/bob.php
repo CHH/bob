@@ -2,7 +2,7 @@
 
 namespace Bob;
 
-function printLn($line, $stream = null)
+function println($line, $stream = null)
 {
     $line = "$line\n";
 
@@ -23,16 +23,12 @@ function template($file, $vars = array())
     }
 
     $template = function($__file, $__vars) {
-        foreach ($__vars as $var => $value) {
-            $$var = $value;
-        }
+        extract($__vars);
         unset($__vars, $var, $value);
 
         ob_start();
         include($__file);
-        $rendered = ob_get_clean();
-
-        return $rendered;
+        return ob_get_clean();
     };
 
     return $template($file, $vars);
