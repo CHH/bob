@@ -29,10 +29,13 @@ $context = (object) array(
     'cwd'  => $_SERVER['PWD']
 );
 
+// This contains the full path to the 
+// file where tasks are defined.
 $definition;
 
-// You can output a usage message with the `-h` or `--help`
-// flags.
+// Internal: Prints a help message.
+//
+// Returns nothing.
 function usage()
 {
     echo <<<HELPTEXT
@@ -59,6 +62,57 @@ Options:
 HELPTEXT;
 }
 
+// Public: Defines the callback as a task with the given name.
+//
+// name     - Task Name.
+// callback - A callback, which gets run if the task is requested.
+//
+// Examples
+//
+//     task('hello', function() {
+//         echo "Hello World\n";
+//     });
+//
+// Returns nothing.
+function task($name, $callback)
+{
+    global $tasks;
+    $tasks[$name] = $callback;
+}
+
+// Public: Defines the description of the subsequent task.
+//
+// text  - Description text, should explain in plain sentences
+//         what the task does.
+// usage - A usage message, must start with the task name and
+//         should then be followed by the arguments.
+//
+// Examples
+//
+//     desc('Says Hello World to NAME', 'greet NAME');
+//     task('greet', function($ctx) {
+//         $name = $ctx->argv[1];
+//
+//         echo "Hello World $name!\n";
+//     });
+//
+// Returns nothing.
+function desc($text, $usage = null)
+{
+    global $tasks, $descriptions, $usages;
+
+    $descriptions[count($tasks)] = $text;
+
+    if ($usage) {
+        $usages[count($tasks)] = $usage;
+    }
+}
+
+// Public: Executes the given task's callback.
+//
+// name - Task to be run.
+//
+// Returns the task callback's return value.
 function execute($name)
 {
     global $tasks, $context;
@@ -72,6 +126,16 @@ function execute($name)
     return call_user_func($task, $context);
 }
 
+// Internal: Runs a task by its name in the provided context.
+// Prints "#" followed by the task name and the time it took 
+// to run (in seconds) separated by a pipe as last line.
+//
+// name    - Task Name.
+// context - An object which gets passed to the task as first
+//           argument and contains passed CLI arguments and the
+//           CWD (optional).
+//
+// Returns the task's return value, or 1 on failure.
 function runTask($name, $context = null)
 {
     try {
@@ -86,9 +150,16 @@ function runTask($name, $context = null)
     return $return === null ? 0 : $return;
 }
 
+// Internal: Lists all tasks with their usages and descriptions
+// and prints them to STDOUT.
+//
+// Returns nothing.
 function listTasks()
 {
-    global $tasks, $descriptions, $usages, $definition;
+    global $tasks, 
+           $descriptions, 
+           $usages, 
+           $definition;
 
     echo "# $definition\n";
 
@@ -114,6 +185,16 @@ function listTasks()
     }
 }
 
+// Internal: Looks up the provided definition file
+// in the directory tree, starting by the provided
+// directory and stops at the filesystem boundary.
+//
+// definition - File name to look up
+// cwd        - Starting point for traversing up the 
+//              directory tree.
+//
+// Returns the absolute path to the file as String or
+// False if the file was not found.
 function getDefinitionPath($definition, $cwd)
 {
     if (!is_dir($cwd)) {
@@ -129,30 +210,13 @@ function getDefinitionPath($definition, $cwd)
         $cwd .= '/..';
 
         // We are at the filesystem boundary if there's
-        // nothing to go up to.
+        // nothing to go up.
         if (realpath($cwd) === false) {
             break;
         }
     }
 
     return $rp;
-}
-
-function task($name, $callback)
-{
-    global $tasks;
-    $tasks[$name] = $callback;
-}
-
-function desc($text, $usage = null)
-{
-    global $tasks, $descriptions, $usages;
-
-    $descriptions[count($tasks)] = $text;
-
-    if ($usage) {
-        $usages[count($tasks)] = $usage;
-    }
 }
 
 $optParser = new Getopt(array(
