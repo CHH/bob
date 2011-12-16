@@ -29,6 +29,8 @@ $context = (object) array(
     'cwd'  => $_SERVER['PWD']
 );
 
+$definition;
+
 // You can output a usage message with the `-h` or `--help`
 // flags.
 function usage()
@@ -86,7 +88,9 @@ function runTask($name, $context = null)
 
 function listTasks()
 {
-    global $tasks, $descriptions, $usages;
+    global $tasks, $descriptions, $usages, $definition;
+
+    echo "# $definition\n";
 
     $i = 0;
     foreach ($tasks as $name => $task) {
@@ -110,6 +114,30 @@ function listTasks()
     }
 }
 
+function getDefinitionPath($definition, $cwd)
+{
+    if (!is_dir($cwd)) {
+        throw new \InvalidArgumentException(sprintf(
+            '%s is not a directory', $cwd
+        ));
+    }
+
+    // Look for the definition Name in the $cwd
+    // until one is found.
+    while (!$rp = realpath("$cwd/$definition")) {
+        // Go up the hierarchy
+        $cwd .= '/..';
+
+        // We are at the filesystem boundary if there's
+        // nothing to go up to.
+        if (realpath($cwd) === false) {
+            break;
+        }
+    }
+
+    return $rp;
+}
+
 function task($name, $callback)
 {
     global $tasks;
@@ -125,18 +153,6 @@ function desc($text, $usage = null)
     if ($usage) {
         $usages[count($tasks)] = $usage;
     }
-}
-
-function getDefinitionPath($definition)
-{
-    global $context;
-    $cwd = $context->cwd;
-
-    while (!$rp = realpath("$cwd/$definition")) {
-        $cwd = $cwd.'/..';
-    }
-
-    return $rp;
 }
 
 $optParser = new Getopt(array(
@@ -156,10 +172,13 @@ try {
 }
 
 $definitionName = $optParser->getOption('definition') ?: "bob_config.php";
-$definition = getDefinitionPath($definitionName);
+$definition = getDefinitionPath($definitionName, $context->cwd);
 
-if (!file_exists($definition)) {
-    println(sprintf('Error: Definition %s not found', $definition), STDERR);
+if (!$definition) {
+    println(
+        sprintf('Error: Filesystem boundary reached. No %s found', $definitionName), 
+        STDERR
+    );
     exit(E_DEFINITION_NOT_FOUND);
 }
 
