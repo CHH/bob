@@ -127,6 +127,18 @@ function desc($text, $usage = null)
     }
 }
 
+function getDefinitionPath($definition)
+{
+    global $context;
+    $cwd = $context->cwd;
+
+    while (!$rp = realpath("$cwd/$definition")) {
+        $cwd = $cwd.'/..';
+    }
+
+    return $rp;
+}
+
 $optParser = new Getopt(array(
     array('h', 'help', Getopt::NO_ARGUMENT),
     array('t', 'tasks', Getopt::NO_ARGUMENT),
@@ -144,7 +156,7 @@ try {
 }
 
 $definitionName = $optParser->getOption('definition') ?: "bob_config.php";
-$definition = "{$context->cwd}/$definitionName";
+$definition = getDefinitionPath($definitionName);
 
 if (!file_exists($definition)) {
     println(sprintf('Error: Definition %s not found', $definition), STDERR);
