@@ -156,9 +156,9 @@ function runTask($name, $context = null)
 // Returns nothing.
 function listTasks()
 {
-    global $tasks, 
-           $descriptions, 
-           $usages, 
+    global $tasks,
+           $descriptions,
+           $usages,
            $definition;
 
     echo "# $definition\n";
@@ -187,10 +187,11 @@ function listTasks()
 
 // Internal: Looks up the provided definition file
 // in the directory tree, starting by the provided
-// directory and stops at the filesystem boundary.
+// directory walks the tree up until it reaches the
+// filesystem boundary.
 //
 // definition - File name to look up
-// cwd        - Starting point for traversing up the 
+// cwd        - Starting point for traversing up the
 //              directory tree.
 //
 // Returns the absolute path to the file as String or
@@ -219,7 +220,7 @@ function getDefinitionPath($definition, $cwd)
     return $rp;
 }
 
-$optParser = new Getopt(array(
+$opts = new Getopt(array(
     array('h', 'help', Getopt::NO_ARGUMENT),
     array('t', 'tasks', Getopt::NO_ARGUMENT),
     array('d', 'definition', Getopt::REQUIRED_ARGUMENT)
@@ -228,14 +229,14 @@ $optParser = new Getopt(array(
 array_shift($context->argv);
 
 try {
-    $optParser->parse($context->argv);
+    $opts->parse($context->argv);
 
 } catch (\UnexpectedValueException $e) {
     usage();
     exit(1);
 }
 
-$definitionName = $optParser->getOption('definition') ?: "bob_config.php";
+$definitionName = $opts->getOption('definition') ?: "bob_config.php";
 $definition = getDefinitionPath($definitionName, $context->cwd);
 
 if (!$definition) {
@@ -248,17 +249,17 @@ if (!$definition) {
 
 include $definition;
 
-if ($optParser->getOption('tasks')) {
+if ($opts->getOption('tasks')) {
     listTasks();
     exit(0);
 }
 
-if ($optParser->getOption('help')) {
+if ($opts->getOption('help')) {
     usage();
     exit(0);
 }
 
-if ($operands = $optParser->getOperands() and count($operands) > 0) {
+if ($operands = $opts->getOperands() and count($operands) > 0) {
     $task = $operands[0];
 } else {
     $task = key($tasks);
