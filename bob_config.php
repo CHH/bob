@@ -9,10 +9,9 @@ namespace Bob;
 // You can pull in other tasks by simply requiring the file
 require __DIR__.'/bob_composer_config.php';
 
-desc('Creates a distributable, self-contained and executable PHAR file');
-task('dist', function() {
-    if (file_exists(__DIR__.'/bin/bob.phar')) {
-        unlink(__DIR__.'/bin/bob.phar');
+fileTask(__DIR__.'/bin/bob.phar', array(__DIR__), function($task) {
+    if (file_exists($task->name)) {
+        unlink($task->name);
     }
 
     $stub = <<<'EOF'
@@ -26,16 +25,16 @@ require 'phar://bob.phar/bin/bob.php';
 __HALT_COMPILER();
 EOF;
 
-    $phar = new \Phar(__DIR__.'/bin/bob.phar', 0, 'bob.phar');
+    $phar = new \Phar($task->name, 0, basename($task->name));
     $phar->startBuffering();
-    $phar->buildFromDirectory(__DIR__, '/(bin\/|lib\/|vendor\/)(.*)\.php$/');
+    $phar->buildFromDirectory($task->prerequisites[0], '/(bin\/|lib\/|vendor\/)(.*)\.php$/');
     $phar['LICENSE.txt'] = file_get_contents(__DIR__.'/LICENSE.txt');
     $phar->setStub($stub);
     $phar->stopBuffering();
 
-    chmod(__DIR__.'/bin/bob.phar', 0555);
+    chmod($task->name, 0555);
 
-    printLn(sprintf('Generated Archive "bin/bob.phar" with %d entries', count($phar)));
+    println(sprintf('Generated Archive "%s" with %d entries', basename($task->name), count($phar)));
 });
 
 /*
@@ -54,7 +53,7 @@ EOF;
  * removed.
  */
 desc('Says "Hello World NAME!"', 'greet NAME');
-task('greet', function($app) {
+task('greet', ['foo'], function($app) {
     if (count($app->argv) < 2) {
         echo "greet expects at least one name as arguments\n";
         return 1;
@@ -65,3 +64,6 @@ task('greet', function($app) {
     echo "Hello World $name!\n";
 });
 
+task('foo', ['bar'], function() {});
+
+task('bar', function() {});

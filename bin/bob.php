@@ -74,10 +74,22 @@ HELPTEXT;
 //     });
 //
 // Returns nothing.
-function task($name, $callback)
+function task($name, $prerequisites = array(), $callback = null)
 {
-    global $tasks;
-    $tasks[$name] = $callback;
+    global $tasks, $descriptions, $usages;
+    $taskCount = count($tasks);
+
+    if (is_callable($prerequisites) and $callback === null) {
+        $callback = $prerequisites;
+        $prerequisites = array();
+    }
+
+    $task = new Task($name, $callback);
+    $task->prerequisites = $prerequisites;
+    $task->description = isset($descriptions[$taskCount]) ? $descriptions[$taskCount] : '';
+    $task->usage = isset($usages[$taskCount]) ? $usages[$taskCount] : $name;
+
+    $tasks[$name] = $task;
 }
 
 // Public: Defines the description of the subsequent task.
@@ -123,31 +135,7 @@ function execute($name)
     }
 
     $task = $tasks[$name];
-    return call_user_func($task, $context);
-}
-
-// Internal: Runs a task by its name in the provided context.
-// Prints "#" followed by the task name and the time it took 
-// to run (in seconds) separated by a pipe as last line.
-//
-// name    - Task Name.
-// context - An object which gets passed to the task as first
-//           argument and contains passed CLI arguments and the
-//           CWD (optional).
-//
-// Returns the task's return value, or 1 on failure.
-function runTask($name, $context = null)
-{
-    try {
-        $start = microtime(true);
-        $return = execute($name, $context);
-        println(sprintf('# %s|%fs', $name, microtime(true) - $start));
-    } catch (\Exception $e) {
-        println('Error: '.$e);
-        $return = 1;
-    }
-
-    return $return === null ? 0 : $return;
+    return $task($context);
 }
 
 // Internal: Lists all tasks with their usages and descriptions
@@ -157,32 +145,30 @@ function runTask($name, $context = null)
 function listTasks()
 {
     global $tasks,
-           $descriptions,
-           $usages,
            $definition;
 
     echo "# $definition\n";
 
     $i = 0;
     foreach ($tasks as $name => $task) {
-        $desc  = isset($descriptions[$i]) ? $descriptions[$i] : '';
-        $usage = isset($usages[$i]) ? $usages[$i] : $name;
-
-        echo "$usage";
+        echo $task->usage;
 
         if ($i === 0) {
             echo " (Default)";
         }
 
         echo "\n";
-        if ($desc) {
-            foreach (explode("\n", $desc) as $descLine) {
-                $descLine = ltrim($descLine);
-                echo "    $descLine\n";
+        if ($task->description) {
+            foreach (explode("\n", $task->description) as $line) {
+                echo "    ", ltrim($line), "\n";
             }
         }
         ++$i;
     }
+}
+
+function findDependencies($task)
+{
 }
 
 // Internal: Looks up the provided definition file
@@ -265,5 +251,15 @@ if ($operands = $opts->getOperands() and count($operands) > 0) {
     $task = key($tasks);
 }
 
-exit(runTask($task));
+if (!isset($tasks[$task])) {
+    println(sprintf('Error: Task "%s" not found.', STDERR));
+}
 
+project()->tasks[] = $tasks[$task];
+
+$start = microtime(true);
+$status = project()->run($context);
+
+printLn(sprintf('# %fs', microtime(true) - $start));
+
+exit($status);

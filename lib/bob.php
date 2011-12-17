@@ -48,3 +48,78 @@ function template($file, $vars = array())
 
     return $template($file, $vars);
 }
+
+// Public: Creates and stores the project instance.
+function project()
+{
+    static $project;
+
+    if (null === $project) {
+        $project = new Project;
+    }
+    return $project;
+}
+
+function fileTask($out, $prerequisites = array(), $callback)
+{
+    $task = new Task($out, function($task) use ($callback) {
+        $sourcesLastModified = max(
+            array_map(
+                function($file) {
+                    return filemtime($file);
+                },
+                $task->prerequisites
+            )
+        );
+
+        if (!file_exists($task->name) or $sourcesLastModified > filemtime($task->name)) {
+            return call_user_func($callback, $task);
+        }
+    });
+
+    $task->prerequisites = $prerequisites;
+    project()->tasks[] = $task;
+}
+
+class Project
+{
+    // Public: Tasks to run in this project.
+    public $tasks = array();
+
+    function run($context = null)
+    {
+        $status = 0;
+        foreach ($this->tasks as $task) {
+            $status = $task($context);
+        }
+
+        return $status;
+    }
+}
+
+class Task
+{
+    public $callback;
+    public $name;
+    public $prerequisites = array();
+    public $description = '';
+    public $usage = '';
+
+    protected $context;
+
+    function __construct($name, $callback)
+    {
+        if (!is_callable($callback)) {
+            throw new \InvalidArgumentException('Callback is not valid');
+        }
+
+        $this->name = $name;
+        $this->callback = $callback;
+    }
+
+    function __invoke($context = null)
+    {
+        $this->context = $context;
+        return call_user_func($this->callback, $this);
+    }
+}
