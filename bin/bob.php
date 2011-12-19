@@ -79,7 +79,7 @@ function task($name, $prerequisites = array(), $callback = null)
     global $tasks, $descriptions, $usages;
     $taskCount = count($tasks);
 
-    if (is_callable($prerequisites) and $callback === null) {
+    if ($callback === null) {
         $callback = $prerequisites;
         $prerequisites = array();
     }

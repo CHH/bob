@@ -3,6 +3,9 @@
 // Public: Contains Utility Functions.
 namespace Bob;
 
+require __DIR__.'/../vendor/FileUtils.php';
+require __DIR__.'/Bob/Config.php';
+
 // Public: Appends an End-Of-Line character to the given
 // text and writes it to a stream.
 //

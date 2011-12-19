@@ -7,7 +7,8 @@ $pkg = array();
 $pkg['name'] = $NAME;
 
 $pkg['require'] = array(
-    'php' => '>=5.3.0'
+    'php' => '>=5.3.0',
+    'pimple/pimple' => '>=1.0.0-dev'
 );
 
 $pkg['description'] = "A tiny and messy build tool for PHP projects.";
