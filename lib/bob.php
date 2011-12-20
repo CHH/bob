@@ -54,17 +54,6 @@ function template($file, $vars = array())
     return $template($file, $vars);
 }
 
-// Public: Creates and stores the project instance.
-function project()
-{
-    static $project;
-
-    if (null === $project) {
-        $project = new Project;
-    }
-    return $project;
-}
-
 function fileList($patterns)
 {
     $fileList = array();
@@ -98,5 +87,5 @@ function fileTask($out, $prerequisites = array(), $callback)
     });
 
     $task->prerequisites = $prerequisites;
-    project()->tasks[] = $task;
+    Project()->tasks[] = $task;
 }

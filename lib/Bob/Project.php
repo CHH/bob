@@ -2,6 +2,17 @@
 
 namespace Bob;
 
+// Public: Creates and stores the project instance.
+function Project()
+{
+    static $project;
+
+    if (null === $project) {
+        $project = new Project;
+    }
+    return $project;
+}
+
 class Project
 {
     // Public: Tasks to run in this project.
