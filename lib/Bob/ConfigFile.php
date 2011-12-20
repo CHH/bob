@@ -4,7 +4,15 @@ namespace Bob;
 
 // Holds the config instance for the static DSL methods
 // while evaluating the config file.
-$_bob_config;
+function ConfigHolder($config = null)
+{
+    static $instance;
+
+    if (null !== $config) {
+        $instance = $config;
+    }
+    return $instance;
+}
 
 // Public: Defines the callback as a task with the given name.
 //
@@ -20,8 +28,7 @@ $_bob_config;
 // Returns nothing.
 function task($name, $prerequisites = array(), $callback = null)
 {
-    global $_bob_config;
-    $taskCount = count($_bob_config->tasks);
+    $taskCount = count(ConfigHolder()->tasks);
 
     if ($callback === null) {
         $callback = $prerequisites;
@@ -30,10 +37,16 @@ function task($name, $prerequisites = array(), $callback = null)
 
     $task = new Task($name, $callback);
     $task->prerequisites = $prerequisites;
-    $task->description = isset($_bob_config->descriptions[$taskCount]) ? $_bob_config->descriptions[$taskCount] : '';
-    $task->usage = isset($_bob_config->usages[$taskCount]) ? $_bob_config->usages[$taskCount] : $name;
 
-    $tasks[$name] = $task;
+    $task->description = isset(ConfigHolder()->descriptions[$taskCount])
+        ? ConfigHolder()->descriptions[$taskCount]
+        : '';
+
+    $task->usage = isset(ConfigHolder()->usages[$taskCount])
+        ? ConfigHolder()->usages[$taskCount] 
+        : $name;
+
+    ConfigHolder()->tasks[$name] = $task;
 }
 
 // Public: Defines the description of the subsequent task.
@@ -55,12 +68,10 @@ function task($name, $prerequisites = array(), $callback = null)
 // Returns nothing.
 function desc($desc, $usage = null)
 {
-    global $_bob_config;
-
-    $_bob_config->descriptions[count($_bob_config->tasks)] = $desc;
+    ConfigHolder()->descriptions[count(ConfigHolder()->tasks)] = $desc;
 
     if ($usage) {
-        $_bob_config->usages[count($_bob_config->tasks)] = $usage;
+        ConfigHolder()->usages[count(ConfigHolder()->tasks)] = $usage;
     }
 }
 
@@ -72,8 +83,6 @@ class ConfigFile
 
     static function evaluate($filename = "bob_config.php", $cwd = null)
     {
-        global $_bob_config;
-
         $cwd    = $cwd ?: $_SERVER['PWD'];
         $path   = static::findConfigFile($filename, $cwd);
 
@@ -83,9 +92,9 @@ class ConfigFile
             ));
         }
 
-        $_bob_config = new static;
+        ConfigHolder(new static);
         include $path;
-        return $_bob_config;
+        return ConfigHolder();
     }
 
     // Internal: Looks up the provided definition file

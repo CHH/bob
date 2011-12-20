@@ -90,7 +90,3 @@ task('composer:manifest', function() {
     @file_put_contents(__DIR__.'/composer.json', $json);
 });
 
-desc('Publishes the composer package on Packagist.org');
-task('composer:publish', function() {
-
-});
