@@ -6,8 +6,10 @@
  */
 namespace Bob;
 
-// You can pull in other tasks by simply requiring the file
-require __DIR__.'/bob_composer_config.php';
+// Because task files are simple PHP files which call some
+// functions, task libraries can simply be included by requiring
+// or including them.
+require __DIR__.'/boblib/composer.php';
 
 $files = FileList(array(
     __DIR__.'/LICENSE.txt',
