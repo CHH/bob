@@ -18,7 +18,7 @@ require __DIR__.'/Bob/Project.php';
 // Returns Nothing.
 function println($line, $stream = null)
 {
-    $line = "$line".PHP_EOL;
+    $line = $line.PHP_EOL;
 
     if (is_resource($stream)) {
         fwrite($stream, $line);
