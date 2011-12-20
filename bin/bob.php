@@ -6,7 +6,6 @@ use Getopt;
 
 require __DIR__.'/../lib/bob.php';
 require __DIR__.'/../vendor/Getopt.php';
-include __DIR__.'/../vendor/.composer/autoload.php';
 
 const E_TASK_NOT_FOUND = 85;
 const E_GENERAL = 1;
@@ -80,6 +79,9 @@ function findDependencies($name)
 
     if ($prerequisites) {
         foreach ($prerequisites as $pr) {
+            if ($pr === $name) {
+                continue;
+            }
             $deps = array_merge($deps, findDependencies($pr));
             $deps[] = $pr;
         }
@@ -127,14 +129,18 @@ if ($opts->getOption('help')) {
 if ($operands = $opts->getOperands() and count($operands) > 0) {
     $task = $operands[0];
 } else {
-    $task = key($tasks);
+    $task = key($config->tasks);
 }
 
 if (!isset($config->tasks[$task])) {
-    println(sprintf('Error: Task "%s" not found.', STDERR));
+    println(sprintf('Error: Task "%s" not found.', $task), STDERR);
 }
 
 foreach (findDependencies($task) as $dep) {
+    if (!isset($config->tasks[$dep])) {
+        println(sprintf('Error: Dependency "%s" not found.', $dep), STDERR);
+        exit(E_TASK_NOT_FOUND);
+    }
     project()->tasks[] = $config->tasks[$dep];
 }
 

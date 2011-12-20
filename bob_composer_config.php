@@ -70,14 +70,13 @@ function getExecutables()
     return $executables;
 }
 
-desc('Creates a composer.json');
-task('composer:manifest', function() {
+fileTask(__DIR__.'/composer.json', array(__DIR__.'/composer_spec.php'), function($task) {
     $NAME = getName();
     $AUTHORS = getAuthors();
     $EXECUTABLES = getExecutables();
     $VERSION = getVersion();
 
-    $pkg = include(__DIR__.'/composer_spec.php');
+    $pkg = include($task->prerequisites[0]);
 
     if (!is_array($pkg)) {
         printLn('ERROR: composer_spec.php MUST return an array');
@@ -87,6 +86,6 @@ task('composer:manifest', function() {
     $json = json_encode($pkg, JSON_PRETTY_PRINT);
 
     printLn('Writing composer.json');
-    @file_put_contents(__DIR__.'/composer.json', $json);
+    @file_put_contents($task->name, $json);
 });
 

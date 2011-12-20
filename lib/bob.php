@@ -65,8 +65,23 @@ function project()
     return $project;
 }
 
+function fileList($patterns)
+{
+    $fileList = array();
+
+    foreach ($patterns as $p) {
+        $fileList = array_merge($fileList, glob($p));
+    }
+
+    return $fileList;
+}
+
 function fileTask($out, $prerequisites = array(), $callback)
 {
+    if ($prerequisites instanceof \Traversable) {
+        $prerequisites = iterator_to_array($prerequisites);
+    }
+
     $task = new Task($out, function($task) use ($callback) {
         $sourcesLastModified = max(
             array_map(

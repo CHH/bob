@@ -9,7 +9,16 @@ namespace Bob;
 // You can pull in other tasks by simply requiring the file
 require __DIR__.'/bob_composer_config.php';
 
-fileTask(__DIR__.'/bin/bob.phar', array(__DIR__), function($task) {
+$files = FileList([
+    __DIR__.'/LICENSE.txt',
+    __DIR__.'/bin/*.php',
+    __DIR__.'/lib/*.php',
+    __DIR__.'/lib/**/*.php',
+    __DIR__.'/vendor/FileUtils.php',
+    __DIR__.'/vendor/Getopt.php',
+]);
+
+fileTask(__DIR__.'/bin/bob.phar', $files, function($task) {
     if (file_exists($task->name)) {
         unlink($task->name);
     }
@@ -27,14 +36,17 @@ EOF;
 
     $phar = new \Phar($task->name, 0, basename($task->name));
     $phar->startBuffering();
-    $phar->buildFromDirectory($task->prerequisites[0], '/(bin\/|lib\/|vendor\/)(.*)\.php$/');
-    $phar['LICENSE.txt'] = file_get_contents(__DIR__.'/LICENSE.txt');
+
+    foreach ($task->prerequisites as $file) {
+        $phar->addFile($file, substr($file, strlen(__DIR__) + 1));
+    }
+
     $phar->setStub($stub);
     $phar->stopBuffering();
 
     chmod($task->name, 0555);
 
-    println(sprintf('Generated Archive "%s" with %d entries', basename($task->name), count($phar)));
+    println(sprintf('Regenerated Archive "%s" with %d entries', basename($task->name), count($phar)));
 });
 
 /*
@@ -54,14 +66,7 @@ EOF;
  */
 desc('Says "Hello World NAME!"', 'greet NAME');
 task('greet', ['foo'], function($task) {
-    if (count($task->context->argv) < 2) {
-        echo "greet expects at least one name as arguments\n";
-        return 1;
-    }
-
-    $name = $task->context->argv[1];
-
-    echo "Hello World $name!\n";
+    echo "Hello World!\n";
 });
 
 task('foo', ['bar'], function() {
