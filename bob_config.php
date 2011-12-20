@@ -9,14 +9,14 @@ namespace Bob;
 // You can pull in other tasks by simply requiring the file
 require __DIR__.'/bob_composer_config.php';
 
-$files = FileList([
+$files = FileList(array(
     __DIR__.'/LICENSE.txt',
     __DIR__.'/bin/*.php',
     __DIR__.'/lib/*.php',
     __DIR__.'/lib/**/*.php',
     __DIR__.'/vendor/FileUtils.php',
     __DIR__.'/vendor/Getopt.php',
-]);
+));
 
 fileTask(__DIR__.'/bin/bob.phar', $files, function($task) {
     if (file_exists($task->name)) {
@@ -65,11 +65,11 @@ EOF;
  * removed.
  */
 desc('Says "Hello World NAME!"', 'greet NAME');
-task('greet', ['foo'], function($task) {
+task('greet', array('foo'), function($task) {
     echo "Hello World!\n";
 });
 
-task('foo', ['bar'], function() {
+task('foo', array('bar'), function() {
     echo "This is the Foo Task\n";
 });
 
