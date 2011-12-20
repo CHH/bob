@@ -2,8 +2,23 @@
 
 namespace Bob;
 
-// Holds the config instance for the static DSL methods
+// Internal: Holds the config instance for the static DSL methods
 // while evaluating the config file.
+//
+// config - The Config instance, the config holder *does not* create
+//          config instances by itself.
+//
+// Examples
+//
+// Setup the Config Holder:
+//
+//     ConfigHolder(new ConfigFile);
+//
+// Retrieve the config instance by calling the function without arguments:
+//
+//     $config = ConfigHolder();
+//
+// Returns an object.
 function ConfigHolder($config = null)
 {
     static $instance;

@@ -9,8 +9,7 @@ class Task
     public $prerequisites = array();
     public $description = '';
     public $usage = '';
-
-    protected $context;
+    public $context;
 
     function __construct($name, $callback)
     {

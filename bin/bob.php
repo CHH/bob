@@ -71,8 +71,21 @@ function listTasks($config)
     }
 }
 
-function findDependencies($task)
+function findDependencies($name)
 {
+    global $config;
+
+    $deps = array();
+    $prerequisites = $config->tasks[$name]->prerequisites;
+
+    if ($prerequisites) {
+        foreach ($prerequisites as $pr) {
+            $deps = array_merge($deps, findDependencies($pr));
+            $deps[] = $pr;
+        }
+    }
+
+    return array_unique($deps);
 }
 
 $opts = new Getopt(array(
@@ -119,6 +132,10 @@ if ($operands = $opts->getOperands() and count($operands) > 0) {
 
 if (!isset($config->tasks[$task])) {
     println(sprintf('Error: Task "%s" not found.', STDERR));
+}
+
+foreach (findDependencies($task) as $dep) {
+    project()->tasks[] = $config->tasks[$dep];
 }
 
 project()->tasks[] = $config->tasks[$task];

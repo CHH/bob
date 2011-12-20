@@ -53,17 +53,21 @@ EOF;
  * removed.
  */
 desc('Says "Hello World NAME!"', 'greet NAME');
-task('greet', ['foo'], function($app) {
-    if (count($app->argv) < 2) {
+task('greet', ['foo'], function($task) {
+    if (count($task->context->argv) < 2) {
         echo "greet expects at least one name as arguments\n";
         return 1;
     }
 
-    $name = $app->argv[1];
+    $name = $task->context->argv[1];
 
     echo "Hello World $name!\n";
 });
 
-task('foo', ['bar'], function() {});
+task('foo', ['bar'], function() {
+    echo "This is the Foo Task\n";
+});
 
-task('bar', function() {});
+task('bar', function() {
+    echo "This is the Bar Task\n";
+});
