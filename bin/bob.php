@@ -6,32 +6,17 @@ use Getopt;
 
 require __DIR__.'/../lib/bob.php';
 require __DIR__.'/../vendor/Getopt.php';
+include __DIR__.'/../vendor/.composer/autoload.php';
 
 const E_TASK_NOT_FOUND = 85;
-const E_DEFINITION_NOT_FOUND = 86;
-
-// Store all tasks, with their name as key
-// and the callback as value.
-$tasks = array();
-
-// Descriptions and usages are simple
-// lists. The `desc` function simply appends
-// to these lists.
-//
-// Therefore the call to `desc` _must_ happen
-// before a task is defined, so the indexes match
-// the order of the tasks in the `$tasks` array.
-$descriptions = array();
-$usages = array();
+const E_GENERAL = 1;
 
 $context = (object) array(
     'argv' => $_SERVER['argv'],
     'cwd'  => $_SERVER['PWD']
 );
 
-// This contains the full path to the 
-// file where tasks are defined.
-$definition;
+$config;
 
 // Internal: Prints a help message.
 //
@@ -62,95 +47,14 @@ Options:
 HELPTEXT;
 }
 
-// Public: Defines the callback as a task with the given name.
-//
-// name     - Task Name.
-// callback - A callback, which gets run if the task is requested.
-//
-// Examples
-//
-//     task('hello', function() {
-//         echo "Hello World\n";
-//     });
-//
-// Returns nothing.
-function task($name, $prerequisites = array(), $callback = null)
-{
-    global $tasks, $descriptions, $usages;
-    $taskCount = count($tasks);
-
-    if ($callback === null) {
-        $callback = $prerequisites;
-        $prerequisites = array();
-    }
-
-    $task = new Task($name, $callback);
-    $task->prerequisites = $prerequisites;
-    $task->description = isset($descriptions[$taskCount]) ? $descriptions[$taskCount] : '';
-    $task->usage = isset($usages[$taskCount]) ? $usages[$taskCount] : $name;
-
-    $tasks[$name] = $task;
-}
-
-// Public: Defines the description of the subsequent task.
-//
-// text  - Description text, should explain in plain sentences
-//         what the task does.
-// usage - A usage message, must start with the task name and
-//         should then be followed by the arguments.
-//
-// Examples
-//
-//     desc('Says Hello World to NAME', 'greet NAME');
-//     task('greet', function($ctx) {
-//         $name = $ctx->argv[1];
-//
-//         echo "Hello World $name!\n";
-//     });
-//
-// Returns nothing.
-function desc($text, $usage = null)
-{
-    global $tasks, $descriptions, $usages;
-
-    $descriptions[count($tasks)] = $text;
-
-    if ($usage) {
-        $usages[count($tasks)] = $usage;
-    }
-}
-
-// Public: Executes the given task's callback.
-//
-// name - Task to be run.
-//
-// Returns the task callback's return value.
-function execute($name)
-{
-    global $tasks, $context;
-
-    if (!isset($tasks[$name])) {
-        println(sprintf('Error: Task "%s" not found.', $name), STDERR);
-        exit(E_TASK_NOT_FOUND);
-    }
-
-    $task = $tasks[$name];
-    return $task($context);
-}
-
 // Internal: Lists all tasks with their usages and descriptions
 // and prints them to STDOUT.
 //
 // Returns nothing.
-function listTasks()
+function listTasks($config)
 {
-    global $tasks,
-           $definition;
-
-    echo "# $definition\n";
-
     $i = 0;
-    foreach ($tasks as $name => $task) {
+    foreach ($config->tasks as $name => $task) {
         echo $task->usage;
 
         if ($i === 0) {
@@ -171,41 +75,6 @@ function findDependencies($task)
 {
 }
 
-// Internal: Looks up the provided definition file
-// in the directory tree, starting by the provided
-// directory walks the tree up until it reaches the
-// filesystem boundary.
-//
-// definition - File name to look up
-// cwd        - Starting point for traversing up the
-//              directory tree.
-//
-// Returns the absolute path to the file as String or
-// False if the file was not found.
-function getDefinitionPath($definition, $cwd)
-{
-    if (!is_dir($cwd)) {
-        throw new \InvalidArgumentException(sprintf(
-            '%s is not a directory', $cwd
-        ));
-    }
-
-    // Look for the definition Name in the $cwd
-    // until one is found.
-    while (!$rp = realpath("$cwd/$definition")) {
-        // Go up the hierarchy
-        $cwd .= '/..';
-
-        // We are at the filesystem boundary if there's
-        // nothing to go up.
-        if (realpath($cwd) === false) {
-            break;
-        }
-    }
-
-    return $rp;
-}
-
 $opts = new Getopt(array(
     array('h', 'help', Getopt::NO_ARGUMENT),
     array('t', 'tasks', Getopt::NO_ARGUMENT),
@@ -223,20 +92,17 @@ try {
 }
 
 $definitionName = $opts->getOption('definition') ?: "bob_config.php";
-$definition = getDefinitionPath($definitionName, $context->cwd);
 
-if (!$definition) {
-    println(
-        sprintf('Error: Filesystem boundary reached. No %s found', $definitionName), 
-        STDERR
-    );
-    exit(E_DEFINITION_NOT_FOUND);
+try {
+    $config = ConfigFile::evaluate($definitionName);
+
+} catch (\InvalidArgumentException $e) {
+    println(sprintf('Error: %s', $e->getMessage()), STDERR);
+    exit(1);
 }
 
-include $definition;
-
 if ($opts->getOption('tasks')) {
-    listTasks();
+    listTasks($config);
     exit(0);
 }
 
@@ -251,11 +117,11 @@ if ($operands = $opts->getOperands() and count($operands) > 0) {
     $task = key($tasks);
 }
 
-if (!isset($tasks[$task])) {
+if (!isset($config->tasks[$task])) {
     println(sprintf('Error: Task "%s" not found.', STDERR));
 }
 
-project()->tasks[] = $tasks[$task];
+project()->tasks[] = $config->tasks[$task];
 
 $start = microtime(true);
 $status = project()->run($context);

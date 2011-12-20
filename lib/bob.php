@@ -4,7 +4,9 @@
 namespace Bob;
 
 require __DIR__.'/../vendor/FileUtils.php';
-require __DIR__.'/Bob/Config.php';
+require __DIR__.'/Bob/Task.php';
+require __DIR__.'/Bob/ConfigFile.php';
+require __DIR__.'/Bob/Project.php';
 
 // Public: Appends an End-Of-Line character to the given
 // text and writes it to a stream.
@@ -82,47 +84,4 @@ function fileTask($out, $prerequisites = array(), $callback)
 
     $task->prerequisites = $prerequisites;
     project()->tasks[] = $task;
-}
-
-class Project
-{
-    // Public: Tasks to run in this project.
-    public $tasks = array();
-
-    function run($context = null)
-    {
-        $status = 0;
-        foreach ($this->tasks as $task) {
-            $status = $task($context);
-        }
-
-        return $status;
-    }
-}
-
-class Task
-{
-    public $callback;
-    public $name;
-    public $prerequisites = array();
-    public $description = '';
-    public $usage = '';
-
-    protected $context;
-
-    function __construct($name, $callback)
-    {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('Callback is not valid');
-        }
-
-        $this->name = $name;
-        $this->callback = $callback;
-    }
-
-    function __invoke($context = null)
-    {
-        $this->context = $context;
-        return call_user_func($this->callback, $this);
-    }
 }
