@@ -52,7 +52,7 @@ function getAuthors()
 
 function getExecutables()
 {
-    $binDir = __DIR__.'/bin';
+    $binDir = BOB_PROJECT.'/bin';
 
     if (!is_dir($binDir)) {
         return array();
@@ -70,7 +70,7 @@ function getExecutables()
     return $executables;
 }
 
-fileTask(__DIR__.'/composer.json', array(__DIR__.'/composer_spec.php'), function($task) {
+fileTask(BOB_PROJECT.'/composer.json', array(BOB_PROJECT.'/composer_spec.php'), function($task) {
     $NAME = getName();
     $AUTHORS = getAuthors();
     $EXECUTABLES = getExecutables();

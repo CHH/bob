@@ -108,13 +108,15 @@ try {
 
 $definitionName = $opts->getOption('definition') ?: "bob_config.php";
 
-try {
-    $config = ConfigFile::evaluate($definitionName);
+$path = ConfigFile::findConfigFile($definitionName, $context->cwd);
 
-} catch (\InvalidArgumentException $e) {
-    println(sprintf('Error: %s', $e->getMessage()), STDERR);
+if (false === $path) {
+    println(sprintf('Error: Filesystem boundary reached. No %s found.', $definitionName), STDERR);
     exit(1);
 }
+
+define("BOB_PROJECT", dirname($path));
+$config = ConfigFile::evaluate($path);
 
 if ($opts->getOption('tasks')) {
     listTasks($config);

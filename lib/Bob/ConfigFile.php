@@ -96,12 +96,9 @@ class ConfigFile
     public $descriptions = array();
     public $usages = array();
 
-    static function evaluate($filename = "bob_config.php", $cwd = null)
+    static function evaluate($path)
     {
-        $cwd    = $cwd ?: $_SERVER['PWD'];
-        $path   = static::findConfigFile($filename, $cwd);
-
-        if (false === $path) {
+        if (!file_exists($path)) {
             throw new \InvalidArgumentException(sprintf(
                 'Config file "%s" not found in "%s".', $filename, $cwd
             ));
@@ -123,7 +120,7 @@ class ConfigFile
     //
     // Returns the absolute path to the file as String or
     // False if the file was not found.
-    static protected function findConfigFile($filename, $cwd)
+    static function findConfigFile($filename, $cwd)
     {
         if (!is_dir($cwd)) {
             throw new \InvalidArgumentException(sprintf(
