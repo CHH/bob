@@ -70,6 +70,7 @@ function getExecutables()
     return $executables;
 }
 
+desc('Generates the composer.json from the composer_spec.php');
 fileTask('composer.json', array('composer_spec.php'), function($task) {
     $NAME = getName();
     $AUTHORS = getAuthors();

@@ -16,7 +16,7 @@ namespace Bob;
 // Returns nothing.
 function task($name, $prerequisites = array(), $callback = null)
 {
-    if ($callback === null) {
+    if ($callback === null and is_callable($prerequisites)) {
         $callback = $prerequisites;
         $prerequisites = array();
     }

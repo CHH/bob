@@ -10,19 +10,17 @@ class Task
     public $description = '';
     public $usage = '';
 
-    function __construct($name, $callback)
+    function __construct($name, $callback = null)
     {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('Callback is not valid');
-        }
-
         $this->name = $name;
         $this->callback = $callback;
     }
 
     function invoke()
     {
-        return call_user_func($this->callback, $this);
+        if (is_callable($this->callback)) {
+            return call_user_func($this->callback, $this);
+        }
     }
 
     function __invoke()

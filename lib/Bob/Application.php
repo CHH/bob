@@ -47,9 +47,6 @@ class Application
             return 0;
         }
 
-        $this->originalDir = $_SERVER['PWD'];
-        chdir(dirname($configPath));
-
         $runList = $this->buildRunList();
 
         $start = microtime(true);
@@ -72,6 +69,9 @@ class Application
         }
 
         ConfigFile::evaluate($configPath);
+
+        $this->originalDir = $_SERVER['PWD'];
+        chdir(dirname($configPath));
     }
 
     function buildRunList()
@@ -87,7 +87,11 @@ class Application
         }
 
         $runList = array();
-        // Todo: Add dependencies here to runlist.
+        foreach ($this->findDependencies($taskName) as $dep) {
+            if ($this->taskExists($dep) and is_callable($this->tasks[$dep])) {
+                $runList[] = $this->tasks[$dep];
+            }
+        }
         $runList[] = $this->tasks[$taskName];
 
         return $runList;
@@ -133,8 +137,11 @@ class Application
                 if ($pr === $name) {
                     continue;
                 }
-                $deps = array_merge($deps, $this->findDependencies($pr));
-                $deps[] = $pr;
+
+                if ($this->taskExists($pr)) {
+                    $deps = array_merge($deps, $this->findDependencies($pr));
+                    $deps[] = $pr;
+                }
             }
         }
 

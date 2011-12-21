@@ -6,12 +6,18 @@
  */
 namespace Bob;
 
+// The first defined task is the default task for the case
+// Bob is executed without a task name.
+desc('Makes a distributable version of Bob, consisting of a composer.json 
+      and a PHAR file.');
+task('dist', array('composer.json', 'bin/bob.phar'));
+
 // Because task files are simple PHP files which call some
 // functions, task libraries can simply be included by requiring
 // or including them.
 require __DIR__.'/boblib/composer.php';
 
-$files = FileList(array(
+$pharFiles = FileList(array(
     __DIR__.'/LICENSE.txt',
     __DIR__.'/bin/*.php',
     __DIR__.'/lib/*.php',
@@ -20,7 +26,8 @@ $files = FileList(array(
     __DIR__.'/vendor/Getopt.php',
 ));
 
-fileTask('bin/bob.phar', $files, function($task) {
+desc('Generates an executable PHP Archive (PHAR) from the project files.');
+fileTask('bin/bob.phar', $pharFiles, function($task) {
     if (file_exists($task->name)) {
         unlink($task->name);
     }
