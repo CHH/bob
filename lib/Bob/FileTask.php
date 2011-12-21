@@ -2,12 +2,25 @@
 
 namespace Bob;
 
+function fileTask($target, $prerequisites = array(), $callback)
+{
+    if ($prerequisites instanceof \Traversable) {
+        $prerequisites = iterator_to_array($prerequisites);
+    }
+
+    $task = new FileTask($target, $callback);
+    $task->prerequisites = $prerequisites;
+
+    Bob::$application->registerTask($target, $task);
+}
+
 class FileTask extends Task
 {
-    function __invoke($context = null)
+    function invoke()
     {
-        if (!$this->isNeeded()) return;
-        parent::__invoke($context);
+        if ($this->isNeeded()) {
+            parent::invoke();
+        }
     }
 
     function isNeeded()

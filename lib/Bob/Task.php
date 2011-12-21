@@ -9,7 +9,6 @@ class Task
     public $prerequisites = array();
     public $description = '';
     public $usage = '';
-    public $context;
 
     function __construct($name, $callback)
     {
@@ -21,9 +20,13 @@ class Task
         $this->callback = $callback;
     }
 
-    function __invoke($context = null)
+    function invoke()
     {
-        $this->context = $context;
         return call_user_func($this->callback, $this);
+    }
+
+    function __invoke()
+    {
+        return $this->invoke();
     }
 }

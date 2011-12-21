@@ -2,33 +2,6 @@
 
 namespace Bob;
 
-// Internal: Holds the config instance for the static DSL methods
-// while evaluating the config file.
-//
-// config - The Config instance, the config holder *does not* create
-//          config instances by itself.
-//
-// Examples
-//
-// Setup the Config Holder:
-//
-//     ConfigHolder(new ConfigFile);
-//
-// Retrieve the config instance by calling the function without arguments:
-//
-//     $config = ConfigHolder();
-//
-// Returns an object.
-function ConfigHolder($config = null)
-{
-    static $instance;
-
-    if (null !== $config) {
-        $instance = $config;
-    }
-    return $instance;
-}
-
 // Public: Defines the callback as a task with the given name.
 //
 // name     - Task Name.
@@ -43,7 +16,7 @@ function ConfigHolder($config = null)
 // Returns nothing.
 function task($name, $prerequisites = array(), $callback = null)
 {
-    $taskCount = count(ConfigHolder()->tasks);
+    $taskCount = count(Bob::$application->tasks);
 
     if ($callback === null) {
         $callback = $prerequisites;
@@ -53,15 +26,7 @@ function task($name, $prerequisites = array(), $callback = null)
     $task = new Task($name, $callback);
     $task->prerequisites = $prerequisites;
 
-    $task->description = isset(ConfigHolder()->descriptions[$taskCount])
-        ? ConfigHolder()->descriptions[$taskCount]
-        : '';
-
-    $task->usage = isset(ConfigHolder()->usages[$taskCount])
-        ? ConfigHolder()->usages[$taskCount] 
-        : $name;
-
-    ConfigHolder()->tasks[$name] = $task;
+    Bob::$application->registerTask($name, $task);
 }
 
 // Public: Defines the description of the subsequent task.
@@ -83,19 +48,15 @@ function task($name, $prerequisites = array(), $callback = null)
 // Returns nothing.
 function desc($desc, $usage = null)
 {
-    ConfigHolder()->descriptions[count(ConfigHolder()->tasks)] = $desc;
+    Bob::$application->addDescription($desc);
 
     if ($usage) {
-        ConfigHolder()->usages[count(ConfigHolder()->tasks)] = $usage;
+        Bob::$application->addUsage($usage);
     }
 }
 
 class ConfigFile
 {
-    public $tasks = array();
-    public $descriptions = array();
-    public $usages = array();
-
     static function evaluate($path)
     {
         if (!file_exists($path)) {
@@ -104,9 +65,7 @@ class ConfigFile
             ));
         }
 
-        ConfigHolder(new static);
         include $path;
-        return ConfigHolder();
     }
 
     // Internal: Looks up the provided definition file

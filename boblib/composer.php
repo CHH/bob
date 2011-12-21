@@ -30,7 +30,7 @@ function getVersion()
 //
 function getAuthors()
 {
-    $authorsFile = __DIR__.'/AUTHORS.txt';
+    $authorsFile = 'AUTHORS.txt';
 
     if (!file_exists($authorsFile)) {
         return array();
@@ -52,7 +52,7 @@ function getAuthors()
 
 function getExecutables()
 {
-    $binDir = BOB_PROJECT.'/bin';
+    $binDir = 'bin';
 
     if (!is_dir($binDir)) {
         return array();
@@ -62,7 +62,7 @@ function getExecutables()
 
     foreach (new \DirectoryIterator($binDir) as $file) {
         if ($file->isFile() and $file->isExecutable()) {
-            $logicalPath = substr($file->getRealpath(), strlen(__DIR__) + 1);
+            $logicalPath = substr($file->getRealpath(), strlen($_SERVER['PWD']) + 1);
             $executables[] = $logicalPath;
         }
     }
@@ -70,7 +70,7 @@ function getExecutables()
     return $executables;
 }
 
-fileTask(BOB_PROJECT.'/composer.json', array(BOB_PROJECT.'/composer_spec.php'), function($task) {
+fileTask('composer.json', array('composer_spec.php'), function($task) {
     $NAME = getName();
     $AUTHORS = getAuthors();
     $EXECUTABLES = getExecutables();

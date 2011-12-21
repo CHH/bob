@@ -4,10 +4,11 @@
 namespace Bob;
 
 require __DIR__.'/../vendor/FileUtils.php';
+require __DIR__.'/../vendor/Getopt.php';
 require __DIR__.'/Bob/Task.php';
 require __DIR__.'/Bob/FileTask.php';
 require __DIR__.'/Bob/ConfigFile.php';
-require __DIR__.'/Bob/Project.php';
+require __DIR__.'/Bob/Application.php';
 
 // Public: Appends an End-Of-Line character to the given
 // text and writes it to a stream.
@@ -66,13 +67,3 @@ function fileList($patterns)
     return $fileList;
 }
 
-function fileTask($out, $prerequisites = array(), $callback)
-{
-    if ($prerequisites instanceof \Traversable) {
-        $prerequisites = iterator_to_array($prerequisites);
-    }
-
-    $task = new FileTask($out, $callback);
-    $task->prerequisites = $prerequisites;
-    Project()->tasks[] = $task;
-}

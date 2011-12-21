@@ -20,7 +20,7 @@ $files = FileList(array(
     __DIR__.'/vendor/Getopt.php',
 ));
 
-fileTask(__DIR__.'/bin/bob.phar', $files, function($task) {
+fileTask('bin/bob.phar', $files, function($task) {
     if (file_exists($task->name)) {
         unlink($task->name);
     }
