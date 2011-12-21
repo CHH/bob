@@ -1,15 +1,24 @@
 <?php
 
-namespace FileUtils;
-
-function uptodate($src, $dest)
+class FileUtils
 {
-    if (!file_exists($dest)) {
+    static function isAbsolute($path)
+    {
+        if (realpath($path) === $path) {
+            return true;
+        }
         return false;
     }
 
-    if (filemtime($dest) >= filemtime($src)) {
-        return true;
+    static function uptodate($src, $dest)
+    {
+        if (!file_exists($dest)) {
+            return false;
+        }
+
+        if (filemtime($dest) >= filemtime($src)) {
+            return true;
+        }
+        return false;
     }
-    return false;
 }
