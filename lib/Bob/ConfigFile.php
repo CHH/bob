@@ -16,8 +16,6 @@ namespace Bob;
 // Returns nothing.
 function task($name, $prerequisites = array(), $callback = null)
 {
-    $taskCount = count(Bob::$application->tasks);
-
     if ($callback === null) {
         $callback = $prerequisites;
         $prerequisites = array();
