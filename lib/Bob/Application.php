@@ -35,17 +35,7 @@ class Application
             return 1;
         }
 
-        $configName = $this->opts->getOption('definition') ?: 'bob_config.php';
-        $configPath = ConfigFile::findConfigFile($configName, $_SERVER['PWD']);
-
-        if (false === $configPath) {
-            throw new \Exception(sprintf(
-                'Error: Filesystem boundary reached. No %s found.', 
-                $configName
-            ));
-        }
-
-        ConfigFile::evaluate($configPath);
+        $this->loadConfig();
 
         if ($this->opts->getOption('help')) {
             echo $this->formatUsage();
@@ -67,6 +57,21 @@ class Application
             $task->invoke();
         }
         printLn(sprintf('# %fs', microtime(true) - $start));
+    }
+
+    function loadConfig()
+    {
+        $configName = $this->opts->getOption('definition') ?: 'bob_config.php';
+        $configPath = ConfigFile::findConfigFile($configName, $_SERVER['PWD']);
+
+        if (false === $configPath) {
+            throw new \Exception(sprintf(
+                'Error: Filesystem boundary reached. No %s found.', 
+                $configName
+            ));
+        }
+
+        ConfigFile::evaluate($configPath);
     }
 
     function buildRunList()
