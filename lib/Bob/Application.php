@@ -88,9 +88,7 @@ class Application
 
         $runList = array();
         foreach ($this->findDependencies($taskName) as $dep) {
-            if ($this->taskExists($dep) and is_callable($this->tasks[$dep])) {
-                $runList[] = $this->tasks[$dep];
-            }
+            $runList[] = $this->tasks[$dep];
         }
         $runList[] = $this->tasks[$taskName];
 
