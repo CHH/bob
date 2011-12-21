@@ -11,12 +11,9 @@
     "homepage": "https:\/\/github.com\/CHH\/Bob",
     "version": "master-dev",
     "authors": [
-        {
-            "name": "Christoph Hochstrasser",
-            "email": "christoph.hochstrasser@gmail.com"
-        }
+
     ],
     "bin": [
-        "bin\/bob.phar"
+        ".phar"
     ]
 }

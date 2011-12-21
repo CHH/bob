@@ -5,6 +5,7 @@ namespace Bob;
 
 require __DIR__.'/../vendor/FileUtils.php';
 require __DIR__.'/Bob/Task.php';
+require __DIR__.'/Bob/FileTask.php';
 require __DIR__.'/Bob/ConfigFile.php';
 require __DIR__.'/Bob/Project.php';
 
@@ -71,21 +72,7 @@ function fileTask($out, $prerequisites = array(), $callback)
         $prerequisites = iterator_to_array($prerequisites);
     }
 
-    $task = new Task($out, function($task) use ($callback) {
-        $sourcesLastModified = max(
-            array_map(
-                function($file) {
-                    return filemtime($file);
-                },
-                $task->prerequisites
-            )
-        );
-
-        if (!file_exists($task->name) or $sourcesLastModified > filemtime($task->name)) {
-            return call_user_func($callback, $task);
-        }
-    });
-
+    $task = new FileTask($out, $callback);
     $task->prerequisites = $prerequisites;
     Project()->tasks[] = $task;
 }
