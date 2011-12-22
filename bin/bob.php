@@ -14,7 +14,7 @@ class Bob
 Bob::$application = new Application;
 
 try {
-    Bob::$application->run();
+    exit(Bob::$application->run());
 
 } catch (\Exception $e) {
     // Print exceptions to STDERR and exit with an error.
