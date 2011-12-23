@@ -11,7 +11,7 @@ function fileTask($target, $prerequisites = array(), $callback)
     $task = new FileTask($target, $callback);
     $task->prerequisites = $prerequisites;
 
-    Bob::$application->registerTask($target, $task);
+    Bob::$application->tasks[$target] = $task;
 }
 
 class FileTask extends Task

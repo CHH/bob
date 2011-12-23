@@ -24,7 +24,7 @@ function task($name, $prerequisites = array(), $callback = null)
     $task = new Task($name, $callback);
     $task->prerequisites = $prerequisites;
 
-    Bob::$application->registerTask($name, $task);
+    Bob::$application->tasks[$name] = $task;
 }
 
 // Public: Defines the description of the subsequent task.
@@ -44,13 +44,10 @@ function task($name, $prerequisites = array(), $callback = null)
 //     });
 //
 // Returns nothing.
-function desc($desc, $usage = null)
+function desc($desc, $usage = '')
 {
-    Bob::$application->addDescription($desc);
-
-    if ($usage) {
-        Bob::$application->addUsage($usage);
-    }
+    Task::$lastDescription = $desc;
+    Task::$lastUsage = $usage;
 }
 
 class ConfigFile

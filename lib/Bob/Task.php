@@ -4,6 +4,9 @@ namespace Bob;
 
 class Task
 {
+    static $lastDescription = '';
+    static $lastUsage = '';
+
     public $callback;
     public $name;
     public $prerequisites = array();
@@ -14,6 +17,12 @@ class Task
     {
         $this->name = $name;
         $this->callback = $callback;
+
+        $this->description = self::$lastDescription;
+        $this->usage = self::$lastUsage ?: $name;
+
+        Task::$lastDescription = '';
+        Task::$lastUsage = '';
     }
 
     function invoke()

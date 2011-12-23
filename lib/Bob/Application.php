@@ -4,14 +4,23 @@ namespace Bob;
 
 use Getopt;
 
+// Public: The command line application. Contains the heavy lifting
+// of everything Bob does.
 class Application
 {
+    // Public: Contains mappings from task name to a task instance.
     var $tasks = array();
-    var $descriptions = array();
-    var $usages = array();
+
+    // Public: The directory where the bob utility was run from.
+    // The CWD inside a task refers to the directory where the
+    // config file was found.
     var $originalDir;
+
+    // Public: The command line option parser. You can add your own options 
+    // when inside a task if you call `addOptions` with the same format as seen here.
     var $opts;
 
+    // Public: Initialize the application.
     function __construct()
     {
         $this->opts = new Getopt(array(
@@ -21,6 +30,12 @@ class Application
         ));
     }
 
+    // Public: Parses the arguments list for options and
+    // then does something useful depending on what is given.
+    //
+    // argv - A list of arguments supplied on the CLI.
+    //
+    // Returns the desired exit status as Integer.
     function run($argv = null)
     {
         if (null === $argv) {
@@ -56,6 +71,11 @@ class Application
         printLn(sprintf('# %fs', microtime(true) - $start));
     }
 
+    // Internal: Looks up the config file path and includes it. Does a 
+    // `chdir` to the dirname where the config is located too. So the
+    // CWD inside of tasks always refers to the project's root.
+    //
+    // Returns nothing.
     function loadConfig()
     {
         $configName = $this->opts->getOption('definition') ?: 'bob_config.php';
@@ -74,6 +94,11 @@ class Application
         chdir(dirname($configPath));
     }
 
+    // Internal: Looks in the arguments for tasks, fetches its dependencies
+    // and returns a list of tasks which should be run. If no task name is
+    // supplied via the CLI then the first defined task is used.
+    //
+    // Returns a list of tasks to run as Array.
     function buildRunList()
     {
         if ($operands = $this->opts->getOperands() and count($operands) > 0) {
@@ -95,34 +120,12 @@ class Application
         return $runList;
     }
 
+    // Public: Checks if the task is defined.
+    //
+    // Returns boolean TRUE if the task is defined, FALSE otherwise.
     function taskExists($name)
     {
         return array_key_exists($name, $this->tasks);
-    }
-
-    function addDescription($text)
-    {
-        $this->descriptions[count($this->tasks)] = $text;
-    }
-
-    function addUsage($text)
-    {
-        $this->usages[count($this->tasks)] = $text;
-    }
-
-    function registerTask($name, $task)
-    {
-        $taskCount = count($this->tasks);
-
-        $task->description = isset($this->descriptions[$taskCount])
-            ? $this->descriptions[$taskCount]
-            : '';
-
-        $task->usage = isset($this->usages[$taskCount])
-            ? $this->usages[$taskCount]
-            : $name;
-
-        $this->tasks[$name] = $task;
     }
 
     function findDependencies($name)
