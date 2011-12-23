@@ -56,6 +56,12 @@ function template($file, $vars = array())
     return $template($file, $vars);
 }
 
+// Public: Takes a list of expressions and joins them to
+// a list of paths.
+//
+// patterns - List of shell file patterns.
+//
+// Returns a list of paths.
 function fileList($patterns)
 {
     $fileList = array();
