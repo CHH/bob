@@ -18,12 +18,12 @@ task('dist', array('composer.json', 'bin/bob.phar'));
 require __DIR__.'/boblib/composer.php';
 
 $pharFiles = FileList(array(
-    __DIR__.'/LICENSE.txt',
-    __DIR__.'/bin/*.php',
-    __DIR__.'/lib/*.php',
-    __DIR__.'/lib/**/*.php',
-    __DIR__.'/vendor/FileUtils.php',
-    __DIR__.'/vendor/Getopt.php',
+    'LICENSE.txt',
+    'bin/*.php',
+    'lib/*.php',
+    'lib/**/*.php',
+    'vendor/FileUtils.php',
+    'vendor/Getopt.php',
 ));
 
 desc('Generates an executable PHP Archive (PHAR) from the project files.');
@@ -47,7 +47,7 @@ EOF;
     $phar->startBuffering();
 
     foreach ($task->prerequisites as $file) {
-        $phar->addFile($file, substr($file, strlen(__DIR__) + 1));
+        $phar->addFile($file, substr($file, (strpos(getcwd(), $file) === 0) ? (strlen(getcwd()) + 1) : 0));
     }
 
     $phar->setStub($stub);
@@ -56,6 +56,7 @@ EOF;
     chmod($task->name, 0555);
 
     println(sprintf('Regenerated Archive "%s" with %d entries', basename($task->name), count($phar)));
+    unset($phar);
 });
 
 /*
