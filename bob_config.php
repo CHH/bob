@@ -68,15 +68,16 @@ EOF;
  * **Important:** The call to `desc()` must be _before_
  * the call to `task()`.
  *
- * Each Task callback additionally receives the `$app`
- * as argument, which contains an `argv` property.
- * The `argv` property already contains only the arguments
- * for the task, the script name and task name are already
- * removed.
+ * The only argument a task receives is the task instance.
+ * Via the task instance you've access to the prerequisites
+ * and name of the task which is very useful for file tasks.
  */
 desc('Says "Hello World NAME!"', 'greet NAME');
 task('greet', array('foo'), function($task) {
-    echo "Hello World!\n";
+    echo "Hello World! I'm the {$task->name} Task!\n";
+
+    echo "I've following prerequisites:\n";
+    echo " - ", join("\n - ", $task->prerequisites), "\n";
 });
 
 task('foo', array('bar'), function() {
