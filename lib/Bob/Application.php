@@ -24,6 +24,7 @@ class Application
     function __construct()
     {
         $this->opts = new Getopt(array(
+            array('i', 'init', Getopt::NO_ARGUMENT),
             array('h', 'help', Getopt::NO_ARGUMENT),
             array('t', 'tasks', Getopt::NO_ARGUMENT),
             array('d', 'definition', Getopt::REQUIRED_ARGUMENT)
@@ -50,6 +51,11 @@ class Application
             return 1;
         }
 
+        if ($this->opts->getOption('init')) {
+            $this->initProject();
+            return 0;
+        }
+
         $this->loadConfig();
 
         if ($this->opts->getOption('help')) {
@@ -69,6 +75,30 @@ class Application
             $task->invoke();
         }
         printLn(sprintf('# %fs', microtime(true) - $start));
+    }
+
+    function initProject()
+    {
+        if (file_exists(getcwd().'/bob_config.php')) {
+            println('Project has already a bob_config.php');
+            return;
+        }
+
+        $config = <<<'EOF'
+<?php
+
+namespace Bob;
+
+desc('Write Hello World to STDOUT');
+task('example', function() {
+    println("Hello World!");
+    println("To add some tasks open the `bob_config.php` in your project root"
+        ." at ".getcwd());
+});
+EOF;
+
+        @file_put_contents(getcwd().'/bob_config.php', $config);
+        println('Inited project at '.getcwd());
     }
 
     // Internal: Looks up the config file path and includes it. Does a 

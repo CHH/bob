@@ -6,6 +6,10 @@
  */
 namespace Bob;
 
+// Note: All file paths used here should be relative to the project
+// directory. Bob automatically sets the current working directory
+// to the path where the `bob_config.php` resides.
+
 // The first defined task is the default task for the case
 // Bob is executed without a task name.
 desc('Makes a distributable version of Bob, consisting of a composer.json 
@@ -64,8 +68,11 @@ desc('Takes an environment variable PREFIX and writes a `bob` executable
 task('install', array('dist'), function($task) {
     $prefix = getenv('PREFIX') ?: '/usr/local';
 
-    copy('bin/bob.phar', "$prefix/bin/bob");
+
+    $success = copy('bin/bob.phar', "$prefix/bin/bob");
     chmod("$prefix/bin/bob", 0755);
+
+    println(sprintf('Installed the `bob` executable in %s.', $prefix));
 });
 
 desc('Removes the `bob` excutable from the PREFIX');
@@ -73,10 +80,13 @@ task('uninstall', array('dist'), function($task) {
     $prefix = getenv("PREFIX") ?: "/usr/local";
 
     if (!file_exists("$prefix/bin/bob")) {
-        println("Seems that $prefix/bin/bob does not exist", STDERR);
+        println("Seems that bob is not installed. Aborting.", STDERR);
         return 1;
     }
-    unlink("$prefix/bin/bob");
+
+    if (false !== unlink("$prefix/bin/bob")) {
+        println("Erased bob successfully from $prefix");
+    }
 });
 
 /*
