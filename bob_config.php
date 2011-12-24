@@ -59,6 +59,26 @@ EOF;
     unset($phar);
 });
 
+desc('Takes an environment variable PREFIX and writes a `bob` executable
+      to $PREFIX/bin/bob. PREFIX defaults to "/usr/local".');
+task('install', array('dist'), function($task) {
+    $prefix = getenv('PREFIX') ?: '/usr/local';
+
+    copy('bin/bob.phar', "$prefix/bin/bob");
+    chmod("$prefix/bin/bob", 0755);
+});
+
+desc('Removes the `bob` excutable from the PREFIX');
+task('uninstall', array('dist'), function($task) {
+    $prefix = getenv("PREFIX") ?: "/usr/local";
+
+    if (!file_exists("$prefix/bin/bob")) {
+        println("Seems that $prefix/bin/bob does not exist", STDERR);
+        return 1;
+    }
+    unlink("$prefix/bin/bob");
+});
+
 /*
  * Each Task consists of an optional `desc()` call
  * with a meaningful Task description, and a call to
@@ -72,7 +92,7 @@ EOF;
  * Via the task instance you've access to the prerequisites
  * and name of the task which is very useful for file tasks.
  */
-desc('Says "Hello World NAME!"', 'greet NAME');
+desc('Example: Says "Hello World NAME!"', 'greet NAME');
 task('greet', array('foo'), function($task) {
     echo "Hello World! I'm the {$task->name} Task!\n";
 
