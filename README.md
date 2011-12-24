@@ -7,37 +7,42 @@ and messy (no OOP, warning: may contain usages of global variables!).
 Getting Started
 ---------------
 
+### Install
+
 First you need to download the [bob.phar][phar] file and place it
 somewhere.
+
+#### System-wide install
+
+To do a system-wide install, checkout either a zipball of Bob or
+clone the Bob Repository with:
+
+    $ git clone git://github.com/CHH/Bob.git
+
+Then `cd Bob` and run `php bin/bob.php install`. You can then run Bob
+via the `bob` executable.
+
+### Prepare your project
 
 You can output a usage message by running
 
 	$ php bob.phar --help
 
----
+First run in your projects root directory Bob with the `--init` flag.
+This creates an empty `bob_config.php` with one example task:
 
-**For Unix and Linux Users:** You can don't have to run the `bob.phar`
-with `php`. Just run `chmod a+x bob.phar`, then you can run it like
-this:
+    $ php bob.phar --init
 
-	$ ./bob.phar --help
-
-Then you also can rename it to just `bob`:
-
-	$ mv bob.phar bob
-	$ ./bob --help
-
----
-
-Then in your project's root, create a file named `bob_config.php`:
-
-    <?php
-	namespace Bob;
-
-This is the file which Bob looks for tasks, when run on the project.
+The `bob_config.php` is the file which Bob looks for tasks, when run on the project.
 It's important that you declare that this file belongs to the 
 `Bob` namespace with `namespace Bob;`, otherwise the DSL functions are
 not available.
+
+---
+**Hint:** It doesn't matter if you're in a sub-directory of your
+project, Bob _will_ find your `bob_config.php` by wandering up
+the directory tree.
+---
 
 Now let's define our first task. This task will output "Hello World":
 
@@ -59,8 +64,12 @@ what it is all about:
 		println('Hello World');
 	});
 
-To view all tasks and their descriptions add a `--tasks` flag:
+To view all tasks and their descriptions pass the `--tasks` flag:
 
 	$ php bob.phar --tasks
 	hello
 	    Prints Hello World to the Command Line
+
+If you pass no arguments to Bob, it runs the first defined task in your
+`bob_config.php`.
+
