@@ -6,6 +6,29 @@ aims to be _very_ lightweight.
 
 It features a very simple DSL and supports file tasks too.
 
+How is Bob compared to [Pake](https://github.com/indeyets/pake):
+
+ - Bob's DSL is a set of namespaced functions, so PHP 5.3 __is a must__.
+ - Bob's task definitions directly take a closure for the task's body,
+   instead of needing some named `run_`.
+ - Bob **has no** file finder similar to `pakeFinder`, if you need this
+   just use the [Symfony Finder](https://github.com/symfony/Finder).
+
+How is Bob compared to [Phing](http://www.phing.info/trac/):
+
+ - Bob **does not use XML config files** to define tasks. I think build
+   files should be written in the language used to write the project
+   itself so _everyone_ in the team can contribute to them. Also it's
+   quite hilarious to use XML to model a DSL with logic and such.
+ - Bob has nothing like plugins. To add new functions to Bob's DSL just
+   put them into the `Bob` namespace and require the file somehow at the
+   beginning of your build file.
+
+   Simply put:
+   The build files are only PHP.
+ - Bob has **no** rich set of provided tasks and I do not plan to add
+   this. _Bob is lightweight._
+
 Getting Started
 ---------------
 
