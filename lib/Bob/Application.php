@@ -98,7 +98,7 @@ task('example', function() {
 EOF;
 
         @file_put_contents(getcwd().'/bob_config.php', $config);
-        println('Inited project at '.getcwd());
+        println('Initialized project at '.getcwd());
     }
 
     // Internal: Looks up the config file path and includes it. Does a 
