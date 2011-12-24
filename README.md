@@ -40,7 +40,11 @@ clone the Bob Repository with:
     $ git clone git://github.com/CHH/Bob.git
 
 Then `cd Bob` and run `php bin/bob.php install`. You can then run Bob
-via the `bob` executable.
+via the `bob` command.
+
+By default the `bob` command is created in `/usr/local/bin`. To change
+this set a `PREFIX` environment variable, the command is then created
+in `PREFIX/bin`.
 
 ### Prepare your project
 
