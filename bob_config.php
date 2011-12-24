@@ -6,13 +6,34 @@
  */
 namespace Bob;
 
-// You can pull in other tasks by simply requiring the file
-require __DIR__.'/bob_composer_config.php';
+// Note: All file paths used here should be relative to the project
+// directory. Bob automatically sets the current working directory
+// to the path where the `bob_config.php` resides.
 
-desc('Creates a distributable, self-contained and executable PHAR file');
-task('dist', function() {
-    if (file_exists(__DIR__.'/bin/bob.phar')) {
-        unlink(__DIR__.'/bin/bob.phar');
+// The first defined task is the default task for the case
+// Bob is executed without a task name.
+desc('Makes a distributable version of Bob, consisting of a composer.json 
+      and a PHAR file.');
+task('dist', array('composer.json', 'bin/bob.phar'));
+
+// Because task files are simple PHP files which call some
+// functions, task libraries can simply be included by requiring
+// or including them.
+require __DIR__.'/boblib/composer.php';
+
+$pharFiles = FileList(array(
+    'LICENSE.txt',
+    'bin/*.php',
+    'lib/*.php',
+    'lib/**/*.php',
+    'vendor/FileUtils.php',
+    'vendor/Getopt.php',
+));
+
+desc('Generates an executable PHP Archive (PHAR) from the project files.');
+fileTask('bin/bob.phar', $pharFiles, function($task) {
+    if (file_exists($task->name)) {
+        unlink($task->name);
     }
 
     $stub = <<<'EOF'
@@ -26,16 +47,46 @@ require 'phar://bob.phar/bin/bob.php';
 __HALT_COMPILER();
 EOF;
 
-    $phar = new \Phar(__DIR__.'/bin/bob.phar', 0, 'bob.phar');
+    $phar = new \Phar($task->name, 0, basename($task->name));
     $phar->startBuffering();
-    $phar->buildFromDirectory(__DIR__, '/(bin\/|lib\/|vendor\/)(.*)\.php$/');
-    $phar['LICENSE.txt'] = file_get_contents(__DIR__.'/LICENSE.txt');
+
+    foreach ($task->prerequisites as $file) {
+        $phar->addFile($file, substr($file, (strpos(getcwd(), $file) === 0) ? (strlen(getcwd()) + 1) : 0));
+    }
+
     $phar->setStub($stub);
     $phar->stopBuffering();
 
-    chmod(__DIR__.'/bin/bob.phar', 0555);
+    chmod($task->name, 0555);
 
-    printLn(sprintf('Generated Archive "bin/bob.phar" with %d entries', count($phar)));
+    println(sprintf('Regenerated Archive "%s" with %d entries', basename($task->name), count($phar)));
+    unset($phar);
+});
+
+desc('Takes an environment variable PREFIX and writes a `bob` executable
+      to $PREFIX/bin/bob. PREFIX defaults to "/usr/local".');
+task('install', array('dist'), function($task) {
+    $prefix = getenv('PREFIX') ?: '/usr/local';
+
+
+    $success = copy('bin/bob.phar', "$prefix/bin/bob");
+    chmod("$prefix/bin/bob", 0755);
+
+    println(sprintf('Installed the `bob` executable in %s.', $prefix));
+});
+
+desc('Removes the `bob` excutable from the PREFIX');
+task('uninstall', array('dist'), function($task) {
+    $prefix = getenv("PREFIX") ?: "/usr/local";
+
+    if (!file_exists("$prefix/bin/bob")) {
+        println("Seems that bob is not installed. Aborting.", STDERR);
+        return 1;
+    }
+
+    if (false !== unlink("$prefix/bin/bob")) {
+        println("Erased bob successfully from $prefix");
+    }
 });
 
 /*
@@ -47,21 +98,22 @@ EOF;
  * **Important:** The call to `desc()` must be _before_
  * the call to `task()`.
  *
- * Each Task callback additionally receives the `$app`
- * as argument, which contains an `argv` property.
- * The `argv` property already contains only the arguments
- * for the task, the script name and task name are already
- * removed.
+ * The only argument a task receives is the task instance.
+ * Via the task instance you've access to the prerequisites
+ * and name of the task which is very useful for file tasks.
  */
-desc('Says "Hello World NAME!"', 'greet NAME');
-task('greet', function($app) {
-    if (count($app->argv) < 2) {
-        echo "greet expects at least one name as arguments\n";
-        return 1;
-    }
+desc('Example: Says "Hello World NAME!"', 'greet NAME');
+task('greet', array('foo'), function($task) {
+    echo "Hello World! I'm the {$task->name} Task!\n";
 
-    $name = $app->argv[1];
-
-    echo "Hello World $name!\n";
+    echo "I've following prerequisites:\n";
+    echo " - ", join("\n - ", $task->prerequisites), "\n";
 });
 
+task('foo', array('bar'), function() {
+    echo "This is the Foo Task\n";
+});
+
+task('bar', function() {
+    echo "This is the Bar Task\n";
+});

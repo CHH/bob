@@ -3,6 +3,13 @@
 // Public: Contains Utility Functions.
 namespace Bob;
 
+require __DIR__.'/../vendor/FileUtils.php';
+require __DIR__.'/../vendor/Getopt.php';
+require __DIR__.'/Bob/Task.php';
+require __DIR__.'/Bob/FileTask.php';
+require __DIR__.'/Bob/ConfigFile.php';
+require __DIR__.'/Bob/Application.php';
+
 // Public: Appends an End-Of-Line character to the given
 // text and writes it to a stream.
 //
@@ -13,7 +20,7 @@ namespace Bob;
 // Returns Nothing.
 function println($line, $stream = null)
 {
-    $line = "$line".PHP_EOL;
+    $line = $line.PHP_EOL;
 
     if (is_resource($stream)) {
         fwrite($stream, $line);
@@ -48,3 +55,21 @@ function template($file, $vars = array())
 
     return $template($file, $vars);
 }
+
+// Public: Takes a list of expressions and joins them to
+// a list of paths.
+//
+// patterns - List of shell file patterns.
+//
+// Returns a list of paths.
+function fileList($patterns)
+{
+    $fileList = array();
+
+    foreach ($patterns as $p) {
+        $fileList = array_merge($fileList, glob($p));
+    }
+
+    return $fileList;
+}
+

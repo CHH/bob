@@ -30,7 +30,7 @@ function getVersion()
 //
 function getAuthors()
 {
-    $authorsFile = __DIR__.'/AUTHORS.txt';
+    $authorsFile = 'AUTHORS.txt';
 
     if (!file_exists($authorsFile)) {
         return array();
@@ -52,7 +52,7 @@ function getAuthors()
 
 function getExecutables()
 {
-    $binDir = __DIR__.'/bin';
+    $binDir = 'bin';
 
     if (!is_dir($binDir)) {
         return array();
@@ -62,7 +62,7 @@ function getExecutables()
 
     foreach (new \DirectoryIterator($binDir) as $file) {
         if ($file->isFile() and $file->isExecutable()) {
-            $logicalPath = substr($file->getRealpath(), strlen(__DIR__) + 1);
+            $logicalPath = substr($file->getRealpath(), strlen($_SERVER['PWD']) + 1);
             $executables[] = $logicalPath;
         }
     }
@@ -70,14 +70,14 @@ function getExecutables()
     return $executables;
 }
 
-desc('Creates a composer.json');
-task('composer:manifest', function() {
+desc('Generates the composer.json from the composer_spec.php');
+fileTask('composer.json', array('composer_spec.php'), function($task) {
     $NAME = getName();
     $AUTHORS = getAuthors();
     $EXECUTABLES = getExecutables();
     $VERSION = getVersion();
 
-    $pkg = include(__DIR__.'/composer_spec.php');
+    $pkg = include($task->prerequisites[0]);
 
     if (!is_array($pkg)) {
         printLn('ERROR: composer_spec.php MUST return an array');
@@ -87,10 +87,6 @@ task('composer:manifest', function() {
     $json = json_encode($pkg, JSON_PRETTY_PRINT);
 
     printLn('Writing composer.json');
-    @file_put_contents(__DIR__.'/composer.json', $json);
+    @file_put_contents($task->name, $json);
 });
 
-desc('Publishes the composer package on Packagist.org');
-task('composer:publish', function() {
-
-});
