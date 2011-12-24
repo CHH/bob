@@ -208,6 +208,7 @@ EOF;
         return <<<HELPTEXT
 Usage:
   bob.php
+  bob.php --init
   bob.php [-d|--definition <definition>] <task>
   bob.php -t|--tasks
   bob.php -h|--help
@@ -218,6 +219,9 @@ Arguments:
     long as they don't contain spaces.
 
 Options:
+  -i|--init:
+    Creates an empty `bob_config.php` in the current working
+    directory if none exists.
   -d|--definition <definition>:
     Lookup <definition> in the current working directory and
     then load tasks from this file instead of "bob_config.php".
