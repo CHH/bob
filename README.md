@@ -10,7 +10,7 @@ How is Bob compared to [Pake](https://github.com/indeyets/pake):
 
  - Bob's DSL is a set of namespaced functions, so PHP 5.3 __is a must__.
  - Bob's task definitions directly take a closure for the task's body,
-   instead of needing some named `run_`.
+   instead of needing some function named `run_*`.
  - Bob **has no** file finder similar to `pakeFinder`, if you need this
    just use the [Symfony Finder](https://github.com/symfony/Finder).
 
