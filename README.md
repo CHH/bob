@@ -22,10 +22,7 @@ How is Bob compared to [Phing](http://www.phing.info/trac/):
    quite hilarious to use XML to model a DSL with logic and such.
  - Bob has nothing like plugins. To add new functions to Bob's DSL just
    put them into the `Bob` namespace and require the file somehow at the
-   beginning of your build file.
-
-   Simply put:
-   The build files are only PHP.
+   beginning of your build file. **Simply put:** Bob's build configs are _only_ PHP.
  - Bob has **no** rich set of provided tasks and I do not plan to add
    this. _Bob is lightweight._
 
