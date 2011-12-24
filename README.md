@@ -39,9 +39,11 @@ It's important that you declare that this file belongs to the
 not available.
 
 ---
+
 **Hint:** It doesn't matter if you're in a sub-directory of your
 project, Bob _will_ find your `bob_config.php` by wandering up
 the directory tree.
+
 ---
 
 Now let's define our first task. This task will output "Hello World":
