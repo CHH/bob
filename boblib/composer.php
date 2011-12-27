@@ -14,7 +14,15 @@ function getName()
 // in your favourite VCS.
 function getVersion()
 {
-    return "master-dev";
+    $tags = `git tag`;
+
+    if (!$tags) {
+        return "master-dev";
+    }
+
+    $tags = explode("\n", $tags);
+    rsort($tags);
+    return $tags[0];
 }
 
 // Should return an array of authors.
@@ -71,7 +79,7 @@ function getExecutables()
 }
 
 desc('Generates the composer.json from the composer_spec.php');
-fileTask('composer.json', array('composer_spec.php'), function($task) {
+task('composer.json', array('composer_spec.php'), function($task) {
     $NAME = getName();
     $AUTHORS = getAuthors();
     $EXECUTABLES = getExecutables();
