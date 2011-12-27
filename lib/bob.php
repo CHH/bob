@@ -5,9 +5,11 @@ namespace Bob;
 
 require __DIR__.'/../vendor/FileUtils.php';
 require __DIR__.'/../vendor/Getopt.php';
+
 require __DIR__.'/Bob/Task.php';
 require __DIR__.'/Bob/FileTask.php';
 require __DIR__.'/Bob/ConfigFile.php';
+require __DIR__.'/Bob/Dsl.php';
 require __DIR__.'/Bob/Application.php';
 
 // Public: Appends an End-Of-Line character to the given

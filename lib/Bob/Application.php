@@ -74,7 +74,7 @@ class Application
         foreach ($runList as $task) {
             $task->invoke();
         }
-        printLn(sprintf('# %fs', microtime(true) - $start));
+        printLn(sprintf('# %f seconds', microtime(true) - $start));
     }
 
     function initProject()
@@ -118,7 +118,7 @@ EOF;
             ));
         }
 
-        ConfigFile::evaluate($configPath);
+        ConfigFile::evaluate($configPath, $this);
 
         $this->originalDir = $_SERVER['PWD'];
         chdir(dirname($configPath));

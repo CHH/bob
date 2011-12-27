@@ -40,8 +40,8 @@ class Task
         $this->description = self::$lastDescription;
         $this->usage = self::$lastUsage ?: $name;
 
-        Task::$lastDescription = '';
-        Task::$lastUsage = '';
+        self::$lastDescription = '';
+        self::$lastUsage = '';
     }
 
     // Public: invokes a given task.
