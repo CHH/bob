@@ -4,20 +4,21 @@ Bob, your friendly builder
 This is Bob. Bob is a build automation tool for PHP projects similar to Rake, but
 aims to be _very lightweight_.
 
-How is Bob compared to [Pake](https://github.com/indeyets/pake):
+**How Bob compares to [Pake](https://github.com/indeyets/pake):**
 
- - Bob's DSL is a set of namespaced functions, so PHP 5.3 __is a must__.
+ - Bob uses a set of namespaced functions for the DSL, so PHP 5.3 __is a must__. 
+   **If you need 5.2.x support, look at Pake.**
  - Bob's task definitions directly take a closure for the task's body,
-   instead of needing some function named `run_*`.
+   instead of performing magic with functions named `run_<task name>`.
  - Bob **has no** file finder similar to `pakeFinder`, if you need this
    just use the [Symfony Finder](https://github.com/symfony/Finder).
 
-How is Bob compared to [Phing](http://www.phing.info/trac/):
+**How Bob compares to [Phing](http://www.phing.info/trac/):**
 
  - Bob **does not use XML config files** to define tasks. I think build
    files should be written in the language used to write the project
-   itself so _everyone_ in the team can contribute to them. Also it's
-   quite hilarious to use XML to model a DSL with logic and such.
+   itself so the barrier to contribution to build files is as low as possible. 
+   Also I think it's quite hilarious to use XML for a DSL with logic and such.
  - Bob has nothing like plugins. To add new functions to Bob's DSL just
    put them into the `Bob` namespace and require the file somehow at the
    beginning of your build file. **Simply put:** Bob's build configs are _only_ PHP.
@@ -29,7 +30,15 @@ Getting Started
 
 ### Install
 
-#### Composer-enabled Project
+#### Prerequisites
+
+Bob needs at least **PHP 5.3.2** to run. 
+
+If you plan to hack on Bob, please make sure you 
+have set `phar.readonly` to `Off` in your `php.ini`. Otherwise you will have a tough luck
+creating a PHAR package of Bob.
+
+#### Install into a [Composer](https://github.com/composer/composer)-enabled Project
 
 Simply add the `chh/bob` package to your `require` section in your
 `composer.json`:
