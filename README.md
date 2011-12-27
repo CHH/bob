@@ -1,10 +1,8 @@
 Bob, your friendly builder
 ==========================
 
-This is Bob. Bob is a build tool for PHP projects similar to Rake, but
-aims to be _very_ lightweight.
-
-It features a very simple DSL and supports file tasks too.
+This is Bob. Bob is a build automation tool for PHP projects similar to Rake, but
+aims to be _very lightweight_.
 
 How is Bob compared to [Pake](https://github.com/indeyets/pake):
 
