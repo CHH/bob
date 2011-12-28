@@ -88,7 +88,7 @@ task('composer.json', array('composer_spec.php'), function($task) {
     $pkg = include($task->prerequisites[0]);
 
     if (!is_array($pkg)) {
-        printLn('ERROR: composer_spec.php MUST return an array');
+        println('Error: composer_spec.php MUST return an array');
         exit(1);
     }
 
@@ -104,7 +104,7 @@ task('composer.json', array('composer_spec.php'), function($task) {
 
     $json = json_encode($pkg, $jsonOptions);
 
-    printLn('Writing composer.json');
+    println('Writing composer.json');
     @file_put_contents($task->name, $json);
 });
 
