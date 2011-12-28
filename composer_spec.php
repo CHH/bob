@@ -11,7 +11,7 @@ $pkg['require'] = array(
 );
 
 $pkg['description'] = "A tiny and messy build tool for PHP projects.";
-$pkg['keywords']    = array('keyword');
+$pkg['keywords']    = array('build');
 $pkg['license']     = "MIT";
 $pkg['homepage']    = "https://github.com/CHH/Bob";
 

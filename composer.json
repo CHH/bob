@@ -5,7 +5,7 @@
     },
     "description": "A tiny and messy build tool for PHP projects.",
     "keywords": [
-        "keyword"
+        "build"
     ],
     "license": "MIT",
     "homepage": "https://github.com/CHH/Bob",
