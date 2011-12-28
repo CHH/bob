@@ -92,7 +92,17 @@ task('composer.json', array('composer_spec.php'), function($task) {
         exit(1);
     }
 
-    $json = json_encode($pkg, JSON_PRETTY_PRINT);
+    $jsonOptions = 0;
+
+    if (defined('JSON_PRETTY_PRINT')) {
+        $jsonOptions |= JSON_PRETTY_PRINT;
+    }
+
+    if (defined("JSON_UNESCAPED_SLASHES")) {
+        $jsonOptions |= JSON_UNESCAPED_SLASHES;
+    }
+
+    $json = json_encode($pkg, $jsonOptions);
 
     printLn('Writing composer.json');
     @file_put_contents($task->name, $json);

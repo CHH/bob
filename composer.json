@@ -1,5 +1,5 @@
 {
-    "name": "chh\/bob",
+    "name": "chh/bob",
     "require": {
         "php": ">=5.3.2"
     },
@@ -8,7 +8,7 @@
         "keyword"
     ],
     "license": "MIT",
-    "homepage": "https:\/\/github.com\/CHH\/Bob",
+    "homepage": "https://github.com/CHH/Bob",
     "version": "master-dev",
     "authors": [
         {
@@ -17,6 +17,6 @@
         }
     ],
     "bin": [
-        "bin\/bob.phar"
+        "bin/bob.phar"
     ]
 }
