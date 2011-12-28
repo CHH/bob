@@ -209,13 +209,22 @@ when contributing code.
 
 [zfcs]: http://framework.zend.com/manual/en/coding-standard.html
 
+#### Documentation
+
+The Code Documentation is all done with [Tomdoc](http://tomdoc.org),
+though there isn't anything generated for now.
+
 #### Testing
 
 I'm not requiring unit tests for contributions, though functionality
-which affects the command line tool should be at least tried.
+which affects the command line tool should be at least tried a couple of
+times.
 
 This shouldn't prevent you from writing Unit Tests though. I'm using
-PHPUnit for this purpose.
+[PHPUnit](http://phpunit.de) for this purpose.
+
+I'm recommending [php-build](https://github.com/CHH/php-build) for doing
+tests with multiple versions of PHP.
 
 #### Building
 
@@ -223,7 +232,7 @@ PHPUnit for this purpose.
 are the Buildfiles of Bob itself.
 
 When you've done some changes and want to regenerate the `bob.phar` PHAR archive
-and the `composer.json` then just enter:
+and the `composer.json` then just run Bob in the root of your clone:
 
     $ php bin/bob.php
 
