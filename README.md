@@ -109,7 +109,7 @@ Let's run this task:
 	$ php bob.phar hello
 
 You know, tasks should be self-documenting, you really don't want a
-manual for your build config or do you?. Bob provides the
+manual for your build config or do you? Bob provides the
 `desc` function for that. Let's add some text to our task, which says
 what it is all about:
 
