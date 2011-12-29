@@ -16,7 +16,10 @@ $pkg['license']     = "MIT";
 $pkg['homepage']    = "https://github.com/CHH/Bob";
 
 // These get computed in the `bob_config.php`
-$pkg['version'] = $VERSION;
+if ($VERSION) {
+    $pkg['version'] = $VERSION;
+}
+
 $pkg['authors'] = $AUTHORS;
 $pkg['bin'] = $EXECUTABLES;
 
