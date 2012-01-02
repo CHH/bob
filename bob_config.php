@@ -59,6 +59,15 @@ EOF;
     unset($phar);
 });
 
+desc("Runs Bob's test suite");
+task("test", function($task) {
+    if (!file_exists("phpunit.xml")) {
+        copy("phpunit.xml.dist", "phpunit.xml");
+    }
+
+    `phpunit`;
+});
+
 desc('Takes an environment variable PREFIX and writes a `bob` executable
       to $PREFIX/bin/bob. PREFIX defaults to "/usr/local".');
 task('install', array('dist'), function($task) {
