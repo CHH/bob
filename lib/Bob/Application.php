@@ -85,7 +85,7 @@ class Application
         $start = microtime(true);
         $task = $this->project[$taskName];
 
-        FileUtils::withCWD($this->projectDir, function() use ($task) {
+        FileUtils::chdir($this->projectDir, function() use ($task) {
             return $task->invoke();
         });
 

@@ -7,7 +7,7 @@ class FileUtilsTest extends \PHPUnit_Framework_TestCase
         $testCwd = getcwd();
         $dir = realpath('/tmp');
 
-        $cwd = FileUtils::withCWD($dir, function() {
+        $cwd = FileUtils::chdir($dir, function() {
             return getcwd();
         });
 
@@ -20,6 +20,6 @@ class FileUtilsTest extends \PHPUnit_Framework_TestCase
      */
     function testWithCwdThrowsExceptionWhenDirectoryDoesNotExist()
     {
-        FileUtils::withCWD('/foo', function() {});
+        FileUtils::chdir('/foo', function() {});
     }
 }

@@ -39,7 +39,7 @@ class FileUtils
     //            callback.
     //
     // Returns the return value of the supplied callback.
-    static function withCWD($dir, $callback, $argv = array())
+    static function chdir($dir, $callback = null, $argv = array())
     {
         if (!is_dir($dir)) {
             throw new \InvalidArgumentException("$dir does not exist.");
@@ -48,9 +48,18 @@ class FileUtils
         $cwd = getcwd();
         chdir($dir);
 
+        if (null === $callback) {
+            return;
+        }
+
         $returnValue = call_user_func_array($callback, $argv);
 
         chdir($cwd);
         return $returnValue;
+    }
+
+    static function cd($dir, $callback = null, $argv = array()) 
+    {
+        return static::chdir($dir, $callback, $argv);
     }
 }
