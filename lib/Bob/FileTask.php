@@ -19,7 +19,7 @@ namespace Bob;
 function fileTask($target, $prerequisites = array(), $callback)
 {
     $task = new FileTask($target, $callback, $prerequisites);
-    task($target, $task);
+    Bob::$application->tasks->register($task);
 }
 
 // Internal: Represents a file task.

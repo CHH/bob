@@ -11,7 +11,7 @@ class Task
     // Internal: Stores the usage message for the next created task.
     static $lastUsage = '';
 
-    // Internal: The task's callback, can be empty.
+    // Internal: The task's action, can be empty.
     var $callback;
 
     // Public: Name of the task. Used to invoke the task and used in prerequisites.
@@ -27,7 +27,8 @@ class Task
     // Public: The usage message.
     var $usage = '';
 
-    var $project;
+    // Public: The task registry, containing all task objects.
+    var $tasks;
 
     // Public: Initializes the task instance.
     //
@@ -67,18 +68,13 @@ class Task
     function invoke()
     {
         foreach ($this->prerequisites as $p) {
-            if ($this->project->taskExists($p)) {
-                $this->project[$p]->invoke();
+            if ($task = $this->tasks[$p]) {
+                $task->invoke();
             }
         }
 
         if (is_callable($this->callback)) {
             return call_user_func($this->callback, $this);
         }
-    }
-
-    function __invoke()
-    {
-        return $this->invoke();
     }
 }

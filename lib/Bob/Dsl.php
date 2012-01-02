@@ -17,18 +17,17 @@ namespace Bob;
 // Returns nothing.
 function task($name, $prerequisites = array(), $callback = null)
 {
+    if ($name instanceof Task) {
+        Bob::$application->tasks->register($name);
+        return;
+    }
+
     if (empty($name)) {
         throw new \InvalidArgumentException('Task Name cannot be empty');
     }
 
-    if ($prerequisites instanceof Task) {
-        $task = $prerequisites;
-        $prerequisites = array();
-    } else {
-        $task = new Task($name, $callback, $prerequisites);
-    }
-
-    Bob::$application->project->register($task);
+    $task = new Task($name, $callback, $prerequisites);
+    Bob::$application->tasks->register($task);
 }
 
 // Public: Defines the description of the subsequent task.

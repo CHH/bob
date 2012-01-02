@@ -10,7 +10,7 @@ use Getopt,
 class Application
 {
     // Public: Contains mappings from task name to a task instance.
-    var $project;
+    var $tasks;
 
     // Public: The directory where the bob utility was run from.
     // The CWD inside a task refers to the directory where the
@@ -32,7 +32,7 @@ class Application
             array('d', 'definition', Getopt::REQUIRED_ARGUMENT)
         ));
 
-        $this->project = new Project;
+        $this->tasks = new TaskRegistry;
     }
 
     // Public: Parses the arguments list for options and
@@ -78,18 +78,19 @@ class Application
             $taskName = "default";
         }
 
-        if (!$this->project->taskExists($taskName)) {
+        if (!$task = $this->tasks[$taskName]) {
+            var_dump(array_keys($this->tasks->getArrayCopy()));
+            var_dump($this->tasks[$taskName]);
             throw new \Exception(sprintf('Error: Task "%s" not found.', $taskName));
         }
 
         $start = microtime(true);
-        $task = $this->project[$taskName];
 
         FileUtils::chdir($this->projectDir, function() use ($task) {
             return $task->invoke();
         });
 
-        printLn(sprintf('# %f seconds', microtime(true) - $start));
+        printLn(sprintf('# %f seconds', microtime(true) - $start), STDERR);
     }
 
     function initProject()
@@ -156,11 +157,10 @@ EOF;
 
     function formatTasksAndDescriptions()
     {
-        $tasks = $this->project->getTasks();
+        $tasks = $this->tasks->getArrayCopy();
         ksort($tasks);
 
         $text = '';
-
         $text .= "(in {$this->projectDir})\n";
 
         foreach ($tasks as $name => $task) {
