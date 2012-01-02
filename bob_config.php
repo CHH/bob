@@ -72,7 +72,7 @@ task("test", function($task) {
 
 desc('Takes an environment variable PREFIX and writes a `bob` executable
       to $PREFIX/bin/bob. PREFIX defaults to "/usr/local".');
-task('install', array('dist'), function($task) {
+task('install', array('bin/bob.phar'), function($task) {
     $prefix = getenv('PREFIX') ?: '/usr/local';
 
 
@@ -83,7 +83,7 @@ task('install', array('dist'), function($task) {
 });
 
 desc('Removes the `bob` excutable from the PREFIX');
-task('uninstall', array('dist'), function($task) {
+task('uninstall', function($task) {
     $prefix = getenv("PREFIX") ?: "/usr/local";
 
     if (!file_exists("$prefix/bin/bob")) {

@@ -141,6 +141,7 @@ EOF;
         $this->originalDir = $_SERVER['PWD'];
         $this->projectDir = dirname($configPath);
 
+        // Load tasks from the search dir in "./bob_tasks/"
         if (is_dir($this->projectDir.'/bob_tasks')) {
             $taskSearchDir = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($this->projectDir.'/bob_tasks')
