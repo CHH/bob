@@ -75,7 +75,7 @@ class Application
         if ($operands = $this->opts->getOperands() and count($operands) > 0) {
             $taskName = $operands[0];
         } else {
-            $taskName = key($this->project->getTasks());
+            $taskName = "default";
         }
 
         if (!$this->project->taskExists($taskName)) {
@@ -103,6 +103,8 @@ class Application
 <?php
 
 namespace Bob;
+
+task('default', array('example'));
 
 desc('Write Hello World to STDOUT');
 task('example', function() {
@@ -154,15 +156,19 @@ EOF;
 
     function formatTasksAndDescriptions()
     {
-        $i = 0;
+        $tasks = $this->project->getTasks();
+        ksort($tasks);
+
         $text = '';
 
-        foreach ($this->project->getTasks() as $name => $task) {
-            $text .= $task->usage;
+        $text .= "(in {$this->projectDir})\n";
 
-            if ($i === 0) {
-                $text .= " (Default)";
+        foreach ($tasks as $name => $task) {
+            if ($name === 'default') {
+                continue;
             }
+
+            $text .= $task->usage;
 
             $text .= "\n";
             if ($task->description) {
@@ -170,7 +176,6 @@ EOF;
                     $text .= "    ".ltrim($line)."\n";
                 }
             }
-            ++$i;
         }
 
         return $text;

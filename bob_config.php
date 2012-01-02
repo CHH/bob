@@ -16,6 +16,8 @@ $pharFiles = FileList(array(
     'vendor/Getopt.php',
 ));
 
+task('default', array('dist'));
+
 // Note: All file paths used here should be relative to the project
 // directory. Bob automatically sets the current working directory
 // to the path where the `bob_config.php` resides.

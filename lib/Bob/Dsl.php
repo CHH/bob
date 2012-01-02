@@ -4,8 +4,9 @@ namespace Bob;
 
 // Public: Defines the callback as a task with the given name.
 //
-// name     - Task Name.
-// callback - A callback, which gets run if the task is requested.
+// name          - Task Name.
+// prerequisites - List of Dependency names.
+// callback      - The task's action, can be any callback.
 //
 // Examples
 //
@@ -16,24 +17,14 @@ namespace Bob;
 // Returns nothing.
 function task($name, $prerequisites = array(), $callback = null)
 {
-    foreach (array_filter(array($name, $prerequisites, $callback)) as $var) {
-        switch (true) {
-            case is_callable(array($var, 'invoke')):
-                $task = $var;
-                break;
-            case is_callable($var):
-                $callback = $var;
-                break;
-            case is_string($var):
-                $name = $var;
-                break;
-            case is_array($var):
-                $prerequisites = $var;
-                break;
-        }
+    if (empty($name)) {
+        throw new \InvalidArgumentException('Task Name cannot be empty');
     }
 
-    if (empty($task)) {
+    if ($prerequisites instanceof Task) {
+        $task = $prerequisites;
+        $prerequisites = array();
+    } else {
         $task = new Task($name, $callback, $prerequisites);
     }
 

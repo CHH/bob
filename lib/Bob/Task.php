@@ -31,14 +31,24 @@ class Task
 
     // Public: Initializes the task instance.
     //
-    // name     - The task name, used to refer to the task in the CLI and
-    //            when declaring dependencies.
-    // callback - The code to run when the task is invoked (optional).
-    function __construct($name, $callback = null, $prerequisites = array())
+    // name          - The task name, used to refer to the task in the CLI and
+    //                 when declaring dependencies.
+    // callback      - The code to run when the task is invoked (optional).
+    // prerequisites - The task's dependencies (optional).
+    function __construct($name, $prerequisites = array(), $callback = null)
     {
         $this->name = $name;
-        $this->callback = $callback;
-        $this->prerequisites = $prerequisites;
+
+        foreach (array_filter(array($prerequisites, $callback)) as $var) {
+            switch (true) {
+                case is_callable($var):
+                    $this->callback = $var;
+                    break;
+                case is_array($var):
+                    $this->prerequisites = $var;
+                    break;
+            }
+        }
 
         $this->description = self::$lastDescription;
         $this->usage = self::$lastUsage ?: $name;
