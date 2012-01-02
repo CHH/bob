@@ -37,7 +37,7 @@ function task($name, $prerequisites = array(), $callback = null)
         $task = new Task($name, $callback, $prerequisites);
     }
 
-    ConfigFile::$application->project->register($task);
+    Bob::$application->project->register($task);
 }
 
 // Public: Defines the description of the subsequent task.

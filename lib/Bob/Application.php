@@ -133,10 +133,20 @@ EOF;
             ));
         }
 
-        ConfigFile::evaluate($configPath, $this);
+        include $configPath;
 
         $this->originalDir = $_SERVER['PWD'];
         $this->projectDir = dirname($configPath);
+
+        if (is_dir($this->projectDir.'/.bob_tasks.d')) {
+            $taskSearchDir = new \DirectoryIterator($this->projectDir.'/.bob_tasks.d');
+
+            foreach ($taskSearchDir as $file) {
+                if ($file->isFile()) {
+                    include $file->getRealpath();
+                }
+            }
+        }
     }
 
     function formatTasksAndDescriptions()

@@ -4,21 +4,6 @@ namespace Bob;
 
 class ConfigFile
 {
-    static $application;
-
-    static function evaluate($path, $application)
-    {
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Config file "%s" not found in "%s".', $filename, $cwd
-            ));
-        }
-
-        static::$application = $application;
-        include $path;
-        static::$application = null;
-    }
-
     // Internal: Looks up the provided definition file
     // in the directory tree, starting by the provided
     // directory walks the tree up until it reaches the
