@@ -139,10 +139,13 @@ EOF;
         $this->projectDir = dirname($configPath);
 
         if (is_dir($this->projectDir.'/.bob_tasks.d')) {
-            $taskSearchDir = new \DirectoryIterator($this->projectDir.'/.bob_tasks.d');
+            $taskSearchDir = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($this->projectDir.'/.bob_tasks.d')
+            );
 
             foreach ($taskSearchDir as $file) {
-                if ($file->isFile()) {
+                if ($file->isFile() 
+                    and pathinfo($file->getRealpath(), PATHINFO_EXTENSION) == 'php') {
                     include $file->getRealpath();
                 }
             }
