@@ -16,6 +16,6 @@
         }
     ],
     "bin": [
-        "bin/bob.phar"
+
     ]
 }
