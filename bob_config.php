@@ -65,7 +65,7 @@ task("test", function($task) {
         copy("phpunit.xml.dist", "phpunit.xml");
     }
 
-    `phpunit`;
+    echo(`phpunit`);
 });
 
 desc('Takes an environment variable PREFIX and writes a `bob` executable
