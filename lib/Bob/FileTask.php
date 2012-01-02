@@ -18,14 +18,8 @@ namespace Bob;
 // Returns nothing.
 function fileTask($target, $prerequisites = array(), $callback)
 {
-    if ($prerequisites instanceof \Traversable) {
-        $prerequisites = iterator_to_array($prerequisites);
-    }
-
-    $task = new FileTask($target, $callback);
-    $task->prerequisites = $prerequisites;
-
-    Bob::$application->tasks[$target] = $task;
+    $task = new FileTask($target, $callback, $prerequisites);
+    task($task);
 }
 
 // Internal: Represents a file task.

@@ -16,15 +16,28 @@ namespace Bob;
 // Returns nothing.
 function task($name, $prerequisites = array(), $callback = null)
 {
-    if ($callback === null and is_callable($prerequisites)) {
-        $callback = $prerequisites;
-        $prerequisites = array();
+    foreach (array_filter(array($name, $prerequisites, $callback)) as $var) {
+        switch (true) {
+            case is_callable(array($var, 'invoke')):
+                $task = $var;
+                break;
+            case is_callable($var):
+                $callback = $var;
+                break;
+            case is_string($var):
+                $name = $var;
+                break;
+            case is_array($var):
+                $prerequisites = $var;
+                break;
+        }
     }
 
-    $task = new Task($name, $callback);
-    $task->prerequisites = $prerequisites;
+    if (empty($task)) {
+        $task = new Task($name, $callback, $prerequisites);
+    }
 
-    ConfigFile::$application->tasks[$name] = $task;
+    ConfigFile::$application->project->register($task);
 }
 
 // Public: Defines the description of the subsequent task.

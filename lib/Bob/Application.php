@@ -2,19 +2,21 @@
 
 namespace Bob;
 
-use Getopt;
+use Getopt,
+    FileUtils;
 
 // Public: The command line application. Contains the heavy lifting
 // of everything Bob does.
 class Application
 {
     // Public: Contains mappings from task name to a task instance.
-    var $tasks = array();
+    var $project;
 
     // Public: The directory where the bob utility was run from.
     // The CWD inside a task refers to the directory where the
     // config file was found.
     var $originalDir;
+    var $projectDir;
 
     // Public: The command line option parser. You can add your own options 
     // when inside a task if you call `addOptions` with the same format as seen here.
@@ -29,6 +31,8 @@ class Application
             array('t', 'tasks', Getopt::NO_ARGUMENT),
             array('d', 'definition', Getopt::REQUIRED_ARGUMENT)
         ));
+
+        $this->project = new Project;
     }
 
     // Public: Parses the arguments list for options and
@@ -68,12 +72,23 @@ class Application
             return 0;
         }
 
-        $runList = $this->buildRunList();
+        if ($operands = $this->opts->getOperands() and count($operands) > 0) {
+            $taskName = $operands[0];
+        } else {
+            $taskName = key($this->project->getTasks());
+        }
+
+        if (!$this->project->taskExists($taskName)) {
+            throw new \Exception(sprintf('Error: Task "%s" not found.', $taskName));
+        }
 
         $start = microtime(true);
-        foreach ($runList as $task) {
-            $task->invoke();
-        }
+        $task = $this->project[$taskName];
+
+        FileUtils::withCWD($this->projectDir, function() use ($task) {
+            return $task->invoke();
+        });
+
         printLn(sprintf('# %f seconds', microtime(true) - $start));
     }
 
@@ -121,62 +136,7 @@ EOF;
         ConfigFile::evaluate($configPath, $this);
 
         $this->originalDir = $_SERVER['PWD'];
-        chdir(dirname($configPath));
-    }
-
-    // Internal: Looks in the arguments for tasks, fetches its dependencies
-    // and returns a list of tasks which should be run. If no task name is
-    // supplied via the CLI then the first defined task is used.
-    //
-    // Returns a list of tasks to run as Array.
-    function buildRunList()
-    {
-        if ($operands = $this->opts->getOperands() and count($operands) > 0) {
-            $taskName = $operands[0];
-        } else {
-            $taskName = key($this->tasks);
-        }
-
-        if (!$this->taskExists($taskName)) {
-            throw new \Exception(sprintf('Error: Task "%s" not found.', $taskName));
-        }
-
-        $runList = array();
-        foreach ($this->findDependencies($taskName) as $dep) {
-            $runList[] = $this->tasks[$dep];
-        }
-        $runList[] = $this->tasks[$taskName];
-
-        return $runList;
-    }
-
-    // Public: Checks if the task is defined.
-    //
-    // Returns boolean TRUE if the task is defined, FALSE otherwise.
-    function taskExists($name)
-    {
-        return array_key_exists($name, $this->tasks);
-    }
-
-    function findDependencies($name)
-    {
-        $deps = array();
-        $prerequisites = $this->tasks[$name]->prerequisites;
-
-        if ($prerequisites) {
-            foreach ($prerequisites as $pr) {
-                if ($pr === $name) {
-                    continue;
-                }
-
-                if ($this->taskExists($pr)) {
-                    $deps = array_merge($deps, $this->findDependencies($pr));
-                    $deps[] = $pr;
-                }
-            }
-        }
-
-        return array_unique($deps);
+        $this->projectDir = dirname($configPath);
     }
 
     function formatTasksAndDescriptions()
@@ -184,7 +144,7 @@ EOF;
         $i = 0;
         $text = '';
 
-        foreach ($this->tasks as $name => $task) {
+        foreach ($this->project->getTasks() as $name => $task) {
             $text .= $task->usage;
 
             if ($i === 0) {

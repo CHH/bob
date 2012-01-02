@@ -12,30 +12,33 @@ class Task
     static $lastUsage = '';
 
     // Internal: The task's callback, can be empty.
-    public $callback;
+    var $callback;
 
     // Public: Name of the task. Used to invoke the task and used in prerequisites.
-    public $name;
+    var $name;
 
     // Public: The task's dependencies. When a task name is encountered then this
     // task gets run before this task.
-    public $prerequisites = array();
+    var $prerequisites = array();
 
     // Public: The description.
-    public $description = '';
+    var $description = '';
 
     // Public: The usage message.
-    public $usage = '';
+    var $usage = '';
+
+    var $project;
 
     // Public: Initializes the task instance.
     //
     // name     - The task name, used to refer to the task in the CLI and
     //            when declaring dependencies.
     // callback - The code to run when the task is invoked (optional).
-    function __construct($name, $callback = null)
+    function __construct($name, $callback = null, $prerequisites = array())
     {
         $this->name = $name;
         $this->callback = $callback;
+        $this->prerequisites = $prerequisites;
 
         $this->description = self::$lastDescription;
         $this->usage = self::$lastUsage ?: $name;
@@ -53,6 +56,12 @@ class Task
     // Returns the callback's return value.
     function invoke()
     {
+        foreach ($this->prerequisites as $p) {
+            if ($this->project->taskExists($p)) {
+                $this->project[$p]->invoke();
+            }
+        }
+
         if (is_callable($this->callback)) {
             return call_user_func($this->callback, $this);
         }

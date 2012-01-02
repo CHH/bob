@@ -6,6 +6,7 @@ namespace Bob;
 require __DIR__.'/../vendor/FileUtils.php';
 require __DIR__.'/../vendor/Getopt.php';
 
+require __DIR__.'/Bob/Project.php';
 require __DIR__.'/Bob/Task.php';
 require __DIR__.'/Bob/FileTask.php';
 require __DIR__.'/Bob/ConfigFile.php';
