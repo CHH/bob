@@ -81,21 +81,23 @@ class Application
             $this->trace = true;
         }
 
-        if ($operands = $this->opts->getOperands() and count($operands) > 0) {
-            $taskName = $operands[0];
-        } else {
-            $taskName = "default";
-        }
+        return $this->runTasks();
+    }
 
-        if (!$task = $this->tasks[$taskName]) {
-            throw new \Exception(sprintf('Error: Task "%s" not found.', $taskName));
-        }
-
+    function runTasks()
+    {
+        $tasks = $this->opts->getOperands() ?: array('default');
         $start = microtime(true);
 
-        FileUtils::chdir($this->projectDir, function() use ($task) {
-            return $task->invoke();
-        });
+        foreach ($tasks as $taskName) {
+            if (!$task = $this->tasks[$taskName]) {
+                throw new \Exception(sprintf('Error: Task "%s" not found.', $taskName));
+            }
+
+            FileUtils::chdir($this->projectDir, function() use ($task) {
+                return $task->invoke();
+            });
+        }
 
         printLn(sprintf('bob: finished in %f seconds', microtime(true) - $start), STDERR);
     }

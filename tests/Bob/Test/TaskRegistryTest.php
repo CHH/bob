@@ -24,7 +24,7 @@ class TaskRegistryTest extends \PHPUnit_Framework_TestCase
             'name' => 'foo'
         );
 
-        $this->registry->register($task);
+        $this->registry[] = $task;
 
         $this->assertEquals($task, $this->registry['foo']);
     }
