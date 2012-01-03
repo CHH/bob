@@ -1,3 +1,4 @@
 phpunit.xml
-vendor/.composer
-vendor/bin/
+vendor/
+!vendor/FileUtils.php
+!vendor/Getopt.php
