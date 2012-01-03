@@ -68,12 +68,12 @@ class Application
         $this->loadConfig();
 
         if ($this->opts->getOption('help')) {
-            echo $this->formatUsage();
+            println($this->formatUsage(), STDERR);
             return 0;
         }
 
         if ($this->opts->getOption('tasks')) {
-            echo $this->formatTasksAndDescriptions();
+            println($this->formatTasksAndDescriptions(), STDERR);
             return 0;
         }
 
@@ -117,7 +117,7 @@ class Application
     function initProject()
     {
         if (file_exists(getcwd()."/{$this->configName}")) {
-            println('Project already has a bob_config.php');
+            println('bob: Project already has a bob_config.php', STDERR);
             return;
         }
 
@@ -168,8 +168,9 @@ EOF;
             );
 
             foreach ($taskSearchDir as $file) {
-                if ($file->isFile() 
-                    and pathinfo($file->getRealpath(), PATHINFO_EXTENSION) == 'php') {
+                $fileExt = pathinfo($file->getRealpath(), PATHINFO_EXTENSION);
+
+                if ($file->isFile() and $fileExt === 'php') {
                     include $file->getRealpath();
                 }
             }
@@ -199,7 +200,7 @@ EOF;
             }
         }
 
-        return $text;
+        return rtrim($text);
     }
 
     function formatUsage()
@@ -208,7 +209,7 @@ EOF;
 Usage:
   bob.php
   bob.php --init
-  bob.php [-d|--definition <definition>] <task>
+  bob.php <task>
   bob.php -t|--tasks
   bob.php -h|--help
 
@@ -221,16 +222,12 @@ Options:
   -i|--init:
     Creates an empty `bob_config.php` in the current working
     directory if none exists.
-  -d|--definition <definition>:
-    Lookup <definition> in the current working directory and
-    then load tasks from this file instead of "bob_config.php".
   -t|--tasks:
     Displays a fancy list of tasks and their descriptions
   -T|--trace:
     Logs trace messages to STDERR
   -h|--help:
     Displays this message
-
 HELPTEXT;
     }
 }

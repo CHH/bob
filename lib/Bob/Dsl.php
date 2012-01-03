@@ -41,7 +41,7 @@ function fileTask($target, $prerequisites = array(), $callback)
 
 // Public: Defines the description of the subsequent task.
 //
-// text  - Description text, should explain in plain sentences
+// desc  - Description text, should explain in plain sentences
 //         what the task does.
 // usage - A usage message, must start with the task name and
 //         should then be followed by the arguments.
@@ -62,3 +62,4 @@ function desc($desc, $usage = '')
     TaskRegistry::$lastDescription = $desc;
     TaskRegistry::$lastUsage = $usage;
 }
+
