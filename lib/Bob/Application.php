@@ -93,6 +93,20 @@ class Application
         printLn(sprintf('# %f seconds', microtime(true) - $start), STDERR);
     }
 
+    function taskDefined($task)
+    {
+        if (is_object($task) and !empty($task->name)) {
+            $task = $task->name;
+        }
+
+        return (bool) $this->tasks[$task];
+    }
+
+    function defineTask($task)
+    {
+        $this->tasks[] = $task;
+    }
+
     function initProject()
     {
         if (file_exists(getcwd().'/bob_config.php')) {

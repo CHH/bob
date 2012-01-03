@@ -5,12 +5,6 @@ namespace Bob;
 // Internal: Represents a single task.
 class Task
 {
-    // Internal: Stores the description for the next created task.
-    static $lastDescription = '';
-
-    // Internal: Stores the usage message for the next created task.
-    static $lastUsage = '';
-
     // Internal: The task's action, can be empty.
     var $callback;
 
@@ -27,35 +21,58 @@ class Task
     // Public: The usage message.
     var $usage = '';
 
-    // Public: The task registry, containing all task objects.
-    var $tasks;
+    // Public: An application instance which holds references
+    // to all tasks.
+    var $application;
 
-    // Public: Initializes the task instance.
-    //
-    // name          - The task name, used to refer to the task in the CLI and
-    //                 when declaring dependencies.
-    // callback      - The code to run when the task is invoked (optional).
-    // prerequisites - The task's dependencies (optional).
-    function __construct($name, $prerequisites = array(), $callback = null)
+    static function defineTask()
     {
-        $this->name = $name;
-
-        foreach (array_filter(array($prerequisites, $callback)) as $var) {
+        foreach (array_filter(func_get_args()) as $arg) {
             switch (true) {
-                case is_callable($var):
-                    $this->callback = $var;
+                case is_callable($arg):
+                    $callback = $arg;
                     break;
-                case is_array($var):
-                    $this->prerequisites = $var;
+                case is_string($arg):
+                    $name = $arg;
+                    break;
+                case is_array($arg):
+                case ($arg instanceof \Traversable):
+                    $prerequisites = $arg;
                     break;
             }
         }
 
-        $this->description = self::$lastDescription;
-        $this->usage = self::$lastUsage ?: $name;
+        if (empty($name)) {
+            throw new \InvalidArgumentException('Name cannot be empty');
+        }
 
-        self::$lastDescription = '';
-        self::$lastUsage = '';
+        if (Bob::$application->taskDefined($name)) {
+            $task = Bob::$application->tasks[$name];
+        } else {
+            $task = new static($name, Bob::$application);
+        }
+
+        empty($prerequisites) ?: $task->prerequisites = $prerequisites;
+        empty($callback)      ?: $task->callback = $callback;
+
+        Bob::$application->defineTask($task);
+    }
+
+    // Public: Initializes the task instance.
+    //
+    // name        - The task name, used to refer to the task in the CLI and
+    //               when declaring dependencies.
+    // application - The application object, to which this task belongs to.
+    function __construct($name, $application)
+    {
+        $this->name        = $name;
+        $this->application = $application;
+
+        $this->description = TaskRegistry::$lastDescription;
+        $this->usage       = TaskRegistry::$lastUsage ?: $name;
+
+        TaskRegistry::$lastDescription = '';
+        TaskRegistry::$lastUsage = '';
     }
 
     // Public: invokes a given task.
@@ -68,7 +85,7 @@ class Task
     function invoke()
     {
         foreach ($this->prerequisites as $p) {
-            if ($task = $this->tasks[$p]) {
+            if ($task = $this->application->tasks[$p]) {
                 $task->invoke();
             }
         }

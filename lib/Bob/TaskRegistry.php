@@ -5,18 +5,21 @@ namespace Bob;
 // Internal: A registry for tasks
 class TaskRegistry extends \ArrayObject
 {
-    // Public: Registers the task object. Task objects must at least
-    // have a "name" property and an "invoke" method.
-    function register($task)
-    {
-        $task->tasks = $this;
-        $this[$task->name] = $task;
-    }
+    // Internal: Stores the description for the next created task.
+    static $lastDescription = '';
+
+    // Internal: Stores the usage message for the next created task.
+    static $lastUsage = '';
 
     function offsetGet($name)
     {
         if (isset($this[$name])) {
             return parent::offsetGet($name);
         }
+    }
+
+    function offsetSet($offset, $task)
+    {
+        parent::offsetSet($task->name, $task);
     }
 }
