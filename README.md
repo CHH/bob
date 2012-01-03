@@ -124,8 +124,18 @@ To view all tasks and their descriptions pass the `--tasks` flag:
 	hello
 	    Prints Hello World to the Command Line
 
-If you pass no arguments to Bob, it runs the first defined task in your
-`bob_config.php`.
+If you pass no arguments to Bob, it will look for a task named `default`
+and run it.
+
+To assign our `hello` task as default just define it as prerequisite of
+the `default` task:
+
+	task('default', array('hello'));
+
+The `hello` task is now run when Bob is invoked without arguments:
+
+	$ php bob.phar
+	Hello World
 
 ---
 
