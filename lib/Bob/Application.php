@@ -211,13 +211,13 @@ EOF;
 Usage:
   bob.php
   bob.php --init
-  bob.php <task>
+  bob.php TASK...
   bob.php -t|--tasks
   bob.php -h|--help
 
 Arguments:
-  task:
-    Name of the Task to run, task names can be everything as
+  TASK:
+    One or more task names to run. Task names can be everything as
     long as they don't contain spaces.
 
 Options:
