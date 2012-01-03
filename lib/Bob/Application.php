@@ -96,7 +96,7 @@ class Application
     function initProject()
     {
         if (file_exists(getcwd().'/bob_config.php')) {
-            println('Project has already a bob_config.php');
+            println('Project already has a bob_config.php');
             return;
         }
 
