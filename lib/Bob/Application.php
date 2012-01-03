@@ -79,8 +79,6 @@ class Application
         }
 
         if (!$task = $this->tasks[$taskName]) {
-            var_dump(array_keys($this->tasks->getArrayCopy()));
-            var_dump($this->tasks[$taskName]);
             throw new \Exception(sprintf('Error: Task "%s" not found.', $taskName));
         }
 
