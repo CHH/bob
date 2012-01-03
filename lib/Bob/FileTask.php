@@ -10,6 +10,10 @@ class FileTask extends Task
     // Returns nothing.
     function invoke()
     {
+        if ($this->application->trace and !$this->isNeeded()) {
+            println("bob: skipping $this: Not needed.", STDERR);
+        }
+
         if ($this->isNeeded()) {
             parent::invoke();
         }
@@ -21,10 +25,8 @@ class FileTask extends Task
     // Returns TRUE if the task must be run, or FALSE otherwise.
     function isNeeded()
     {
-        if (!file_exists($this->name) or $this->getTimestamp() > filemtime($this->name)) {
-            return true;
-        }
-        return false;
+        return !file_exists($this->name)
+               or $this->getTimestamp() > filemtime($this->name);
     }
 
     // Internal: Returns the timestamp when the prerequisites were last modified.

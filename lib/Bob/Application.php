@@ -22,6 +22,10 @@ class Application
     // when inside a task if you call `addOptions` with the same format as seen here.
     var $opts;
 
+    var $trace = false;
+
+    var $configName = 'bob_config.php';
+
     // Public: Initialize the application.
     function __construct()
     {
@@ -29,6 +33,7 @@ class Application
             array('i', 'init', Getopt::NO_ARGUMENT),
             array('h', 'help', Getopt::NO_ARGUMENT),
             array('t', 'tasks', Getopt::NO_ARGUMENT),
+            array('T', 'trace', Getopt::NO_ARGUMENT),
             array('d', 'definition', Getopt::REQUIRED_ARGUMENT)
         ));
 
@@ -72,6 +77,10 @@ class Application
             return 0;
         }
 
+        if ($this->opts->getOption('trace')) {
+            $this->trace = true;
+        }
+
         if ($operands = $this->opts->getOperands() and count($operands) > 0) {
             $taskName = $operands[0];
         } else {
@@ -88,7 +97,7 @@ class Application
             return $task->invoke();
         });
 
-        printLn(sprintf('# %f seconds', microtime(true) - $start), STDERR);
+        printLn(sprintf('bob: finished in %f seconds', microtime(true) - $start), STDERR);
     }
 
     function taskDefined($task)
@@ -107,7 +116,7 @@ class Application
 
     function initProject()
     {
-        if (file_exists(getcwd().'/bob_config.php')) {
+        if (file_exists(getcwd()."/{$this->configName}")) {
             println('Project already has a bob_config.php');
             return;
         }
@@ -127,7 +136,7 @@ task('example', function() {
 });
 EOF;
 
-        @file_put_contents(getcwd().'/bob_config.php', $config);
+        @file_put_contents(getcwd()."/{$this->configName}", $config);
         println('Initialized project at '.getcwd());
     }
 
@@ -138,13 +147,12 @@ EOF;
     // Returns nothing.
     function loadConfig()
     {
-        $configName = $this->opts->getOption('definition') ?: 'bob_config.php';
-        $configPath = ConfigFile::findConfigFile($configName, $_SERVER['PWD']);
+        $configPath = ConfigFile::findConfigFile($this->configName, $_SERVER['PWD']);
 
         if (false === $configPath) {
             throw new \Exception(sprintf(
                 'Error: Filesystem boundary reached. No %s found.', 
-                $configName
+                $this->configName
             ));
         }
 
@@ -174,7 +182,7 @@ EOF;
         ksort($tasks);
 
         $text = '';
-        $text .= "(in {$this->projectDir})\n";
+        $text .= "(in {$this->projectDir}".DIRECTORY_SEPARATOR."{$this->configName})\n";
 
         foreach ($tasks as $name => $task) {
             if ($name === 'default') {
@@ -218,6 +226,8 @@ Options:
     then load tasks from this file instead of "bob_config.php".
   -t|--tasks:
     Displays a fancy list of tasks and their descriptions
+  -T|--trace:
+    Logs trace messages to STDERR
   -h|--help:
     Displays this message
 

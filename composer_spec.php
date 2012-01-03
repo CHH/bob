@@ -8,9 +8,10 @@ $pkg['name'] = $NAME;
 
 $pkg['require'] = array(
     'php' => '>=5.3.2',
+    'symfony/finder' => '>=2.0.0,<2.1.0dev'
 );
 
-$pkg['description'] = "A tiny and messy build tool for PHP projects.";
+$pkg['description'] = "A tiny and messy build automation tool for PHP projects.";
 $pkg['keywords']    = array('build');
 $pkg['license']     = "MIT";
 $pkg['homepage']    = "https://github.com/CHH/Bob";

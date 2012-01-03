@@ -84,6 +84,10 @@ class Task
     // Returns the callback's return value.
     function invoke()
     {
+        if ($this->application->trace) {
+            println("bob: invoke $this", STDERR);
+        }
+
         foreach ($this->prerequisites as $p) {
             if ($task = $this->application->tasks[$p]) {
                 $task->invoke();
@@ -93,5 +97,12 @@ class Task
         if (is_callable($this->callback)) {
             return call_user_func($this->callback, $this);
         }
+    }
+
+    function __toString()
+    {
+        return sprintf(
+            '%s (%s)', $this->name, get_class($this)
+        );
     }
 }
