@@ -14,6 +14,8 @@ require __DIR__.'/Bob/ConfigFile.php';
 require __DIR__.'/Bob/Dsl.php';
 require __DIR__.'/Bob/Application.php';
 
+use Symfony\Component\Process\Process;
+
 // Public: Appends an End-Of-Line character to the given
 // text and writes it to a stream.
 //
@@ -63,6 +65,18 @@ function template($file, $vars = array())
     };
 
     return $template($file, $vars);
+}
+
+function sh($cmd, $callback = null)
+{
+    $process = new Process($cmd);
+    $process->run();
+
+    if (is_callable($callback)) {
+        call_user_func($callback, $process->isSuccessful(), $process);
+    }
+
+    return $process->getOutput();
 }
 
 // Public: Takes a list of expressions and joins them to

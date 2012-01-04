@@ -8,7 +8,8 @@ $pkg['name'] = $NAME;
 
 $pkg['require'] = array(
     'php' => '>=5.3.2',
-    'symfony/finder' => '>=2.0.0,<2.1.0dev'
+    'symfony/finder' => '>=2.0.0,<2.1.0dev',
+    'symfony/process' => '>=2.0.0,<2.1.0dev'
 );
 
 $pkg['description'] = "A tiny and messy build automation tool for PHP projects.";
