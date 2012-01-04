@@ -12,19 +12,22 @@ class Application
     // Public: Contains mappings from task name to a task instance.
     var $tasks;
 
-    // Public: The directory where the bob utility was run from.
-    // The CWD inside a task refers to the directory where the
-    // config file was found.
+    // Public: The working directory where the bob utility was run from.
     var $originalDir;
+
+    // Public: The directory where the root config was found. This
+    // directory is set as working directory while tasks are executed.
     var $projectDir;
 
-    // Public: The command line option parser. You can add your own options 
+    // The command line option parser. You can add your own options 
     // when inside a task if you call `addOptions` with the same format as seen here.
     var $opts;
 
     var $trace = false;
-
     var $configName = 'bob_config.php';
+
+    // List of paths of all loaded config files.
+    var $loadedConfigs = array();
 
     // Public: Initialize the application.
     function __construct()
@@ -118,7 +121,7 @@ class Application
 
     function initProject()
     {
-        if (file_exists(getcwd()."/{$this->configName}")) {
+        if (file_exists("{$this->projectDir}/{$this->configName}")) {
             println('bob: Project already has a bob_config.php', STDERR);
             return;
         }
@@ -138,13 +141,13 @@ task('example', function() {
 });
 EOF;
 
-        @file_put_contents(getcwd()."/{$this->configName}", $config);
-        println('Initialized project at '.getcwd());
+        @file_put_contents("{$this->projectDir}/{$this->configName}", $config);
+        println('Initialized project at '.$this->projectDir);
     }
 
-    // Internal: Looks up the config file path and includes it. Does a 
-    // `chdir` to the dirname where the config is located too. So the
-    // CWD inside of tasks always refers to the project's root.
+    // Internal: Looks up the build config files from the root of the project
+    // and from the search dir in `./bob_tasks`. Build Config files contain
+    // the task definitions.
     //
     // Returns nothing.
     function loadConfig()
@@ -160,7 +163,13 @@ EOF;
 
         include $configPath;
 
+        $this->loadedConfigs[] = $configPath;
+
+        // Save the original working directory, the working directory
+        // gets set to the project directory while running tasks.
         $this->originalDir = $_SERVER['PWD'];
+
+        // The project dir is the directory of the root config.
         $this->projectDir = dirname($configPath);
 
         // Load tasks from the search dir in "./bob_tasks/"
@@ -174,6 +183,7 @@ EOF;
 
                 if ($file->isFile() and $fileExt === 'php') {
                     include $file->getRealpath();
+                    $this->loadedConfigs[] = $file->getRealpath();
                 }
             }
         }
@@ -185,7 +195,7 @@ EOF;
         ksort($tasks);
 
         $text = '';
-        $text .= "(in {$this->projectDir}".DIRECTORY_SEPARATOR."{$this->configName})\n";
+        $text .= "(in {$this->projectDir})\n";
 
         foreach ($tasks as $name => $task) {
             if ($name === 'default') {

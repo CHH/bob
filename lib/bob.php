@@ -3,6 +3,7 @@
 // Public: Contains Utility Functions.
 namespace Bob;
 
+require __DIR__.'/../vendor/.composer/autoload.php';
 require __DIR__.'/../vendor/FileUtils.php';
 require __DIR__.'/../vendor/Getopt.php';
 
@@ -19,6 +20,11 @@ require __DIR__.'/Bob/Application.php';
 // line   - Text to write.
 // stream - Resource to write the text to (optional). By
 //          default the text is printed to STDOUT via `echo`
+//
+// Examples
+//
+//     # Print something to STDERR (uses fwrite)
+//     println('Error', STDERR);
 //
 // Returns Nothing.
 function println($line, $stream = null)
