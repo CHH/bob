@@ -8,16 +8,6 @@ namespace Bob;
 
 use FileUtils;
 
-// Construct a list of all files which should go into the bob.phar
-$pharFiles = FileList(array(
-    'LICENSE.txt',
-    'bin/*.php',
-    'lib/*.php',
-    'lib/**/*.php',
-    'vendor/FileUtils.php',
-    'vendor/Getopt.php',
-));
-
 $pharFiles = find()->in("lib")->in('bin')->in('vendor')->files()->name("*.php");
 
 // The "default" task is invoked when there's no
