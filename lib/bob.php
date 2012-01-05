@@ -69,6 +69,10 @@ function template($file, $vars = array())
 
 function sh($cmd, $callback = null)
 {
+    if (is_array($cmd)) {
+        $cmd = join(' ', $cmd);
+    }
+
     $process = new Process($cmd);
     $process->run();
 
@@ -77,6 +81,15 @@ function sh($cmd, $callback = null)
     }
 
     return $process->getOutput();
+}
+
+function php($script, $callback = null)
+{
+}
+
+function find()
+{
+    return new \Symfony\Component\Finder\Finder;
 }
 
 // Public: Takes a list of expressions and joins them to

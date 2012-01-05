@@ -29,6 +29,30 @@ class FileUtils
         return false;
     }
 
+    static function relativize($path, $basePath = null)
+    {
+        if (null === $basePath) {
+            $basePath = $_SERVER['PWD'];
+        }
+
+        $path = realpath($path);
+        $basePath = realpath($basePath);
+
+        if (false === $path) {
+            throw new \InvalidArgumentException('Path does not exist.');
+        }
+
+        if (false === $basePath) {
+            throw new \InvalidArgumentException('Base path does not exist.');
+        }
+
+        if (false === ($pos = strpos($path, $basePath))) {
+            return $path;
+        }
+
+        return substr($path, strlen($basePath) + 1);
+    }
+
     // Public: Sets the Current Working Directory to the path
     // given with `dir` and changes it back to the previous working
     // directory after running the callback.

@@ -52,8 +52,13 @@ class Task
             $task = new static($name, Bob::$application);
         }
 
-        empty($prerequisites) ?: $task->prerequisites = $prerequisites;
-        empty($callback)      ?: $task->callback = $callback;
+        if (!empty($prerequisites)) {
+            foreach ($prerequisites as $p) {
+                $task->addPrerequisite($p);
+            }
+        }
+
+        empty($callback) ?: $task->callback = $callback;
 
         Bob::$application->defineTask($task);
     }
@@ -97,6 +102,17 @@ class Task
         if (is_callable($this->callback)) {
             return call_user_func($this->callback, $this);
         }
+    }
+
+    function addPrerequisite($prerequisite)
+    {
+        $this->prerequisites[] = (string) $prerequisite;
+        return $this;
+    }
+
+    function getPrerequisites()
+    {
+        return $this->prerequisites;
     }
 
     function __toString()

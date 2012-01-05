@@ -6,6 +6,8 @@
  */
 namespace Bob;
 
+use FileUtils;
+
 // Construct a list of all files which should go into the bob.phar
 $pharFiles = FileList(array(
     'LICENSE.txt',
@@ -15,6 +17,8 @@ $pharFiles = FileList(array(
     'vendor/FileUtils.php',
     'vendor/Getopt.php',
 ));
+
+$pharFiles = find()->in("lib")->in('bin')->in('vendor')->files()->name("*.php");
 
 // The "default" task is invoked when there's no
 // task explicitly given on the command line.
@@ -51,7 +55,8 @@ EOF;
     $phar->startBuffering();
 
     foreach ($task->prerequisites as $file) {
-        $phar->addFile($file, substr($file, (strpos($projectDir, $file) === 0) ? (strlen($projectDir) + 1) : 0));
+        $file = (string) $file;
+        $phar->addFile($file, FileUtils::relativize($file, $projectDir));
     }
 
     $phar->setStub($stub);
