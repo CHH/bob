@@ -8,7 +8,10 @@ namespace Bob;
 
 use FileUtils;
 
-$pharFiles = find()->in("lib")->in('bin')->in('vendor')->files()->name("*.php");
+$pharFiles = find()
+    ->in(array("lib", "bin", "vendor"))
+    ->files()
+    ->name("*.php");
 
 // The "default" task is invoked when there's no
 // task explicitly given on the command line.
@@ -59,12 +62,16 @@ EOF;
 });
 
 desc("Runs Bob's test suite");
-task("test", function($task) {
-    if (!file_exists("phpunit.xml")) {
-        copy("phpunit.xml.dist", "phpunit.xml");
-    }
-
+task("test", array('phpunit.xml'), function($task) {
     echo(`phpunit`);
+});
+
+fileTask('phpunit.xml', array('phpunit.dist.xml'), function() {
+    copy('phpunit.dist.xml', 'phpunit.xml');
+});
+
+fileTask('composer.lock', array('composer.json'), function() {
+    echo(`composer update`);
 });
 
 desc('Takes an environment variable PREFIX and writes a `bob` executable

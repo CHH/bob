@@ -10,5 +10,13 @@
     {
         "package": "symfony\/process",
         "version": "2.0.7"
+    },
+    {
+        "package": "ulrichsg\/getopt-php",
+        "version": "master-dev"
+    },
+    {
+        "package": "chh\/fileutils",
+        "version": "master-dev"
     }
 ]

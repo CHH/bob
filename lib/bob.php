@@ -4,8 +4,6 @@
 namespace Bob;
 
 require __DIR__.'/../vendor/.composer/autoload.php';
-require __DIR__.'/../vendor/FileUtils.php';
-require __DIR__.'/../vendor/Getopt.php';
 
 require __DIR__.'/Bob/TaskRegistry.php';
 require __DIR__.'/Bob/Task.php';
@@ -100,12 +98,14 @@ function find()
 // Returns a list of paths.
 function fileList($patterns)
 {
-    $fileList = array();
+    $patterns = (array) $patterns;
+    $finder = new \Symfony\Component\Finder\Finder;
+    $finder->files();
 
     foreach ($patterns as $p) {
-        $fileList = array_merge($fileList, glob($p));
+        $finder->name($p);
     }
 
-    return $fileList;
+    return $finder;
 }
 
