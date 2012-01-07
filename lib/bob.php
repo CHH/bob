@@ -4,6 +4,7 @@
 namespace Bob;
 
 require __DIR__.'/../vendor/.composer/autoload.php';
+require __DIR__.'/../vendor/ulrichsg/getopt-php/src/Getopt.php';
 
 require __DIR__.'/Bob/TaskRegistry.php';
 require __DIR__.'/Bob/Task.php';

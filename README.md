@@ -65,13 +65,19 @@ To do a system-wide install, download either a zipball of Bob or
 clone the Bob Repository with:
 
     $ git clone git://github.com/CHH/Bob.git
+    $ cd Bob
 
-Then `cd Bob` and run `php bin/bob.php install`. You can then run Bob
-via the `bob` command.
+To install all of Bob's dependencies download Composer and run
+`composer install`:
+
+    $ wget http://getcomposer.org/composer.phar
+    php composer.phar install
+
+Then run `php bin/bob.php install` and you're done.
 
 By default the `bob` command is created in `/usr/local/bin`. To change
 this set a `PREFIX` environment variable, the command is then created
-in `PREFIX/bin`.
+in `$PREFIX/bin`.
 
 ### Prepare your project
 
@@ -167,11 +173,11 @@ Then put this into your `bob_config.php`:
     fileTask('concat.txt', array('file1.txt', 'file2.txt', 'file3.txt'), function($task) {
         println("Concatenating");
         $concat = '';
-        
+    
         foreach ($task->prerequisites as $file) {
             $concat .= file_get_contents($file);
         }
-
+    
         @file_put_contents($task->name, $concat);
     });
 
@@ -217,6 +223,11 @@ to simply submit Issues to the [Issue Tracker][issues].
 I'm using the [Zend Framework Coding Standard][zfcs] in Bob and **so should you**
 when contributing code.
 
+Actually I'm using a loose version of it, the notable differences are:
+
+ - I'm treating the `public` keyword as optional in functions.
+ - `var` is okay for defining public instance variables.
+
 [zfcs]: http://framework.zend.com/manual/en/coding-standard.html
 
 #### Documentation
@@ -231,7 +242,9 @@ which affects the command line tool should be at least tried a couple of
 times.
 
 This shouldn't prevent you from writing Unit Tests though. I'm using
-[PHPUnit](http://phpunit.de) for this purpose.
+[PHPUnit](http://phpunit.de) for this purpose. There's also a `test`
+task which runs `phpunit` (this handles the copying the `phpunit.dist.xml` to
+`phpunit.xml` too).
 
 I'm recommending [php-build](https://github.com/CHH/php-build) for doing
 tests with multiple versions of PHP.
