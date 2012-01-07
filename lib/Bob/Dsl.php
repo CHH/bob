@@ -57,9 +57,8 @@ function fileTask($target, $prerequisites = array(), $callback)
 //     });
 //
 // Returns nothing.
-function desc($desc, $usage = '')
+function desc($desc)
 {
     TaskRegistry::$lastDescription = $desc;
-    TaskRegistry::$lastUsage = $usage;
 }
 

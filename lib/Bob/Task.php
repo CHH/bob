@@ -6,7 +6,7 @@ namespace Bob;
 class Task
 {
     // Internal: The task's action, can be empty.
-    var $callback;
+    var $action;
 
     // Public: Name of the task. Used to invoke the task and used in prerequisites.
     var $name;
@@ -18,9 +18,6 @@ class Task
     // Public: The description.
     var $description = '';
 
-    // Public: The usage message.
-    var $usage = '';
-
     // Public: An application instance which holds references
     // to all tasks.
     var $application;
@@ -30,7 +27,7 @@ class Task
         foreach (array_filter(func_get_args()) as $arg) {
             switch (true) {
                 case is_callable($arg):
-                    $callback = $arg;
+                    $action = $arg;
                     break;
                 case is_string($arg):
                     $name = $arg;
@@ -58,9 +55,10 @@ class Task
             }
         }
 
-        empty($callback) ?: $task->callback = $callback;
+        empty($action) ?: $task->action = $action;
 
         Bob::$application->defineTask($task);
+        return $task;
     }
 
     // Public: Initializes the task instance.
@@ -72,12 +70,8 @@ class Task
     {
         $this->name        = $name;
         $this->application = $application;
-
         $this->description = TaskRegistry::$lastDescription;
-        $this->usage       = TaskRegistry::$lastUsage ?: $name;
-
         TaskRegistry::$lastDescription = '';
-        TaskRegistry::$lastUsage = '';
     }
 
     // Child classes of Task should put here their custom logic to determine
@@ -97,12 +91,12 @@ class Task
     function invoke()
     {
         if (!$this->isNeeded()) {
-            $this->application->trace and println("bob: skipping $this", STDERR);
+            $this->application->trace and println("bob: skipping {$this->inspect()}", STDERR);
             return;
         }
 
         if ($this->application->trace) {
-            println("bob: invoke $this", STDERR);
+            println("bob: invoke {$this->inspect()}", STDERR);
         }
 
         foreach ($this->prerequisites as $p) {
@@ -111,8 +105,8 @@ class Task
             }
         }
 
-        if (is_callable($this->callback)) {
-            return call_user_func($this->callback, $this);
+        if (is_callable($this->action)) {
+            return call_user_func($this->action, $this);
         }
     }
 
@@ -127,10 +121,15 @@ class Task
         return $this->prerequisites;
     }
 
-    function __toString()
+    function inspect()
     {
         return sprintf(
             '[%s] (%s)', $this->name, get_class($this)
         );
+    }
+
+    function __toString()
+    {
+        return $this->name;
     }
 }

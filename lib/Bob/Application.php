@@ -204,7 +204,7 @@ EOF;
                 continue;
             }
 
-            $text .= $task->usage;
+            $text .= $task->name;
 
             $text .= "\n";
             if ($task->description) {
