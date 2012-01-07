@@ -121,7 +121,9 @@ class Application
 
     function initProject()
     {
-        if (file_exists("{$this->projectDir}/{$this->configName}")) {
+        $cwd = $_SERVER['PWD'];
+
+        if (file_exists("$cwd/{$this->configName}")) {
             println('bob: Project already has a bob_config.php', STDERR);
             return;
         }
@@ -141,8 +143,8 @@ task('example', function() {
 });
 EOF;
 
-        @file_put_contents("{$this->projectDir}/{$this->configName}", $config);
-        println('Initialized project at '.$this->projectDir);
+        @file_put_contents("$cwd/{$this->configName}", $config);
+        println('Initialized project at '.$cwd);
     }
 
     // Internal: Looks up the build config files from the root of the project
