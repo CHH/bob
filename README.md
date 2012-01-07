@@ -59,7 +59,7 @@ or:
 
     ./vendor/bin/bob.phar
 
-#### System-wide install
+#### System-wide install (Unix-like OS only)
 
 To do a system-wide install, download either a zipball of Bob or
 clone the Bob Repository with:
