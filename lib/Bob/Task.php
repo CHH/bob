@@ -80,15 +80,27 @@ class Task
         TaskRegistry::$lastUsage = '';
     }
 
-    // Public: invokes a given task.
+    // Child classes of Task should put here their custom logic to determine
+    // if the task should do something. See the FileTask class for an
+    // example of this.
     //
-    // Todo
-    //
-    //  - Do dependency resolution here?
+    // Returns TRUE if the task should be run, FALSE otherwise.
+    function isNeeded()
+    {
+        return true;
+    }
+
+    // Public: Collects all dependencies and invokes the task if it's 
+    // needed.
     //
     // Returns the callback's return value.
     function invoke()
     {
+        if (!$this->isNeeded()) {
+            $this->application->trace and println("bob: skipping $this", STDERR);
+            return;
+        }
+
         if ($this->application->trace) {
             println("bob: invoke $this", STDERR);
         }
@@ -118,7 +130,7 @@ class Task
     function __toString()
     {
         return sprintf(
-            '%s (%s)', $this->name, get_class($this)
+            '[%s] (%s)', $this->name, get_class($this)
         );
     }
 }

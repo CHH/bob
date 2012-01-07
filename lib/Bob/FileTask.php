@@ -5,20 +5,6 @@ namespace Bob;
 // Internal: Represents a file task.
 class FileTask extends Task
 {
-    // Public: Run the task only when it's needed.
-    //
-    // Returns nothing.
-    function invoke()
-    {
-        if ($this->application->trace and !$this->isNeeded()) {
-            println("bob: skipping $this: Not needed.", STDERR);
-        }
-
-        if ($this->isNeeded()) {
-            parent::invoke();
-        }
-    }
-
     // Public: Checks if the target exists or one of the prerequisites is newer
     // than the target file.
     //
