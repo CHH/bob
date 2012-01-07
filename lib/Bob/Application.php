@@ -222,8 +222,8 @@ EOF;
         return <<<HELPTEXT
 Usage:
   bob.php
-  bob.php --init
   bob.php TASK...
+  bob.php --init
   bob.php -t|--tasks
   bob.php -h|--help
 
