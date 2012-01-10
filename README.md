@@ -40,7 +40,7 @@ creating a PHAR package of Bob.
 
 #### Install into a [Composer](https://github.com/composer/composer)-enabled Project
 
-Simply add the `chh/bob` package to your `require` section in your
+Simply add the `chh/bob` package to the `require` section in your
 `composer.json`:
 
     {

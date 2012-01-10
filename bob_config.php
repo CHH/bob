@@ -23,7 +23,7 @@ task('default', array('dist'));
 
 desc('Makes a distributable version of Bob, consisting of a composer.json
       and a PHAR file.');
-task('dist', array('composer.json', 'bin/bob.phar'));
+task('dist', array('test', 'composer.lock', 'bin/bob.phar'));
 
 desc('Generates an executable PHP Archive (PHAR) from the project files.');
 fileTask('bin/bob.phar', $pharFiles, function($task) {
@@ -66,8 +66,8 @@ task("test", array('phpunit.xml'), function($task) {
     echo(`phpunit`);
 });
 
-fileTask('phpunit.xml', array('phpunit.dist.xml'), function() {
-    copy('phpunit.dist.xml', 'phpunit.xml');
+fileTask('phpunit.xml', array('phpunit.xml.dist'), function() {
+    copy('phpunit.xml.dist', 'phpunit.xml');
 });
 
 fileTask('composer.lock', array('composer.json'), function() {
