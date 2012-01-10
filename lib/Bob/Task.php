@@ -90,7 +90,7 @@ class Task
     // Returns the callback's return value.
     function invoke()
     {
-        if (!$this->isNeeded()) {
+        if (!$this->application->forceRun and !$this->isNeeded()) {
             $this->application->trace and println("bob: skipping {$this->inspect()}", STDERR);
             return;
         }

@@ -19,15 +19,19 @@ class Application
     // directory is set as working directory while tasks are executed.
     var $projectDir;
 
-    // The command line option parser. You can add your own options 
+    // Public: The command line option parser. You can add your own options 
     // when inside a task if you call `addOptions` with the same format as seen here.
     var $opts;
 
+    // Public: Enable tracing.
     var $trace = false;
     var $configName = 'bob_config.php';
 
     // List of paths of all loaded config files.
     var $loadedConfigs = array();
+
+    // Public: Should tasks run even if they're not needed?
+    var $forceRun = false;
 
     // Public: Initialize the application.
     function __construct()
@@ -37,7 +41,7 @@ class Application
             array('h', 'help', Getopt::NO_ARGUMENT),
             array('t', 'tasks', Getopt::NO_ARGUMENT),
             array('T', 'trace', Getopt::NO_ARGUMENT),
-            array('d', 'definition', Getopt::REQUIRED_ARGUMENT)
+            array('f', 'force', Getopt::NO_ARGUMENT),
         ));
 
         $this->tasks = new TaskRegistry;
@@ -78,6 +82,10 @@ class Application
         if ($this->opts->getOption('tasks')) {
             println($this->formatTasksAndDescriptions(), STDERR);
             return 0;
+        }
+
+        if ($this->opts->getOption('force')) {
+            $this->forceRun = true;
         }
 
         if ($this->opts->getOption('trace')) {
@@ -240,6 +248,8 @@ Options:
     Displays a fancy list of tasks and their descriptions
   -T|--trace:
     Logs trace messages to STDERR
+  -f|--force:
+    Force to run all tasks, even if they're not needed
   -h|--help:
     Displays this message
 HELPTEXT;
