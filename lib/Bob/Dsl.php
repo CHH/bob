@@ -17,7 +17,7 @@ namespace Bob;
 // Returns nothing.
 function task($name, $prerequisites = null, $callback = null)
 {
-    Task::defineTask($name, $prerequisites, $callback);
+    return Task::defineTask($name, $prerequisites, $callback);
 }
 
 // Public: Config file function for creating a task which is only run
@@ -36,7 +36,7 @@ function task($name, $prerequisites = null, $callback = null)
 // Returns nothing.
 function fileTask($target, $prerequisites = array(), $callback)
 {
-    FileTask::defineTask($target, $prerequisites, $callback);
+    return FileTask::defineTask($target, $prerequisites, $callback);
 }
 
 // Public: Defines the description of the subsequent task.
