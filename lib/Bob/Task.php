@@ -121,10 +121,24 @@ class Task
         return $this->prerequisites;
     }
 
+    function getTaskPrerequisites()
+    {
+        $tasks = array();
+
+        foreach ($this->prerequisites as $p) {
+            if ($this->application->taskDefined($p)) {
+                $tasks[] = $p;
+            }
+        }
+
+        return $tasks;
+    }
+
     function inspect()
     {
         return sprintf(
-            '[%s] (%s)', $this->name, get_class($this)
+            '[%s] class %s (%s)',
+            $this->name, get_class($this), join(', ', $this->getTaskPrerequisites())
         );
     }
 
