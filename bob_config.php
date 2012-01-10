@@ -8,10 +8,7 @@ namespace Bob;
 
 use FileUtils;
 
-$pharFiles = find()
-    ->in(array("lib", "bin", "vendor"))
-    ->files()
-    ->name("*.php");
+$pharFiles = fileList('*.php')->in(array('lib', 'bin', 'vendor'));
 
 // The "default" task is invoked when there's no
 // task explicitly given on the command line.

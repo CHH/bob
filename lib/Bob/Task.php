@@ -5,8 +5,8 @@ namespace Bob;
 // Internal: Represents a single task.
 class Task
 {
-    // Internal: The task's action, can be empty.
-    var $action;
+    // Internal: The task's actions, can be empty.
+    var $actions = array();
 
     // Public: Name of the task. Used to invoke the task and used in prerequisites.
     var $name;
@@ -21,6 +21,8 @@ class Task
     // Public: An application instance which holds references
     // to all tasks.
     var $application;
+
+    protected $deactivated = false;
 
     static function defineTask()
     {
@@ -55,7 +57,7 @@ class Task
             }
         }
 
-        empty($action) ?: $task->action = $action;
+        empty($action) ?: $task->actions[] = $action;
 
         Bob::$application->defineTask($task);
         return $task;
@@ -72,6 +74,8 @@ class Task
         $this->application = $application;
         $this->description = TaskRegistry::$lastDescription;
         TaskRegistry::$lastDescription = '';
+
+        $this->actions = new \SplDoublyLinkedList;
     }
 
     // Child classes of Task should put here their custom logic to determine
@@ -90,6 +94,8 @@ class Task
     // Returns the callback's return value.
     function invoke()
     {
+        if ($this->deactivated) return;
+
         if (!$this->application->forceRun and !$this->isNeeded()) {
             $this->application->trace and println("bob: skipping {$this->inspect()}", STDERR);
             return;
@@ -105,9 +111,10 @@ class Task
             }
         }
 
-        if (is_callable($this->action)) {
-            return call_user_func($this->action, $this);
+        foreach ($this->actions as $action) {
+            call_user_func($action, $this);
         }
+        $this->deactivated = true;
     }
 
     function addPrerequisite($prerequisite)

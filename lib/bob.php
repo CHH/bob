@@ -15,6 +15,9 @@ require __DIR__.'/Bob/Application.php';
 
 use Symfony\Component\Process\Process;
 
+class BuildFailedException extends \Exception
+{}
+
 // Public: Appends an End-Of-Line character to the given
 // text and writes it to a stream.
 //
@@ -66,7 +69,20 @@ function template($file, $vars = array())
     return $template($file, $vars);
 }
 
-function sh($cmd, $callback = null)
+// Public: Runs a command in a new process.
+//
+// cmd      - Command with arguments as String.
+// callback - A callback which receives the success as Boolean
+//            and the Process instance as second argument.
+//
+// Examples
+//
+//   process('ls -A', function($ok, $process) {
+//       if (!$ok) fwrite($process->getErrorOutput(), STDERR);
+//   });
+//
+// Returns the Output as String.
+function process($cmd, $callback = null)
 {
     if (is_array($cmd)) {
         $cmd = join(' ', $cmd);
@@ -84,11 +100,6 @@ function sh($cmd, $callback = null)
 
 function php($script, $callback = null)
 {
-}
-
-function find()
-{
-    return new \Symfony\Component\Finder\Finder;
 }
 
 // Public: Takes a list of expressions and joins them to

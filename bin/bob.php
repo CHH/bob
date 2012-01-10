@@ -18,7 +18,7 @@ try {
 
 } catch (\Exception $e) {
     // Print exceptions to STDERR and exit with an error.
-    println($e, STDERR);
+    println(sprintf('Build failed: %s', $e), STDERR);
     exit(1);
 }
 
