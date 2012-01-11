@@ -95,12 +95,32 @@ class Application
         return $this->runTasks();
     }
 
+    function collectTasks()
+    {
+        $tasks = array();
+        $args = $this->opts->getOperands();
+
+        foreach ($args as $arg) {
+            if (preg_match('/^(\w+)=(.*)$/', $arg, $matches)) {
+                $_ENV[$matches[1]] = trim($matches[2], '"');
+                continue;
+            }
+
+            $tasks[] = $arg;
+        }
+
+        if (empty($tasks)) {
+            $tasks += array('default');
+        }
+
+        return $tasks;
+    }
+
     function runTasks()
     {
-        $tasks = $this->opts->getOperands() ?: array('default');
         $start = microtime(true);
 
-        foreach ($tasks as $taskName) {
+        foreach ($this->collectTasks() as $taskName) {
             if (!$task = $this->tasks[$taskName]) {
                 throw new \Exception(sprintf('Error: Task "%s" not found.', $taskName));
             }
@@ -208,18 +228,10 @@ EOF;
         $text .= "(in {$this->projectDir})\n";
 
         foreach ($tasks as $name => $task) {
-            if ($name === 'default') {
+            if ($name === 'default' or !$task->description) {
                 continue;
             }
-
-            $text .= $task->name;
-
-            $text .= "\n";
-            if ($task->description) {
-                foreach (explode("\n", $task->description) as $line) {
-                    $text .= "    ".ltrim($line)."\n";
-                }
-            }
+            $text .= sprintf("bob %s # %s\n", $task->name, $task->description);
         }
 
         return rtrim($text);
