@@ -22,7 +22,6 @@ desc('Makes a distributable version of Bob, consisting of a composer.json
       and a PHAR file.');
 task('dist', array('test', 'composer.lock', 'bin/bob.phar'));
 
-desc('Generates an executable PHP Archive (PHAR) from the project files.');
 fileTask('bin/bob.phar', $pharFiles, function($task) {
     if (file_exists($task->name)) {
         unlink($task->name);

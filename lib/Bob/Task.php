@@ -22,11 +22,13 @@ class Task
     // to all tasks.
     var $application;
 
-    protected $deactivated = false;
+    protected $invoked = false;
 
-    static function defineTask()
+    static function defineTask($name, $prerequisites = null, $action = null)
     {
-        foreach (array_filter(func_get_args()) as $arg) {
+        $prerequisites = null; $action = null;
+
+        foreach (array_filter(array($prerequisites, $action)) as $arg) {
             switch (true) {
                 case is_callable($arg):
                     $action = $arg;
@@ -51,13 +53,7 @@ class Task
             $task = new static($name, Bob::$application);
         }
 
-        if (!empty($prerequisites)) {
-            foreach ($prerequisites as $p) {
-                $task->addPrerequisite($p);
-            }
-        }
-
-        empty($action) ?: $task->actions[] = $action;
+        $task->enhance($prerequisites, $action);
 
         Bob::$application->defineTask($task);
         return $task;
@@ -94,7 +90,7 @@ class Task
     // Returns the callback's return value.
     function invoke()
     {
-        if ($this->deactivated) return;
+        if ($this->invoked) return;
 
         if (!$this->application->forceRun and !$this->isNeeded()) {
             $this->application->trace and println("bob: skipping {$this->inspect()}", STDERR);
@@ -111,10 +107,33 @@ class Task
             }
         }
 
+        $this->execute();
+        $this->invoked = true;
+    }
+
+    function execute()
+    {
         foreach ($this->actions as $action) {
             call_user_func($action, $this);
         }
-        $this->deactivated = true;
+    }
+
+    function reenable()
+    {
+        $this->invoked = false;
+    }
+
+    function enhance($deps = null, $action = null)
+    {
+        if ($deps) {
+            foreach ($deps as $d) {
+                $this->addPrerequisite($d);
+            }
+        }
+
+        if (is_callable($action)) {
+            $this->actions[] = $action;
+        }
     }
 
     function addPrerequisite($prerequisite)
@@ -143,10 +162,9 @@ class Task
 
     function inspect()
     {
-        return sprintf(
-            '[%s] class %s (%s)',
-            $this->name, get_class($this), join(', ', $this->getTaskPrerequisites())
-        );
+        $prereqs = join(', ', $this->getTaskPrerequisites());
+        $class = get_class($this);
+        return "<$class {$this->name} => $prereqs>";
     }
 
     function __toString()
