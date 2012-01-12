@@ -3,7 +3,8 @@
 namespace Bob;
 
 use Getopt,
-    FileUtils;
+    FileUtils,
+    Symfony\Component\Finder\Finder;
 
 // Public: The command line application. Contains the heavy lifting
 // of everything Bob does.
@@ -25,7 +26,8 @@ class Application
 
     // Public: Enable tracing.
     var $trace = false;
-    var $configName = 'bob_config.php';
+    var $configFile = 'bob_config.php';
+    var $configSearchDir = "bob_tasks";
 
     // List of paths of all loaded config files.
     var $loadedConfigs = array();
@@ -95,7 +97,7 @@ class Application
         return $this->runTasks();
     }
 
-    function collectTasks()
+    protected function collectTasks()
     {
         $tasks = array();
         $args = $this->opts->getOperands();
@@ -116,7 +118,7 @@ class Application
         return $tasks;
     }
 
-    function runTasks()
+    protected function runTasks()
     {
         $start = microtime(true);
 
@@ -147,11 +149,11 @@ class Application
         $this->tasks[] = $task;
     }
 
-    function initProject()
+    protected function initProject()
     {
         $cwd = $_SERVER['PWD'];
 
-        if (file_exists("$cwd/{$this->configName}")) {
+        if (file_exists("$cwd/{$this->configFile}")) {
             println('bob: Project already has a bob_config.php', STDERR);
             return;
         }
@@ -171,7 +173,7 @@ task('example', function() {
 });
 EOF;
 
-        @file_put_contents("$cwd/{$this->configName}", $config);
+        @file_put_contents("$cwd/{$this->configFile}", $config);
         println('Initialized project at '.$cwd);
     }
 
@@ -180,9 +182,9 @@ EOF;
     // the task definitions.
     //
     // Returns nothing.
-    function loadConfig()
+    protected function loadConfig()
     {
-        $configPath = ConfigFile::findConfigFile($this->configName, $_SERVER['PWD']);
+        $configPath = ConfigFile::findConfigFile($this->configFile, $_SERVER['PWD']);
 
         if (false === $configPath) {
             throw new \Exception(sprintf(
@@ -192,7 +194,6 @@ EOF;
         }
 
         include $configPath;
-
         $this->loadedConfigs[] = $configPath;
 
         // Save the original working directory, the working directory
@@ -203,18 +204,14 @@ EOF;
         $this->projectDir = dirname($configPath);
 
         // Load tasks from the search dir in "./bob_tasks/"
-        if (is_dir($this->projectDir.'/bob_tasks')) {
-            $taskSearchDir = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($this->projectDir.'/bob_tasks')
-            );
+        if (is_dir($this->projectDir.$this->configSearchDir)) {
+            $finder = Finder::create()
+                ->files()->name("*.php")
+                ->in($this->projectDir.$this->configSearchDir);
 
-            foreach ($taskSearchDir as $file) {
-                $fileExt = pathinfo($file->getRealpath(), PATHINFO_EXTENSION);
-
-                if ($file->isFile() and $fileExt === 'php') {
-                    include $file->getRealpath();
-                    $this->loadedConfigs[] = $file->getRealpath();
-                }
+            foreach ($finder as $file) {
+                include $file->getRealpath();
+                $this->loadedConfigs[] = $file->getRealpath();
             }
         }
     }
@@ -242,7 +239,7 @@ EOF;
         return <<<HELPTEXT
 Usage:
   bob.php
-  bob.php TASK...
+  bob.php [VAR=VALUE...] [TASK...]
   bob.php --init
   bob.php -t|--tasks
   bob.php -h|--help
@@ -251,6 +248,9 @@ Arguments:
   TASK:
     One or more task names to run. Task names can be everything as
     long as they don't contain spaces.
+  VAR=VALUE:
+    One or more environment variable definitions.
+    These get placed in the \$_ENV array.
 
 Options:
   -i|--init:
