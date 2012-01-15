@@ -26,18 +26,14 @@ class Task
 
     static function defineTask($name, $prerequisites = null, $action = null)
     {
-        $prerequisites = null; $action = null;
-
         foreach (array_filter(array($prerequisites, $action)) as $arg) {
             switch (true) {
                 case is_callable($arg):
                     $action = $arg;
                     break;
-                case is_string($arg):
-                    $name = $arg;
-                    break;
                 case is_array($arg):
                 case ($arg instanceof \Traversable):
+                case ($arg instanceof \Iterator):
                     $prerequisites = $arg;
                     break;
             }
