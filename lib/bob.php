@@ -84,7 +84,7 @@ function template($file, $vars = array())
 // Examples
 //
 //   proc('ls -A', function($ok, $process) {
-//       if (!$ok) fwrite($process->getErrorOutput(), STDERR);
+//       $ok or fwrite($process->getErrorOutput(), STDERR);
 //   });
 //
 // Returns the Output as String.
