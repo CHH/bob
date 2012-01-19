@@ -83,7 +83,7 @@ function template($file, $vars = array())
 //   });
 //
 // Returns the Output as String.
-function process($cmd, $callback = null)
+function proc($cmd, $callback = null)
 {
     if (is_array($cmd)) {
         $cmd = join(' ', $cmd);
