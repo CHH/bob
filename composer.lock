@@ -1,22 +1,25 @@
-[
-    {
-        "package": "pimple\/pimple",
-        "version": "1.0.0-dev"
-    },
-    {
-        "package": "symfony\/finder",
-        "version": "2.0.7"
-    },
-    {
-        "package": "symfony\/process",
-        "version": "2.0.7"
-    },
-    {
-        "package": "ulrichsg\/getopt-php",
-        "version": "master-dev"
-    },
-    {
-        "package": "chh\/fileutils",
-        "version": "master-dev"
-    }
-]
+{
+    "hash": "a38e40ea4ad1daca5d15f22276b99768",
+    "packages": [
+        {
+            "package": "pimple\/pimple",
+            "version": "1.0.0-dev"
+        },
+        {
+            "package": "ulrichsg\/getopt-php",
+            "version": "master-dev"
+        },
+        {
+            "package": "symfony\/process",
+            "version": "v2.0.9"
+        },
+        {
+            "package": "symfony\/finder",
+            "version": "v2.0.9"
+        },
+        {
+            "package": "chh\/fileutils",
+            "version": "master-dev"
+        }
+    ]
+}
