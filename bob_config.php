@@ -106,4 +106,3 @@ task('uninstall', function($task) {
     }
 });
 
-sh('ls -l');
