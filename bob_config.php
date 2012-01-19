@@ -18,7 +18,7 @@ $packageTask->define();
 
 // The "default" task is invoked when there's no
 // task explicitly given on the command line.
-task('default', array('dist'));
+task('default', array('phar'));
 
 // Note: All file paths used here should be relative to the project
 // directory. Bob automatically sets the current working directory
@@ -26,7 +26,12 @@ task('default', array('dist'));
 
 desc('Makes a distributable version of Bob, consisting of a composer.json
       and a PHAR file.');
-task('dist', array('test', 'composer.lock', 'bin/bob.phar'));
+task('phar', array('composer.lock', 'bin/bob.phar'));
+
+task('clean', function() {
+    if (file_exists('bin/bob.phar')) unlink('bin/bob.phar');
+    if (file_exists('bin/bob')) unlink('bin/bob');
+});
 
 fileTask('bin/bob.phar', $pharFiles, function($task) {
     if (file_exists($task->name)) {
