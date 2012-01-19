@@ -16,6 +16,14 @@ require __DIR__.'/Bob/Application.php';
 
 use Symfony\Component\Process\Process;
 
+class Exception extends \Exception
+{}
+
+function fail($msg)
+{
+    throw new Exception($msg);
+}
+
 // Public: Appends an End-Of-Line character to the given
 // text and writes it to a stream.
 //
@@ -90,15 +98,9 @@ function proc($cmd, $callback = null)
         );
 
         $callback = function($ok, $process) use ($showCmd) {
+            $ok or fail("Command failed with status ({$process->getExitCode()}) [$showCmd]");
+
             println($showCmd, STDERR);
-
-            if (!$ok) {
-                throw new Exception(sprintf(
-                    'Command failed with status (%d) [%s]', 
-                    $process->getExitCode(), $showCmd
-                ));
-            }
-
             echo $process->getOutput();
         };
     }
@@ -119,14 +121,9 @@ function sh($script, $callback = null)
         );
 
         $callback = function($ok, $process) use ($showCmd) {
-            println($showCmd, STDERR);
+            $ok or fail("Command failed with status ({$process->getExitCode()}) [$showCmd]");
 
-            if (!$ok) {
-                throw new Exception(sprintf(
-                    'Command failed with status (%d) [%s]', 
-                    $process->getExitCode(), $showCmd
-                ));
-            }
+            println($showCmd, STDERR);
             echo $process->getOutput();
         };
     }
