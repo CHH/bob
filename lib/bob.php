@@ -75,45 +75,70 @@ function template($file, $vars = array())
 //
 // Examples
 //
-//   process('ls -A', function($ok, $process) {
+//   proc('ls -A', function($ok, $process) {
 //       if (!$ok) fwrite($process->getErrorOutput(), STDERR);
 //   });
 //
 // Returns the Output as String.
 function proc($cmd, $callback = null)
 {
-    if (is_array($cmd)) {
-        $cmd = join(' ', $cmd);
-    }
+    $cmd = join(' ', (array) $cmd);
 
-    println(sprintf('bob: proc(%s)', $cmd), STDERR);
+    if (!is_callable($callback)) {
+        $showCmd = sprintf(
+            "bob: proc(%s)", strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd
+        );
+
+        $callback = function($ok, $process) use ($showCmd) {
+            println($showCmd, STDERR);
+
+            if (!$ok) {
+                throw new Exception(sprintf(
+                    'Command failed with status (%d) [%s]', 
+                    $process->getExitCode(), $showCmd
+                ));
+            }
+
+            echo $process->getOutput();
+        };
+    }
 
     $process = new Process($cmd);
     $process->run();
 
-    if (is_callable($callback)) {
-        call_user_func($callback, $process->isSuccessful(), $process);
-    }
-
-    echo $process->getOutput();
+    call_user_func($callback, $process->isSuccessful(), $process);
 }
 
 function sh($script, $callback = null)
 {
-    println(sprintf('bob: sh(%s)', $script), STDERR);
+    $script = join(' ', (array) $script);
+
+    if (!is_callable($callback)) {
+        $showCmd = sprintf(
+            "bob: sh(%s)", strlen($script) > 42 ? substr($script, 0, 42).'...' : $script
+        );
+
+        $callback = function($ok, $process) use ($showCmd) {
+            println($showCmd, STDERR);
+
+            if (!$ok) {
+                throw new Exception(sprintf(
+                    'Command failed with status (%d) [%s]', 
+                    $process->getExitCode(), $showCmd
+                ));
+            }
+            echo $process->getOutput();
+        };
+    }
 
     $process = new Process('/bin/sh');
     $process->setStdin($script);
     $process->run();
 
-    if (is_callable($callback)) {
-        call_user_func($callback, $process->isSuccessful(), $process);
-    }
-
-    echo $process->getOutput();
+    call_user_func($callback, $process->isSuccessful(), $process);
 }
 
-function php($script, $callback = null)
+function php($args, $callback = null)
 {
 }
 
