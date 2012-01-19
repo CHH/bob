@@ -29,8 +29,8 @@ desc('Makes a distributable version of Bob, consisting of a composer.json
 task('phar', array('composer.lock', 'bin/bob.phar'));
 
 task('clean', function() {
-    if (file_exists('bin/bob.phar')) unlink('bin/bob.phar');
-    if (file_exists('bin/bob')) unlink('bin/bob');
+    file_exists('bin/bob.phar') and unlink('bin/bob.phar');
+    file_exists('bin/bob')      and unlink('bin/bob');
 });
 
 fileTask('bin/bob.phar', $pharFiles, function($task) {
@@ -64,7 +64,9 @@ EOF;
 
     chmod($task->name, 0555);
 
-    println(sprintf('Regenerated Archive "%s" with %d entries', basename($task->name), count($phar)));
+    println(sprintf(
+        'Regenerated Archive "%s" with %d entries', basename($task->name), count($phar)
+    ));
     unset($phar);
 });
 
