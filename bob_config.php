@@ -70,7 +70,7 @@ EOF;
 
 desc("Runs Bob's test suite");
 task("test", array('phpunit.xml'), function($task) {
-    echo(`phpunit`);
+    proc('phpunit');
 });
 
 fileTask('phpunit.xml', array('phpunit.xml.dist'), function() {
@@ -78,7 +78,7 @@ fileTask('phpunit.xml', array('phpunit.xml.dist'), function() {
 });
 
 fileTask('composer.lock', array('composer.json'), function() {
-    echo(`composer update`);
+    proc('composer update');
 });
 
 desc('Takes an environment variable PREFIX and writes a `bob` executable
@@ -106,3 +106,4 @@ task('uninstall', function($task) {
     }
 });
 
+sh('ls -l');

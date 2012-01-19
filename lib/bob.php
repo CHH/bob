@@ -90,13 +90,31 @@ function proc($cmd, $callback = null)
     }
 
     $process = new Process($cmd);
+    println(sprintf('bob: proc(%s)', $cmd), STDERR);
     $process->run();
 
     if (is_callable($callback)) {
         call_user_func($callback, $process->isSuccessful(), $process);
     }
 
-    return $process->getOutput();
+    echo $process->getOutput();
+}
+
+function sh($script, $callback = null)
+{
+    $cmd = '/bin/sh';
+
+    $process = new Process($cmd);
+    $process->setStdin($script);
+
+    println(sprintf('bob: sh(%s)', $script), STDERR);
+    $process->run();
+
+    if (is_callable($callback)) {
+        call_user_func($callback, $process->isSuccessful(), $process);
+    }
+
+    echo $process->getOutput();
 }
 
 function php($script, $callback = null)
