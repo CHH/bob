@@ -101,8 +101,6 @@ task('uninstall', function($task) {
         return 1;
     }
 
-    if (false !== unlink("$prefix/bin/bob")) {
-        println("Erased bob successfully from $prefix");
-    }
+    unlink("$prefix/bin/bob") and println("Erased bob successfully from $prefix");
 });
 

@@ -111,6 +111,7 @@ function proc($cmd, $callback = null)
     call_user_func($callback, $process->isSuccessful(), $process);
 }
 
+// Public: Run something on the shell.
 function sh($script, $callback = null)
 {
     $script = join(' ', (array) $script);
@@ -135,8 +136,15 @@ function sh($script, $callback = null)
     call_user_func($callback, $process->isSuccessful(), $process);
 }
 
-function php($args, $callback = null)
+// Public: Run a PHP Process.
+function php($argv, $callback = null)
 {
+    $argv = join(' ', (array) $argv);
+
+    $execFinder = new \Symfony\Component\Process\PhpExecutableFinder;
+    $php = $execFinder->find();
+
+    return proc("$php $argv", $callback);
 }
 
 // Public: Takes a list of expressions and joins them to
