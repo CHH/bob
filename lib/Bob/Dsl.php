@@ -62,7 +62,3 @@ function desc($desc)
     TaskRegistry::$lastDescription = $desc;
 }
 
-function fail($msg)
-{
-    throw new BuildFailedException($msg);
-}

@@ -16,9 +16,6 @@ require __DIR__.'/Bob/Application.php';
 
 use Symfony\Component\Process\Process;
 
-class BuildFailedException extends \Exception
-{}
-
 // Public: Appends an End-Of-Line character to the given
 // text and writes it to a stream.
 //
@@ -89,8 +86,9 @@ function proc($cmd, $callback = null)
         $cmd = join(' ', $cmd);
     }
 
-    $process = new Process($cmd);
     println(sprintf('bob: proc(%s)', $cmd), STDERR);
+
+    $process = new Process($cmd);
     $process->run();
 
     if (is_callable($callback)) {
@@ -102,12 +100,10 @@ function proc($cmd, $callback = null)
 
 function sh($script, $callback = null)
 {
-    $cmd = '/bin/sh';
-
-    $process = new Process($cmd);
-    $process->setStdin($script);
-
     println(sprintf('bob: sh(%s)', $script), STDERR);
+
+    $process = new Process('/bin/sh');
+    $process->setStdin($script);
     $process->run();
 
     if (is_callable($callback)) {
