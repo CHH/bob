@@ -94,9 +94,7 @@ class Application
             $this->trace = true;
         }
 
-        return $this->withErrorHandling(function() {
-            $this->runTasks();
-        });
+        return $this->withErrorHandling(array($this, 'runTasks'));
     }
 
     protected function collectTasks()

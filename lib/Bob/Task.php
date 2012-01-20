@@ -24,6 +24,11 @@ class Task
 
     protected $invoked = false;
 
+    static function get($name)
+    {
+        return Bob::$application->tasks[$name];
+    }
+
     static function defineTask($name, $prerequisites = null, $action = null)
     {
         foreach (array_filter(array($prerequisites, $action)) as $arg) {

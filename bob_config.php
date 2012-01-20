@@ -24,8 +24,7 @@ task('default', array('phar'));
 // directory. Bob automatically sets the current working directory
 // to the path where the `bob_config.php` resides.
 
-desc('Makes a distributable version of Bob, consisting of a composer.json
-      and a PHAR file.');
+desc('Compiles a executable, standalone PHAR file');
 task('phar', array('composer.lock', 'bin/bob.phar'));
 
 task('clean', function() {
@@ -72,7 +71,7 @@ EOF;
 
 desc("Runs Bob's test suite");
 task("test", array('phpunit.xml'), function($task) {
-    proc('phpunit');
+    sh('phpunit');
 });
 
 fileTask('phpunit.xml', array('phpunit.xml.dist'), function() {
@@ -80,11 +79,10 @@ fileTask('phpunit.xml', array('phpunit.xml.dist'), function() {
 });
 
 fileTask('composer.lock', array('composer.json'), function() {
-    proc('composer update');
+    sh('composer update');
 });
 
-desc('Takes an environment variable PREFIX and writes a `bob` executable
-      to $PREFIX/bin/bob. PREFIX defaults to "/usr/local".');
+desc('Does a system install of Bob, by default to /usr/local/bin');
 task('install', array('bin/bob.phar'), function($task) {
     $prefix = getenv('PREFIX') ?: '/usr/local';
 
@@ -104,9 +102,5 @@ task('uninstall', function($task) {
     }
 
     unlink("$prefix/bin/bob") and println("Erased bob successfully from $prefix");
-});
-
-task('failing', function() {
-    return false;
 });
 
