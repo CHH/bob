@@ -79,7 +79,7 @@ function desc($desc)
 // Returns Nothing.
 function println($line, $stream = null)
 {
-    $line = $line.PHP_EOL;
+    $line .= PHP_EOL;
 
     if (is_resource($stream)) {
         fwrite($stream, $line);
@@ -97,6 +97,7 @@ function println($line, $stream = null)
 //   # template.phtml
 //   Hello <?= $name ? >
 //
+//   # test.php
 //   $t = template('template.phtml');
 //   echo $t(array('name' => 'Christoph'));
 //   # => Hello Christoph
@@ -115,7 +116,7 @@ function template($file)
 
     $template = function($__vars) use ($__file) {
         extract($__vars);
-        unset($__vars, $var, $value);
+        unset($__vars);
 
         ob_start();
         include($__file);

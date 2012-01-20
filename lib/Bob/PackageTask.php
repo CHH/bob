@@ -19,6 +19,7 @@ use Phar,
 //      'dist/myproject', trim(`git log -n 1 --format=%H`), glob('*')
 //   );
 //
+//   # define() defines all tasks on the application instance.
 //   $packageTask->define();
 class PackageTask
 {
@@ -57,7 +58,7 @@ class PackageTask
         task('repackage', function() use ($file) {
             unlink($file);
             unlink($file.'.gz');
-            Bob::$application->tasks['package']->invoke();
+            Task::get('package')->invoke();
         });
 
         // TODO: automatically exclude target files from prerequisites

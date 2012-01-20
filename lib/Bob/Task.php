@@ -24,6 +24,9 @@ class Task
 
     protected $invoked = false;
 
+    // Public: Returns a task instance.
+    //
+    // Returns a task instance, Null when Task was not found.
     static function get($name)
     {
         return Bob::$application->tasks[$name];

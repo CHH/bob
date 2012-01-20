@@ -8,9 +8,6 @@ class TaskRegistry extends \ArrayObject
     // Internal: Stores the description for the next created task.
     static $lastDescription = '';
 
-    // Internal: Stores the usage message for the next created task.
-    static $lastUsage = '';
-
     function offsetGet($name)
     {
         if (isset($this[$name])) {
