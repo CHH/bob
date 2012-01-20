@@ -8,7 +8,7 @@ use Bob;
 class Task
 {
     // Internal: The task's actions, can be empty.
-    var $actions = array();
+    var $actions;
 
     // Public: Name of the task. Used to invoke the task and used in prerequisites.
     var $name;
@@ -117,6 +117,9 @@ class Task
         $this->invoked = true;
     }
 
+    // Internal: Executes all actions.
+    //
+    // Returns nothing.
     function execute()
     {
         foreach ($this->actions as $action) {
@@ -124,6 +127,9 @@ class Task
         }
     }
 
+    // Clears all actions and prerequisites.
+    //
+    // Returns nothing.
     function clear()
     {
         $this->actions = new \SplDoublyLinkedList;

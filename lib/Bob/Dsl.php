@@ -165,9 +165,7 @@ function sh($cmd, $callback = null)
     $cmd = join(' ', (array) $cmd);
 
     if (!is_callable($callback)) {
-        $showCmd = sprintf(
-            "bob: sh(%s)", strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd
-        );
+        $showCmd = strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd;
 
         $callback = function($ok, $process) use ($showCmd) {
             $ok or fail("Command failed with status ({$process->getExitCode()}) [$showCmd]");

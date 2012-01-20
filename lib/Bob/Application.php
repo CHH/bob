@@ -222,7 +222,7 @@ EOF;
             call_user_func($callback);
             return 0;
         } catch (\Exception $e) {
-            println('Build failed: '.$e->getMessage(), STDERR);
+            println('bob: Build failed: '.$e->getMessage(), STDERR);
 
             if ($this->trace) {
                 println($e->getTraceAsString());
