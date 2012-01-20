@@ -4,6 +4,19 @@ namespace Bob;
 
 use Symfony\Component\Process\Process;
 
+class BuildFailedException extends \Exception
+{}
+
+// Public: Lets the build fail with an Exception.
+//
+// msg - The Exception message as String.
+//
+// Returns nothing.
+function fail($msg)
+{
+    throw new BuildFailedException((string) $msg);
+}
+
 // Public: Defines the callback as a task with the given name.
 //
 // name          - Task Name.

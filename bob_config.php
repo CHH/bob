@@ -48,7 +48,7 @@ require 'phar://bob.phar/bin/bob.php';
 __HALT_COMPILER();
 EOF;
 
-    $projectDir = Bob::$application->projectDir;
+    $projectDir = \Bob::$application->projectDir;
 
     $phar = new \Phar($task->name, 0, basename($task->name));
     $phar->startBuffering();

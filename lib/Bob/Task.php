@@ -2,6 +2,8 @@
 
 namespace Bob;
 
+use Bob;
+
 // Internal: Represents a single task.
 class Task
 {
