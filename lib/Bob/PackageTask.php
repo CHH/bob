@@ -60,6 +60,7 @@ class PackageTask
             Bob::$application->tasks['package']->invoke();
         });
 
+        // TODO: automatically exclude target files from prerequisites
         fileTask($file, $this->prerequisites, function($task) {
             file_exists($task->name)       and unlink($task->name);
             file_exists($task->name.'.gz') and unlink($task->name);

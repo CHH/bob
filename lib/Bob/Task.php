@@ -114,6 +114,12 @@ class Task
         }
     }
 
+    function clear()
+    {
+        $this->actions = new \SplDoublyLinkedList;
+        $this->prerequisites = array();
+    }
+
     function reenable()
     {
         $this->invoked = false;

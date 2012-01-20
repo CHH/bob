@@ -74,12 +74,12 @@ class Application
             return 0;
         }
 
-        $this->loadConfig();
-
         if ($this->opts->getOption('help')) {
             println($this->formatUsage(), STDERR);
             return 0;
         }
+
+        $this->loadConfig();
 
         if ($this->opts->getOption('tasks')) {
             println($this->formatTasksAndDescriptions(), STDERR);
@@ -94,7 +94,9 @@ class Application
             $this->trace = true;
         }
 
-        return $this->runTasks();
+        return $this->withErrorHandling(function() {
+            $this->runTasks();
+        });
     }
 
     protected function collectTasks()
@@ -213,6 +215,21 @@ EOF;
                 include $file->getRealpath();
                 $this->loadedConfigs[] = $file->getRealpath();
             }
+        }
+    }
+
+    function withErrorHandling($callback)
+    {
+        try {
+            call_user_func($callback);
+            return 0;
+        } catch (\Exception $e) {
+            println('Build failed: '.$e->getMessage(), STDERR);
+
+            if ($this->trace) {
+                println($e->getTraceAsString());
+            }
+            return 1;
         }
     }
 

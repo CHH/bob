@@ -4,21 +4,9 @@ namespace Bob;
 
 require __DIR__.'/../lib/bob.php';
 
-class Bob
-{
-    static $application;
-}
-
 // This is the top-level application instance, which holds all
 // tasks and contains the logic for running them.
 Bob::$application = new Application;
 
-try {
-    exit(Bob::$application->run());
-
-} catch (\Exception $e) {
-    // Print exceptions to STDERR and exit with an error.
-    println(sprintf('Build failed: %s', $e), STDERR);
-    exit(1);
-}
+exit(Bob::$application->run());
 

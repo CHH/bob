@@ -24,6 +24,13 @@ function fail($msg)
     throw new Exception($msg);
 }
 
+// Public: Holds the current application instance.
+class Bob
+{
+    // Public: Instance of \Bob\Application
+    static $application;
+}
+
 // Public: Appends an End-Of-Line character to the given
 // text and writes it to a stream.
 //
@@ -33,8 +40,8 @@ function fail($msg)
 //
 // Examples
 //
-//     # Print something to STDERR (uses fwrite)
-//     println('Error', STDERR);
+//   # Print something to STDERR (uses fwrite)
+//   println('Error', STDERR);
 //
 // Returns Nothing.
 function println($line, $stream = null)
@@ -51,11 +58,19 @@ function println($line, $stream = null)
 // Public: Renders a PHP template.
 //
 // file - Template file, this must be a valid PHP file.
-// vars - The local variables which should be available
-//        within the template script.
 //
-// Returns the rendered template as String.
-function template($file, $vars = array())
+// Examples
+//
+//   # template.phtml
+//   Hello <?= $name ? >
+//
+//   $t = template('template.phtml');
+//   echo $t(array('name' => 'Christoph'));
+//   # => Hello Christoph
+//
+// Returns an anonymous function of the variables, which returns
+// the rendered String.
+function template($file)
 {
     if (!file_exists($file)) {
         throw \InvalidArgumentException(sprintf(
@@ -63,7 +78,9 @@ function template($file, $vars = array())
         ));
     }
 
-    $template = function($__file, $__vars) {
+    $__file = $file;
+
+    $template = function($__vars) use ($__file) {
         extract($__vars);
         unset($__vars, $var, $value);
 
@@ -72,29 +89,37 @@ function template($file, $vars = array())
         return ob_get_clean();
     };
 
-    return $template($file, $vars);
+    return $template;
 }
 
-// Public: Runs a command in a new process.
+// Public: Runs a system command
 //
-// cmd      - Command with arguments as String.
+// cmd      - Command with arguments as String or List. Lists get joined by a single space.
 // callback - A callback which receives the success as Boolean
-//            and the Process instance as second argument.
+//            and the Process instance as second argument (optional).
 //
 // Examples
 //
-//   proc('ls -A', function($ok, $process) {
+//   # Triggers the default behaviour, the command's output is
+//   # displayed on STDOUT and the build fails when the exit code
+//   # was greater than zero.
+//   sh('ls -l');
+//
+//   # When a callback is passed as second argument, then the callback
+//   # receives the success status ($ok) as Boolean and a process instance
+//   # as second argument. The default behaviour is prevented too.
+//   sh('ls -A', function($ok, $process) {
 //       $ok or fwrite($process->getErrorOutput(), STDERR);
 //   });
 //
-// Returns the Output as String.
-function proc($cmd, $callback = null)
+// Returns nothing.
+function sh($cmd, $callback = null)
 {
     $cmd = join(' ', (array) $cmd);
 
     if (!is_callable($callback)) {
         $showCmd = sprintf(
-            "bob: proc(%s)", strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd
+            "bob: sh(%s)", strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd
         );
 
         $callback = function($ok, $process) use ($showCmd) {
@@ -111,40 +136,24 @@ function proc($cmd, $callback = null)
     call_user_func($callback, $process->isSuccessful(), $process);
 }
 
-// Public: Run something on the shell.
-function sh($script, $callback = null)
-{
-    $script = join(' ', (array) $script);
-
-    if (!is_callable($callback)) {
-        $showCmd = sprintf(
-            "bob: sh(%s)", strlen($script) > 42 ? substr($script, 0, 42).'...' : $script
-        );
-
-        $callback = function($ok, $process) use ($showCmd) {
-            $ok or fail("Command failed with status ({$process->getExitCode()}) [$showCmd]");
-
-            println($showCmd, STDERR);
-            echo $process->getOutput();
-        };
-    }
-
-    $process = new Process('/bin/sh');
-    $process->setStdin($script);
-    $process->run();
-
-    call_user_func($callback, $process->isSuccessful(), $process);
-}
-
-// Public: Run a PHP Process.
+// Public: Run a PHP Process with the given arguments.
+//
+// argv     - The argv either as Array or String. Arrays get joined by a single space.
+// callback - See sh()
+//
+// Examples
+//
+//   # Runs a PHP dev server on `localhost:4000` with the document root
+//   # `public/` and the router script `public/index.php`.
+//   php(array('-S', 'localhost:4000', '-t', 'public/', 'public/index.php'));
+//
+// Returns nothing.
 function php($argv, $callback = null)
 {
-    $argv = join(' ', (array) $argv);
-
     $execFinder = new \Symfony\Component\Process\PhpExecutableFinder;
     $php = $execFinder->find();
 
-    return proc("$php $argv", $callback);
+    return sh(array($php, join(' ', (array) $argv)), $callback);
 }
 
 // Public: Takes a list of expressions and joins them to
