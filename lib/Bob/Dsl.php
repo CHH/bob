@@ -169,14 +169,13 @@ function sh($cmd, $callback = null)
 
         $callback = function($ok, $process) use ($showCmd) {
             $ok or fail("Command failed with status ({$process->getExitCode()}) [$showCmd]");
-
-            println($showCmd, STDERR);
-            echo $process->getOutput();
         };
     }
 
     $process = new Process($cmd);
-    $process->run();
+    $process->run(function($type, $output) {
+        $type == 'err' ? fwrite($output, STDERR) : print($output);
+    });
 
     call_user_func($callback, $process->isSuccessful(), $process);
 }
