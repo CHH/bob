@@ -163,14 +163,15 @@ function template($file)
 function sh($cmd, $callback = null)
 {
     $cmd = join(' ', (array) $cmd);
+    $showCmd = strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd;
 
     if (!is_callable($callback)) {
-        $showCmd = strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd;
-
         $callback = function($ok, $process) use ($showCmd) {
             $ok or fail("Command failed with status ({$process->getExitCode()}) [$showCmd]");
         };
     }
+
+    println("bob: sh($showCmd)", STDERR);
 
     $process = new Process($cmd);
     $process->run(function($type, $output) {
