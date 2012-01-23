@@ -184,7 +184,7 @@ EOF;
     // Returns nothing.
     protected function loadConfig()
     {
-        $configPath = ConfigFile::findConfigFile($this->configFile, $_SERVER['PWD']);
+        $configPath = ConfigFile::findConfigFile($this->configFile, getcwd());
 
         if (false === $configPath) {
             throw new \Exception(sprintf(
@@ -198,7 +198,7 @@ EOF;
 
         // Save the original working directory, the working directory
         // gets set to the project directory while running tasks.
-        $this->originalDir = $_SERVER['PWD'];
+        $this->originalDir = getcwd();
 
         // The project dir is the directory of the root config.
         $this->projectDir = dirname($configPath);
