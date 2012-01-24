@@ -25,7 +25,7 @@ task('default', array('phar'));
 // to the path where the `bob_config.php` resides.
 
 desc('Compiles a executable, standalone PHAR file');
-task('phar', array('composer.lock', 'bin/bob.phar'));
+task('phar', array('composer.lock', 'test', 'bin/bob.phar'));
 
 task('clean', function() {
     file_exists('bin/bob.phar') and unlink('bin/bob.phar');
