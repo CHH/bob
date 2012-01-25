@@ -56,14 +56,12 @@ function fileTask($target, $prerequisites = array(), $callback)
 
 // Public: Defines the description of the subsequent task.
 //
-// desc  - Description text, should explain in plain sentences
-//         what the task does.
-// usage - A usage message, must start with the task name and
-//         should then be followed by the arguments.
+// desc - Description text, should explain in plain sentences
+//        what the task does.
 //
 // Examples
 //
-//     desc('Says Hello World to NAME', 'greet NAME');
+//     desc('Says Hello World to NAME');
 //     task('greet', function($task) {
 //         $operands = Bob::$application->opts->getOperands();
 //         $name = $operands[1];
