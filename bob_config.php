@@ -1,9 +1,8 @@
 <?php
-/*
- * Put the `bob_config.php` into the "Bob" namespace,
- * otherwise you would've to call the `task` and
- * `desc` functions with a `Bob\` prefix.
- */
+
+# Put the `bob_config.php` into the "Bob" namespace,
+# otherwise you would've to call the `task` and
+# `desc` functions with a `Bob\` prefix.
 namespace Bob;
 
 use FileUtils;
@@ -16,13 +15,13 @@ $packageTask = new PackageTask(
 );
 $packageTask->define();
 
-// The "default" task is invoked when there's no
-// task explicitly given on the command line.
+# The "default" task is invoked when there's no
+# task explicitly given on the command line.
 task('default', array('phar'));
 
-// Note: All file paths used here should be relative to the project
-// directory. Bob automatically sets the current working directory
-// to the path where the `bob_config.php` resides.
+# Note: All file paths used here should be relative to the project
+# directory. Bob automatically sets the current working directory
+# to the path where the `bob_config.php` resides.
 
 desc('Compiles a executable, standalone PHAR file');
 task('phar', array('composer.lock', 'test', 'bin/bob.phar'));
