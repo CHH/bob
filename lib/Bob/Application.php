@@ -251,13 +251,18 @@ EOF;
 
     function formatUsage()
     {
+        $VERSION = \Bob::VERSION;
+        $bin = basename($_SERVER['SCRIPT_NAME']);
+
         return <<<HELPTEXT
+bob $VERSION
+
 Usage:
-  bob.php
-  bob.php [VAR=VALUE...] [TASK...]
-  bob.php --init
-  bob.php -t|--tasks
-  bob.php -h|--help
+  $bin
+  $bin [VAR=VALUE...] [TASK...]
+  $bin --init
+  $bin -t|--tasks
+  $bin -h|--help
 
 Arguments:
   TASK:
