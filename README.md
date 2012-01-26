@@ -122,9 +122,10 @@ Tasks are run by using their name as argument(s) on the command line:
 
 	$ php bob.phar hello
 
-When Bob is invoked without a task in the arguments, then it tries to invoke
+When Bob is invoked without tasks it tries to invoke
 the `default` task.
-To set a task as default task we simply assign the task as prerequisite
+
+To set a task as default task assign the task as prerequisite
 of the `default` task:
 
 	task('default', array('hello'));
@@ -261,5 +262,5 @@ To run the Test Suite:
 
 	$ php bin/bob.php test
 
-(In case you wonder that the `bob.phar` gets sometimes not regenerated: It's
+(_In case you wonder that the PHAR gets sometimes not regenerated:_ It's
 only regenerated when the actual source files for the archive change.)
