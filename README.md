@@ -64,11 +64,13 @@ or:
 
 #### System-wide install (Unix-like OS only)
 
-To do a system-wide install, download either a zipball of Bob or
-clone the Bob Repository with:
+To do a system-wide install, download either a [Release][tags] or
+clone the Repository with:
 
     $ git clone git://github.com/CHH/Bob.git
     $ cd Bob
+
+[tags]: https://github.com/CHH/Bob/tags
 
 To install all of Bob's dependencies download Composer and run
 `composer install`:
