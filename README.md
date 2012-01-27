@@ -258,7 +258,7 @@ run Bob on itself:
 
     $ php bin/bob.php
 
-To run the Test Suite:
+To run only the Test Suite:
 
 	$ php bin/bob.php test
 
