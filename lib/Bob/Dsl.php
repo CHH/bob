@@ -173,7 +173,7 @@ function sh($cmd, $callback = null)
 
     $process = new Process($cmd);
     $process->run(function($type, $output) {
-        $type == 'err' ? fwrite($output, STDERR) : print($output);
+        $type == 'err' ? fwrite(STDERR, $output) : print($output);
     });
 
     call_user_func($callback, $process->isSuccessful(), $process);
