@@ -188,8 +188,8 @@ EOF;
 
         if (false === $configPath) {
             throw new \Exception(sprintf(
-                'Error: Filesystem boundary reached. No %s found.', 
-                $this->configName
+                'Error: Filesystem boundary reached. No %s found.',
+                $this->configFile
             ));
         }
 
