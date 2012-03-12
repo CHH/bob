@@ -142,6 +142,7 @@ function template($file)
 # cmd      - Command with arguments as String or List. Lists get joined by a single space.
 # callback - A callback which receives the success as Boolean
 #            and the Process instance as second argument (optional).
+# timeout  - Timeout for the process, defaults to 60 seconds.
 #
 # Examples
 #
@@ -158,7 +159,7 @@ function template($file)
 #   });
 #
 # Returns nothing.
-function sh($cmd, $callback = null)
+function sh($cmd, $callback = null, $timeout = 60)
 {
     $cmd = join(' ', (array) $cmd);
     $showCmd = strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd;
@@ -172,6 +173,8 @@ function sh($cmd, $callback = null)
     println("bob: sh($showCmd)", STDERR);
 
     $process = new Process($cmd);
+    $process->setTimeout($timeout);
+
     $process->run(function($type, $output) {
         $type == 'err' ? fwrite(STDERR, $output) : print($output);
     });
