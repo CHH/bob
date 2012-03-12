@@ -2,10 +2,10 @@
 
 namespace Bob;
 
-// Internal: A registry for tasks
+# Internal: A registry for tasks
 class TaskRegistry extends \ArrayObject
 {
-    // Internal: Stores the description for the next created task.
+    # Internal: Stores the description for the next created task.
     static $lastDescription = '';
 
     function offsetGet($name)

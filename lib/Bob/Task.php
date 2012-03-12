@@ -4,31 +4,31 @@ namespace Bob;
 
 use Bob;
 
-// Internal: Represents a single task.
+# Internal: Represents a single task.
 class Task
 {
-    // Internal: The task's actions, can be empty.
+    # Internal: The task's actions, can be empty.
     var $actions;
 
-    // Public: Name of the task. Used to invoke the task and used in prerequisites.
+    # Public: Name of the task. Used to invoke the task and used in prerequisites.
     var $name;
 
-    // Public: The task's dependencies. When a task name is encountered then this
-    // task gets run before this task.
+    # Public: The task's dependencies. When a task name is encountered then this
+    # task gets run before this task.
     var $prerequisites = array();
 
-    // Public: The description.
+    # Public: The description.
     var $description = '';
 
-    // Public: An application instance which holds references
-    // to all tasks.
+    # Public: An application instance which holds references
+    # to all tasks.
     var $application;
 
     protected $invoked = false;
 
-    // Public: Returns a task instance.
-    //
-    // Returns a task instance, Null when Task was not found.
+    # Public: Returns a task instance.
+    #
+    # Returns a task instance, Null when Task was not found.
     static function get($name)
     {
         return Bob::$application->tasks[$name];
@@ -65,11 +65,11 @@ class Task
         return $task;
     }
 
-    // Public: Initializes the task instance.
-    //
-    // name        - The task name, used to refer to the task in the CLI and
-    //               when declaring dependencies.
-    // application - The application object, to which this task belongs to.
+    # Public: Initializes the task instance.
+    #
+    # name        - The task name, used to refer to the task in the CLI and
+    #               when declaring dependencies.
+    # application - The application object, to which this task belongs to.
     function __construct($name, $application)
     {
         $this->name        = $name;
@@ -80,20 +80,20 @@ class Task
         $this->actions = new \SplDoublyLinkedList;
     }
 
-    // Child classes of Task should put here their custom logic to determine
-    // if the task should do something. See the FileTask class for an
-    // example of this.
-    //
-    // Returns TRUE if the task should be run, FALSE otherwise.
+    # Child classes of Task should put here their custom logic to determine
+    # if the task should do something. See the FileTask class for an
+    # example of this.
+    #
+    # Returns TRUE if the task should be run, FALSE otherwise.
     function isNeeded()
     {
         return true;
     }
 
-    // Public: Collects all dependencies and invokes the task if it's 
-    // needed.
-    //
-    // Returns the callback's return value.
+    # Public: Collects all dependencies and invokes the task if it's 
+    # needed.
+    #
+    # Returns the callback's return value.
     function invoke()
     {
         if ($this->invoked) return;
@@ -117,9 +117,9 @@ class Task
         $this->invoked = true;
     }
 
-    // Internal: Executes all actions.
-    //
-    // Returns nothing.
+    # Internal: Executes all actions.
+    #
+    # Returns nothing.
     function execute()
     {
         foreach ($this->actions as $action) {
@@ -127,9 +127,9 @@ class Task
         }
     }
 
-    // Clears all actions and prerequisites.
-    //
-    // Returns nothing.
+    # Clears all actions and prerequisites.
+    #
+    # Returns nothing.
     function clear()
     {
         $this->actions = new \SplDoublyLinkedList;

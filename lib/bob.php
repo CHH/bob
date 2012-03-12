@@ -11,11 +11,11 @@ require __DIR__.'/Bob/ConfigFile.php';
 require __DIR__.'/Bob/Dsl.php';
 require __DIR__.'/Bob/Application.php';
 
-// Internal: Holds the current application instance.
+# Internal: Holds the current application instance.
 class Bob
 {
     const VERSION = "v0.1.0";
 
-    // Instance of \Bob\Application
+    # Instance of \Bob\Application
     static $application;
 }

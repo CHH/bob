@@ -7,87 +7,87 @@ use Symfony\Component\Process\Process;
 class BuildFailedException extends \Exception
 {}
 
-// Public: Lets the build fail with an Exception.
-//
-// msg - The Exception message as String.
-//
-// Returns nothing.
+# Public: Lets the build fail with an Exception.
+#
+# msg - The Exception message as String.
+#
+# Returns nothing.
 function fail($msg)
 {
     throw new BuildFailedException((string) $msg);
 }
 
-// Public: Defines the callback as a task with the given name.
-//
-// name          - Task Name.
-// prerequisites - List of Dependency names.
-// callback      - The task's action, can be any callback.
-//
-// Examples
-//
-//     task('hello', function() {
-//         echo "Hello World\n";
-//     });
-//
-// Returns nothing.
+# Public: Defines the callback as a task with the given name.
+#
+# name          - Task Name.
+# prerequisites - List of Dependency names.
+# callback      - The task's action, can be any callback.
+#
+# Examples
+#
+#     task('hello', function() {
+#         echo "Hello World\n";
+#     });
+#
+# Returns nothing.
 function task($name, $prerequisites = null, $callback = null)
 {
     return Task::defineTask($name, $prerequisites, $callback);
 }
 
-// Public: Config file function for creating a task which is only run
-// when the target file does not exist, or the prerequisites were modified.
-//
-// target        - Filename of the resulting file, this is set as task name. Use
-//                 paths relative to the CWD (the CWD is always set to the root
-//                 of your project for you).
-// prerequisites - List of files which are needed to generate the target. The callback
-//                 which generates the target is only run when one of this files is newer
-//                 than the target file. You can access this list from within the task via
-//                 the task's `prerequisites` property.
-// callback      - Place your logic needed to generate the target here. It's only run when
-//                 the prerequisites were modified or the target does not exist.
-//
-// Returns nothing.
+# Public: Config file function for creating a task which is only run
+# when the target file does not exist, or the prerequisites were modified.
+#
+# target        - Filename of the resulting file, this is set as task name. Use
+#                 paths relative to the CWD (the CWD is always set to the root
+#                 of your project for you).
+# prerequisites - List of files which are needed to generate the target. The callback
+#                 which generates the target is only run when one of this files is newer
+#                 than the target file. You can access this list from within the task via
+#                 the task's `prerequisites` property.
+# callback      - Place your logic needed to generate the target here. It's only run when
+#                 the prerequisites were modified or the target does not exist.
+#
+# Returns nothing.
 function fileTask($target, $prerequisites = array(), $callback)
 {
     return FileTask::defineTask($target, $prerequisites, $callback);
 }
 
-// Public: Defines the description of the subsequent task.
-//
-// desc - Description text, should explain in plain sentences
-//        what the task does.
-//
-// Examples
-//
-//     desc('Says Hello World to NAME');
-//     task('greet', function($task) {
-//         $operands = Bob::$application->opts->getOperands();
-//         $name = $operands[1];
-//
-//         echo "Hello World $name!\n";
-//     });
-//
-// Returns nothing.
+# Public: Defines the description of the subsequent task.
+#
+# desc - Description text, should explain in plain sentences
+#        what the task does.
+#
+# Examples
+#
+#     desc('Says Hello World to NAME');
+#     task('greet', function($task) {
+#         $operands = Bob::$application->opts->getOperands();
+#         $name = $operands[1];
+#
+#         echo "Hello World $name!\n";
+#     });
+#
+# Returns nothing.
 function desc($desc)
 {
     TaskRegistry::$lastDescription = $desc;
 }
 
-// Public: Appends an End-Of-Line character to the given
-// text and writes it to a stream.
-//
-// line   - Text to write.
-// stream - Resource to write the text to (optional). By
-//          default the text is printed to STDOUT via `echo`
-//
-// Examples
-//
-//   # Print something to STDERR (uses fwrite)
-//   println('Error', STDERR);
-//
-// Returns Nothing.
+# Public: Appends an End-Of-Line character to the given
+# text and writes it to a stream.
+#
+# line   - Text to write.
+# stream - Resource to write the text to (optional). By
+#          default the text is printed to STDOUT via `echo`
+#
+# Examples
+#
+#   # Print something to STDERR (uses fwrite)
+#   println('Error', STDERR);
+#
+# Returns Nothing.
 function println($line, $stream = null)
 {
     $line .= PHP_EOL;
@@ -99,22 +99,22 @@ function println($line, $stream = null)
     }
 }
 
-// Public: Renders a PHP template.
-//
-// file - Template file, this must be a valid PHP file.
-//
-// Examples
-//
-//   # template.phtml
-//   Hello <?= $name ? >
-//
-//   # test.php
-//   $t = template('template.phtml');
-//   echo $t(array('name' => 'Christoph'));
-//   # => Hello Christoph
-//
-// Returns an anonymous function of the variables, which returns
-// the rendered String.
+# Public: Renders a PHP template.
+#
+# file - Template file, this must be a valid PHP file.
+#
+# Examples
+#
+#   # template.phtml
+#   Hello <?= $name ? >
+#
+#   # test.php
+#   $t = template('template.phtml');
+#   echo $t(array('name' => 'Christoph'));
+#   # => Hello Christoph
+#
+# Returns an anonymous function of the variables, which returns
+# the rendered String.
 function template($file)
 {
     if (!file_exists($file)) {
@@ -137,27 +137,27 @@ function template($file)
     return $template;
 }
 
-// Public: Runs a system command
-//
-// cmd      - Command with arguments as String or List. Lists get joined by a single space.
-// callback - A callback which receives the success as Boolean
-//            and the Process instance as second argument (optional).
-//
-// Examples
-//
-//   # Triggers the default behaviour, the command's output is
-//   # displayed on STDOUT and the build fails when the exit code
-//   # was greater than zero.
-//   sh('ls -l');
-//
-//   # When a callback is passed as second argument, then the callback
-//   # receives the success status ($ok) as Boolean and a process instance
-//   # as second argument. The default behaviour is prevented too.
-//   sh('ls -A', function($ok, $process) {
-//       $ok or fwrite($process->getErrorOutput(), STDERR);
-//   });
-//
-// Returns nothing.
+# Public: Runs a system command
+#
+# cmd      - Command with arguments as String or List. Lists get joined by a single space.
+# callback - A callback which receives the success as Boolean
+#            and the Process instance as second argument (optional).
+#
+# Examples
+#
+#   # Triggers the default behaviour, the command's output is
+#   # displayed on STDOUT and the build fails when the exit code
+#   # was greater than zero.
+#   sh('ls -l');
+#
+#   # When a callback is passed as second argument, then the callback
+#   # receives the success status ($ok) as Boolean and a process instance
+#   # as second argument. The default behaviour is prevented too.
+#   sh('ls -A', function($ok, $process) {
+#       $ok or fwrite($process->getErrorOutput(), STDERR);
+#   });
+#
+# Returns nothing.
 function sh($cmd, $callback = null)
 {
     $cmd = join(' ', (array) $cmd);
@@ -179,18 +179,18 @@ function sh($cmd, $callback = null)
     call_user_func($callback, $process->isSuccessful(), $process);
 }
 
-// Public: Run a PHP Process with the given arguments.
-//
-// argv     - The argv either as Array or String. Arrays get joined by a single space.
-// callback - See sh()
-//
-// Examples
-//
-//   # Runs a PHP dev server on `localhost:4000` with the document root
-//   # `public/` and the router script `public/index.php`.
-//   php(array('-S', 'localhost:4000', '-t', 'public/', 'public/index.php'));
-//
-// Returns nothing.
+# Public: Run a PHP Process with the given arguments.
+#
+# argv     - The argv either as Array or String. Arrays get joined by a single space.
+# callback - See sh()
+#
+# Examples
+#
+#   # Runs a PHP dev server on `localhost:4000` with the document root
+#   # `public/` and the router script `public/index.php`.
+#   php(array('-S', 'localhost:4000', '-t', 'public/', 'public/index.php'));
+#
+# Returns nothing.
 function php($argv, $callback = null)
 {
     $execFinder = new \Symfony\Component\Process\PhpExecutableFinder;
@@ -199,12 +199,12 @@ function php($argv, $callback = null)
     return sh(array($php, join(' ', (array) $argv)), $callback);
 }
 
-// Public: Takes a list of expressions and joins them to
-// a list of paths.
-//
-// patterns - List of shell file patterns.
-//
-// Returns a list of paths.
+# Public: Takes a list of expressions and joins them to
+# a list of paths.
+#
+# patterns - List of shell file patterns.
+#
+# Returns a list of paths.
 function fileList($patterns)
 {
     $patterns = (array) $patterns;

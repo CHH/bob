@@ -6,36 +6,36 @@ use Getopt,
     FileUtils,
     Symfony\Component\Finder\Finder;
 
-// Public: The command line application. Contains the heavy lifting
-// of everything Bob does.
+# Public: The command line application. Contains the heavy lifting
+# of everything Bob does.
 class Application
 {
-    // Public: Contains mappings from task name to a task instance.
+    # Public: Contains mappings from task name to a task instance.
     var $tasks;
 
-    // Public: The working directory where the bob utility was run from.
+    # Public: The working directory where the bob utility was run from.
     var $originalDir;
 
-    // Public: The directory where the root config was found. This
-    // directory is set as working directory while tasks are executed.
+    # Public: The directory where the root config was found. This
+    # directory is set as working directory while tasks are executed.
     var $projectDir;
 
-    // Public: The command line option parser. You can add your own options 
-    // when inside a task if you call `addOptions` with the same format as seen here.
+    # Public: The command line option parser. You can add your own options 
+    # when inside a task if you call `addOptions` with the same format as seen here.
     var $opts;
 
-    // Public: Enable tracing.
+    # Public: Enable tracing.
     var $trace = false;
     var $configFile = 'bob_config.php';
     var $configSearchDir = "bob_tasks";
 
-    // List of paths of all loaded config files.
+    # List of paths of all loaded config files.
     var $loadedConfigs = array();
 
-    // Public: Should tasks run even if they're not needed?
+    # Public: Should tasks run even if they're not needed?
     var $forceRun = false;
 
-    // Public: Initialize the application.
+    # Public: Initialize the application.
     function __construct()
     {
         $this->opts = new Getopt(array(
@@ -49,12 +49,12 @@ class Application
         $this->tasks = new TaskRegistry;
     }
 
-    // Public: Parses the arguments list for options and
-    // then does something useful depending on what is given.
-    //
-    // argv - A list of arguments supplied on the CLI.
-    //
-    // Returns the desired exit status as Integer.
+    # Public: Parses the arguments list for options and
+    # then does something useful depending on what is given.
+    #
+    # argv - A list of arguments supplied on the CLI.
+    #
+    # Returns the desired exit status as Integer.
     function run($argv = null)
     {
         if (null === $argv) {
@@ -177,11 +177,11 @@ EOF;
         println('Initialized project at '.$cwd);
     }
 
-    // Internal: Looks up the build config files from the root of the project
-    // and from the search dir in `./bob_tasks`. Build Config files contain
-    // the task definitions.
-    //
-    // Returns nothing.
+    # Internal: Looks up the build config files from the root of the project
+    # and from the search dir in `./bob_tasks`. Build Config files contain
+    # the task definitions.
+    #
+    # Returns nothing.
     protected function loadConfig()
     {
         $configPath = ConfigFile::findConfigFile($this->configFile, getcwd());
@@ -196,14 +196,14 @@ EOF;
         include $configPath;
         $this->loadedConfigs[] = $configPath;
 
-        // Save the original working directory, the working directory
-        // gets set to the project directory while running tasks.
+        # Save the original working directory, the working directory
+        # gets set to the project directory while running tasks.
         $this->originalDir = getcwd();
 
-        // The project dir is the directory of the root config.
+        # The project dir is the directory of the root config.
         $this->projectDir = dirname($configPath);
 
-        // Load tasks from the search dir in "./bob_tasks/"
+        # Load tasks from the search dir in "./bob_tasks/"
         if (is_dir($this->projectDir.$this->configSearchDir)) {
             $finder = Finder::create()
                 ->files()->name("*.php")
