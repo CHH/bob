@@ -185,12 +185,13 @@ function sh($cmd, $callback = null, $timeout = 60)
 # Public: Run a PHP Process with the given arguments.
 #
 # argv     - The argv either as Array or String. Arrays get joined by a single space.
-# callback - See sh()
+# callback - See sh().
+# timeout  - See sh().
 #
 # Examples
 #
 #   # Runs a PHP dev server on `localhost:4000` with the document root
-#   # `public/` and the router script `public/index.php`.
+#   # `public/` and the router script `public/index.php` (requires PHP >= 5.4).
 #   php(array('-S', 'localhost:4000', '-t', 'public/', 'public/index.php'));
 #
 # Returns nothing.
@@ -199,7 +200,10 @@ function php($argv, $callback = null, $timeout = 60)
     $execFinder = new \Symfony\Component\Process\PhpExecutableFinder;
     $php = $execFinder->find();
 
-    return sh(array($php, join(' ', (array) $argv)), $callback, $timeout);
+    $argv = (array) $argv;
+    array_unshift($argv, $php);
+
+    return sh($argv, $callback, $timeout);
 }
 
 # Public: Takes a list of expressions and joins them to
