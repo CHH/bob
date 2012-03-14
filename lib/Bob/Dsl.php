@@ -194,12 +194,12 @@ function sh($cmd, $callback = null, $timeout = 60)
 #   php(array('-S', 'localhost:4000', '-t', 'public/', 'public/index.php'));
 #
 # Returns nothing.
-function php($argv, $callback = null)
+function php($argv, $callback = null, $timeout = 60)
 {
     $execFinder = new \Symfony\Component\Process\PhpExecutableFinder;
     $php = $execFinder->find();
 
-    return sh(array($php, join(' ', (array) $argv)), $callback);
+    return sh(array($php, join(' ', (array) $argv)), $callback, $timeout);
 }
 
 # Public: Takes a list of expressions and joins them to
