@@ -164,12 +164,6 @@ function sh($cmd, $callback = null, $timeout = 60)
     $cmd = join(' ', (array) $cmd);
     $showCmd = strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd;
 
-    if (!is_callable($callback)) {
-        $callback = function($ok, $process) use ($showCmd) {
-            $ok or fail("Command failed with status ({$process->getExitCode()}) [$showCmd]");
-        };
-    }
-
     println("bob: sh($showCmd)", STDERR);
 
     $process = new Process($cmd);
@@ -179,7 +173,11 @@ function sh($cmd, $callback = null, $timeout = 60)
         $type == 'err' ? fwrite(STDERR, $output) : print($output);
     });
 
-    call_user_func($callback, $process->isSuccessful(), $process);
+    $process->isSuccessful() or fail("Command failed with status ({$process->getExitCode()}) [$showCmd]");
+
+    if ($callback !== null) {
+        call_user_func($callback, $process->isSuccessful(), $process);
+    }
 }
 
 # Public: Run a PHP Process with the given arguments.
