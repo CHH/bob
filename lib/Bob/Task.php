@@ -7,24 +7,26 @@ use Bob;
 # Internal: Represents a single task.
 class Task
 {
-    # Internal: The task's actions, can be empty.
-    var $actions;
+    public
+        # Internal: The task's actions, can be empty.
+        $actions,
 
-    # Public: Name of the task. Used to invoke the task and used in prerequisites.
-    var $name;
+        # Public: Name of the task. Used to invoke the task and used in prerequisites.
+        $name,
 
-    # Public: The task's dependencies. When a task name is encountered then this
-    # task gets run before this task.
-    var $prerequisites = array();
+        # Public: The task's dependencies. When a task name is encountered then this
+        # task gets run before this task.
+        $prerequisites = array(),
 
-    # Public: The description.
-    var $description = '';
+        # Public: The description.
+        $description = '',
 
-    # Public: An application instance which holds references
-    # to all tasks.
-    var $application;
+        # Public: An application instance which holds references
+        # to all tasks.
+        $application;
 
-    protected $invoked = false;
+    protected
+        $invoked = false;
 
     # Public: Returns a task instance.
     #

@@ -11,29 +11,31 @@ use Getopt,
 class Application
 {
     # Public: Contains mappings from task name to a task instance.
-    var $tasks;
+    public
+        $tasks
 
-    # Public: The working directory where the bob utility was run from.
-    var $originalDir;
+        # Public: The working directory where the bob utility was run from.
+        $originalDir,
 
-    # Public: The directory where the root config was found. This
-    # directory is set as working directory while tasks are executed.
-    var $projectDir;
+        # Public: The directory where the root config was found. This
+        # directory is set as working directory while tasks are executed.
+        $projectDir,
 
-    # Public: The command line option parser. You can add your own options 
-    # when inside a task if you call `addOptions` with the same format as seen here.
-    var $opts;
+        # Public: The command line option parser. You can add your own options
+        # when inside a task if you call `addOptions` with the same format as seen here.
+        $opts,
 
-    # Public: Enable tracing.
-    var $trace = false;
-    var $configFile = 'bob_config.php';
-    var $configSearchDir = "bob_tasks";
+        # Public: Enable tracing.
+        $trace = false,
 
-    # List of paths of all loaded config files.
-    var $loadedConfigs = array();
+        $configFile = "bob_config.php",
+        $configSearchDir = "bob_tasks",
 
-    # Public: Should tasks run even if they're not needed?
-    var $forceRun = false;
+        # List of paths of all loaded config files.
+        $loadedConfigs = array(),
+
+        # Public: Should tasks run even if they're not needed?
+        $forceRun = false;
 
     # Public: Initialize the application.
     function __construct()
