@@ -5,6 +5,11 @@ namespace Bob;
 # Internal: Represents a file task.
 class FileTask extends Task
 {
+    static function defineTask($name, $prerequisites = null, $action = null)
+    {
+        return parent::defineTask($name, $prerequisites, $action);
+    }
+
     # Public: Checks if the target exists or one of the prerequisites is newer
     # than the target file.
     #

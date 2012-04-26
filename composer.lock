@@ -2,24 +2,28 @@
     "hash": "a38e40ea4ad1daca5d15f22276b99768",
     "packages": [
         {
-            "package": "pimple\/pimple",
-            "version": "1.0.0-dev"
+            "package": "chh/fileutils",
+            "version": "dev-master",
+            "source-reference": "e432f9fa7b98504b0e12d23c2853824f523454dd"
         },
         {
-            "package": "ulrichsg\/getopt-php",
-            "version": "master-dev"
+            "package": "symfony/finder",
+            "version": "2.0.x-dev",
+            "source-reference": "42e22b1a62010e2a78088c3929d9d0034751bfb8"
         },
         {
-            "package": "symfony\/process",
-            "version": "v2.0.9"
+            "package": "symfony/process",
+            "version": "2.0.x-dev",
+            "source-reference": "v2.0.12"
         },
         {
-            "package": "symfony\/finder",
-            "version": "v2.0.9"
-        },
-        {
-            "package": "chh\/fileutils",
-            "version": "master-dev"
+            "package": "ulrichsg/getopt-php",
+            "version": "dev-master",
+            "source-reference": "9693fbcd9c3c578edb5a445f0953125f067eadbf"
         }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
     ]
 }

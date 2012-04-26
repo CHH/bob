@@ -2,8 +2,8 @@
 
 namespace Bob;
 
-use Getopt,
-    FileUtils,
+use Ulrichsg\Getopt,
+    CHH\FileUtils,
     Symfony\Component\Finder\Finder;
 
 # Public: The command line application. Contains the heavy lifting
@@ -12,7 +12,7 @@ class Application
 {
     # Public: Contains mappings from task name to a task instance.
     public
-        $tasks
+        $tasks,
 
         # Public: The working directory where the bob utility was run from.
         $originalDir,

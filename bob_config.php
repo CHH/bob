@@ -5,7 +5,7 @@
 # `desc` functions with a `Bob\` prefix.
 namespace Bob;
 
-use FileUtils;
+use CHH\FileUtils;
 
 $pharFiles = fileList('*.php')->in(array('lib', 'bin', 'vendor'));
 
