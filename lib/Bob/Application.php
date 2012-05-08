@@ -206,10 +206,10 @@ EOF;
         $this->projectDir = dirname($configPath);
 
         # Load tasks from the search dir in "./bob_tasks/"
-        if (is_dir($this->projectDir.$this->configSearchDir)) {
+        if (is_dir("{$this->projectDir}/{$this->configSearchDir}")) {
             $finder = Finder::create()
                 ->files()->name("*.php")
-                ->in($this->projectDir.$this->configSearchDir);
+                ->in("{$this->projectDir}/{$this->configSearchDir}");
 
             foreach ($finder as $file) {
                 include $file->getRealpath();
