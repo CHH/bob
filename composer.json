@@ -1,9 +1,9 @@
 {
     "name": "chh/bob",
     "require": {
-        "php": ">=5.3.2",
-        "symfony/finder": ">=2.0.0,<2.1.0dev",
-        "symfony/process": ">=2.0.0,<2.1.0dev",
+        "php": ">=5.3.3",
+        "symfony/finder": "2.*@stable",
+        "symfony/process": "2.*@stable",
         "ulrichsg/getopt-php": "*",
         "chh/fileutils": "*"
     },

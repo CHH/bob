@@ -1,5 +1,5 @@
 {
-    "hash": "a38e40ea4ad1daca5d15f22276b99768",
+    "hash": "30fb8e1c0b3f9d6fe50c09963c83d6a5",
     "packages": [
         {
             "package": "chh/fileutils",
@@ -8,13 +8,11 @@
         },
         {
             "package": "symfony/finder",
-            "version": "2.0.x-dev",
-            "source-reference": "42e22b1a62010e2a78088c3929d9d0034751bfb8"
+            "version": "v2.0.13"
         },
         {
             "package": "symfony/process",
-            "version": "2.0.x-dev",
-            "source-reference": "v2.0.12"
+            "version": "v2.0.13"
         },
         {
             "package": "ulrichsg/getopt-php",
@@ -25,5 +23,10 @@
     "packages-dev": null,
     "aliases": [
 
-    ]
+    ],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "symfony/finder": 0,
+        "symfony/process": 0
+    }
 }
