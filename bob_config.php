@@ -73,9 +73,7 @@ task("test", array('phpunit.xml'), function($task) {
     sh('phpunit');
 });
 
-fileTask('phpunit.xml', array('phpunit.xml.dist'), function() {
-    copy('phpunit.xml.dist', 'phpunit.xml');
-});
+copyTask("phpunit.xml.dist", "phpunit.xml");
 
 fileTask('composer.lock', array('composer.json'), function() {
     sh('composer update');

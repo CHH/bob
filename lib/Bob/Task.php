@@ -76,6 +76,7 @@ class Task
     {
         $this->name        = $name;
         $this->application = $application;
+
         $this->description = TaskRegistry::$lastDescription;
         TaskRegistry::$lastDescription = '';
 

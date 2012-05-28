@@ -48,10 +48,25 @@ function task($name, $prerequisites = null, $callback = null)
 # callback      - Place your logic needed to generate the target here. It's only run when
 #                 the prerequisites were modified or the target does not exist.
 #
-# Returns nothing.
+# Returns a Task instance.
 function fileTask($target, $prerequisites = array(), $callback)
 {
     return FileTask::defineTask($target, $prerequisites, $callback);
+}
+
+# Copies the file only when it doesn't exists or was updated.
+#
+# source - Source file. This file is watched for changes.
+# dest   - Destination.
+#
+# Returns a Task instance.
+function copyTask($from, $to)
+{
+    return FileTask::defineTask($to, array($from), function($task) {
+        if (false === copy($task->prerequisites[0], $task->name)) {
+            fail("Failed copying '{$task->prerequisites[0]}' => '{$task->name}'");
+        }
+    });
 }
 
 # Public: Defines the description of the subsequent task.
