@@ -1,12 +1,5 @@
 {
     "name": "chh/bob",
-    "require": {
-        "php": ">=5.3.3",
-        "symfony/finder": "2.*@stable",
-        "symfony/process": "2.*@stable",
-        "ulrichsg/getopt-php": "*",
-        "chh/fileutils": "*"
-    },
     "description": "A tiny and messy build automation tool for PHP projects.",
     "keywords": [
         "build"
@@ -19,6 +12,18 @@
             "email": "christoph.hochstrasser@gmail.com"
         }
     ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/finder": "2.*@stable",
+        "symfony/process": "2.*@stable",
+        "ulrichsg/getopt-php": "*",
+        "chh/fileutils": "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Bob": "lib/"
+        }
+    },
     "bin": [
         "bin/bob.phar"
     ]
