@@ -48,7 +48,7 @@ Simply add the `chh/bob` package to the `require` section in your
 
     {
         "require": {
-            "chh/bob": "master-dev"
+            "chh/bob": "*@dev"
         }
     }
 
