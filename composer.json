@@ -16,8 +16,8 @@
         "php": ">=5.3.3",
         "symfony/finder": "2.*@stable",
         "symfony/process": "2.*@stable",
-        "ulrichsg/getopt-php": "*",
-        "chh/fileutils": "*"
+        "ulrichsg/getopt-php": "*@dev",
+        "chh/fileutils": "*@dev"
     },
     "autoload": {
         "psr-0": {
