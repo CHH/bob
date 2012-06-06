@@ -63,6 +63,8 @@ function fileTask($target, $prerequisites = array(), $callback)
 function copyTask($from, $to)
 {
     return FileTask::defineTask($to, array($from), function($task) {
+        println("bob: copyTask('{$task->prerequisites[0]}' => '{$task->name}')", STDERR);
+
         if (false === copy($task->prerequisites[0], $task->name)) {
             fail("Failed copying '{$task->prerequisites[0]}' => '{$task->name}'");
         }
