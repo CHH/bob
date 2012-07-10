@@ -8,7 +8,7 @@ use Bob;
 class Task
 {
     public
-        # Internal: The task's actions, can be empty.
+        # Internal: The task's actions as SplDoublyLinkedList, can be empty.
         $actions,
 
         # Public: Name of the task. Used to invoke the task and used in prerequisites.
@@ -23,10 +23,12 @@ class Task
 
         # Public: An application instance which holds references
         # to all tasks.
-        $application;
+        $application,
+
+        $enable = true;
 
     protected
-        $invoked = false;
+        $reenable = false;
 
     # Public: Returns a task instance.
     #
@@ -99,12 +101,23 @@ class Task
     # Returns the callback's return value.
     function invoke()
     {
-        if ($this->invoked) return;
+        if (!$this->enable) {
+            if ($this->application->trace) {
+                println("bob: {$this->inspect()} is not enabled.", STDERR);
+            }
+            return;
+        }
+
+        if (!$this->reenable and $this->application->invocationChain->has($this->name)) {
+            return;
+        }
 
         if (!$this->application->forceRun and !$this->isNeeded()) {
             $this->application->trace and println("bob: skipping {$this->inspect()}", STDERR);
             return;
         }
+
+        $this->application->invocationChain->push($this);
 
         if ($this->application->trace) {
             println("bob: invoke {$this->inspect()}", STDERR);
@@ -117,7 +130,7 @@ class Task
         }
 
         $this->execute();
-        $this->invoked = true;
+        $this->reenable = false;
     }
 
     # Internal: Executes all actions.
@@ -141,7 +154,7 @@ class Task
 
     function reenable()
     {
-        $this->invoked = false;
+        $this->reenable = true;
     }
 
     function enhance($deps = null, $action = null)

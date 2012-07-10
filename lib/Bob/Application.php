@@ -35,7 +35,9 @@ class Application
         $loadedConfigs = array(),
 
         # Public: Should tasks run even if they're not needed?
-        $forceRun = false;
+        $forceRun = false,
+
+        $invocationChain;
 
     # Public: Initialize the application.
     function __construct()
@@ -49,6 +51,7 @@ class Application
         ));
 
         $this->tasks = new TaskRegistry;
+        $this->invocationChain = new TaskInvocationChain;
     }
 
     # Public: Parses the arguments list for options and
