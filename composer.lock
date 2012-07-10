@@ -1,10 +1,11 @@
 {
-    "hash": "0ae2112221af874e5de528617e5cfe24",
+    "hash": "48656950f941a2cde3ed0432650aaad4",
     "packages": [
         {
             "package": "chh/fileutils",
             "version": "dev-master",
-            "source-reference": "e432f9fa7b98504b0e12d23c2853824f523454dd"
+            "source-reference": "e432f9fa7b98504b0e12d23c2853824f523454dd",
+            "commit-date": "1335424874"
         },
         {
             "package": "symfony/finder",
@@ -17,16 +18,19 @@
         {
             "package": "ulrichsg/getopt-php",
             "version": "dev-master",
-            "source-reference": "11c0d3bb2df4f79004b085f495fe7a149efda9d5"
+            "source-reference": "11c0d3bb2df4f79004b085f495fe7a149efda9d5",
+            "commit-date": "1338474142"
         }
     ],
     "packages-dev": null,
     "aliases": [
 
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": {
         "symfony/finder": 0,
-        "symfony/process": 0
+        "symfony/process": 0,
+        "ulrichsg/getopt-php": 20,
+        "chh/fileutils": 20
     }
 }
