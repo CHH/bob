@@ -17,6 +17,11 @@ function fail($msg)
     throw new BuildFailedException((string) $msg);
 }
 
+function failf($msg, $args = array())
+{
+    throw new BuildFailedException(vsprintf($msg, (array) $args));
+}
+
 # Public: Defines the callback as a task with the given name.
 #
 # name          - Task Name.
@@ -154,34 +159,40 @@ function template($file)
     return $template;
 }
 
-# Public: Runs a system command
+# Public: Runs a system command. Let's the build fail when the command did exit with a
+# status indicating an error.
 #
 # cmd      - Command with arguments as String or List. Lists get joined by a single space.
 # callback - A callback which receives the success as Boolean
 #            and the Process instance as second argument (optional).
-# timeout  - Timeout for the process, defaults to 60 seconds.
+# options  - Array of options:
+#            timeout     - Timeout in seconds.
+#            failOnError - Should the build fail when the command failed with a non-zero
+#                          exit status? (default: false)
 #
 # Examples
 #
-#   # Triggers the default behaviour, the command's output is
-#   # displayed on STDOUT and the build fails when the exit code
+#   # The command's output is displayed on STDOUT and the build fails when the exit code
 #   # was greater than zero.
 #   sh('ls -l');
 #
 #   # When a callback is passed as second argument, then the callback
 #   # receives the success status ($ok) as Boolean and a process instance
-#   # as second argument. The default behaviour is prevented too.
+#   # as second argument.
 #   sh('ls -A', function($ok, $process) {
 #       $ok or fwrite($process->getErrorOutput(), STDERR);
 #   });
 #
 # Returns nothing.
-function sh($cmd, $callback = null, $timeout = 60)
+function sh($cmd, $callback = null, $options = array())
 {
     $cmd = join(' ', (array) $cmd);
     $showCmd = strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd;
 
     println("bob: sh($showCmd)", STDERR);
+
+    $timeout     = @$options["timeout"];
+    $failOnError = @$options["failOnError"];
 
     $process = new Process($cmd);
     $process->setTimeout($timeout);
@@ -190,7 +201,9 @@ function sh($cmd, $callback = null, $timeout = 60)
         $type == 'err' ? fwrite(STDERR, $output) : print($output);
     });
 
-    $process->isSuccessful() or fail("Command failed with status ({$process->getExitCode()}) [$showCmd]");
+    if (!$process->isSuccessful() and $failOnError) {
+        failf("Command failed with status (%d) [%s]", array($process->getExitCode(), $showCmd));
+    }
 
     if ($callback !== null) {
         call_user_func($callback, $process->isSuccessful(), $process);
@@ -201,7 +214,7 @@ function sh($cmd, $callback = null, $timeout = 60)
 #
 # argv     - The argv either as Array or String. Arrays get joined by a single space.
 # callback - See sh().
-# timeout  - See sh().
+# options  - See sh().
 #
 # Examples
 #
@@ -210,7 +223,7 @@ function sh($cmd, $callback = null, $timeout = 60)
 #   php(array('-S', 'localhost:4000', '-t', 'public/', 'public/index.php'));
 #
 # Returns nothing.
-function php($argv, $callback = null, $timeout = 60)
+function php($argv, $callback = null, $options = array())
 {
     $execFinder = new \Symfony\Component\Process\PhpExecutableFinder;
     $php = $execFinder->find();
@@ -218,7 +231,7 @@ function php($argv, $callback = null, $timeout = 60)
     $argv = (array) $argv;
     array_unshift($argv, $php);
 
-    return sh($argv, $callback, $timeout);
+    return sh($argv, $callback, $options);
 }
 
 # Public: Takes a list of expressions and joins them to
