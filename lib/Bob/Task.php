@@ -108,7 +108,7 @@ class Task
             return;
         }
 
-        if (!$this->reenable and $this->application->invocationChain->has($this->name)) {
+        if (!$this->reenable and $this->application->invocationChain->has($this)) {
             return;
         }
 

@@ -2,14 +2,40 @@
 
 namespace Bob;
 
-class TaskInvocationChain extends \SplStack
+use SplStack,
+    SplObjectStorage;
+
+class TaskInvocationChain implements \IteratorAggregate
 {
-    function has($taskName)
+    protected $objects, $stack;
+
+    function __construct()
     {
-        foreach ($this as $task) {
-            if ($task->name === $taskName) {
-                return true;
-            }
-        }
+        $this->objects = new SplObjectStorage;
+        $this->stack = new SplStack;
+    }
+
+    function push($task)
+    {
+        $this->stack->push($task);
+        $this->objects->attach($task);
+    }
+
+    function pop()
+    {
+        $task = $this->stack->pop();
+        $this->objects->detach($task);
+
+        return $task;
+    }
+
+    function has($task)
+    {
+        return $this->objects->contains($task);
+    }
+
+    function getIterator()
+    {
+        return $this->stack;
     }
 }
