@@ -84,7 +84,9 @@ class Application
             return 0;
         }
 
-        $this->loadConfig();
+        if (!$this->loadConfig()) {
+            return 127;
+        }
 
         if ($this->opts->getOption('tasks')) {
             println($this->formatTasksAndDescriptions(), STDERR);
@@ -192,10 +194,11 @@ EOF;
         $configPath = ConfigFile::findConfigFile($this->configFile, getcwd());
 
         if (false === $configPath) {
-            throw new \Exception(sprintf(
-                'Error: Filesystem boundary reached. No %s found.',
+            fwrite(STDERR, sprintf(
+                "bob: Error: Filesystem boundary reached, no %s found.\n",
                 $this->configFile
             ));
+            return false;
         }
 
         include $configPath;
@@ -219,6 +222,8 @@ EOF;
                 $this->loadedConfigs[] = $file->getRealpath();
             }
         }
+
+        return true;
     }
 
     function withErrorHandling($callback)
