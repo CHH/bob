@@ -23,14 +23,14 @@ class ConfigFile
             ));
         }
 
-        # Look for the definition Name in the $cwd
+        # Look for the definition name in the $cwd
         # until one is found.
         while (!$rp = realpath("$cwd/$filename")) {
             # Go up the hierarchy
             $cwd .= '/..';
 
             # We are at the filesystem boundary if there's
-            # nothing to go up.
+            # nothing to go up to.
             if (realpath($cwd) === false) {
                 break;
             }

@@ -4,7 +4,10 @@ namespace Bob;
 
 use Ulrichsg\Getopt,
     CHH\FileUtils,
-    Symfony\Component\Finder\Finder;
+    Symfony\Component\Finder\Finder,
+    Monolog\Logger,
+    Monolog\Handler\StreamHandler,
+    Monolog\Formatter\LineFormatter;
 
 # Public: The command line application. Contains the heavy lifting
 # of everything Bob does.
@@ -37,6 +40,9 @@ class Application
         # Public: Should tasks run even if they're not needed?
         $forceRun = false,
 
+        # Logger instance.
+        $log,
+
         $invocationChain;
 
     # Public: Initialize the application.
@@ -48,10 +54,18 @@ class Application
             array('t', 'tasks', Getopt::NO_ARGUMENT),
             array('T', 'trace', Getopt::NO_ARGUMENT),
             array('f', 'force', Getopt::NO_ARGUMENT),
+            array('C', 'chdir', Getopt::REQUIRED_ARGUMENT),
         ));
 
         $this->tasks = new TaskRegistry;
         $this->invocationChain = new TaskInvocationChain;
+
+        $this->log = new Logger("bob");
+
+        $stderrHandler = new StreamHandler(STDERR);
+        $stderrHandler->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%\n"));
+
+        $this->log->pushHandler($stderrHandler);
     }
 
     # Public: Parses the arguments list for options and
@@ -82,6 +96,17 @@ class Application
         if ($this->opts->getOption('help')) {
             println($this->formatUsage(), STDERR);
             return 0;
+        }
+
+        if ($dir = $this->opts->getOption("chdir")) {
+            if (!is_dir($dir)) {
+                $this->log->err(sprintf('Dir not found: "%s"', $dir));
+                return 1;
+            }
+
+            $this->log->info(sprintf('Changing working directory to "%s"', realpath($dir)));
+
+            chdir($dir);
         }
 
         if (!$this->loadConfig()) {
@@ -131,7 +156,7 @@ class Application
 
         foreach ($this->collectTasks() as $taskName) {
             if (!$task = $this->tasks[$taskName]) {
-                throw new \Exception(sprintf('Error: Task "%s" not found.', $taskName));
+                throw new \Exception(sprintf('Task "%s" not found.', $taskName));
             }
 
             FileUtils::chdir($this->projectDir, function() use ($task) {
@@ -139,7 +164,7 @@ class Application
             });
         }
 
-        printLn(sprintf('bob: finished in %f seconds', microtime(true) - $start), STDERR);
+        $this->log->info(sprintf('Build finished in %f seconds', microtime(true) - $start));
     }
 
     function taskDefined($task)
@@ -161,7 +186,7 @@ class Application
         $cwd = $_SERVER['PWD'];
 
         if (file_exists("$cwd/{$this->configFile}")) {
-            println('bob: Project already has a bob_config.php', STDERR);
+            $this->log->err('Project already has a bob_config.php');
             return;
         }
 
@@ -181,7 +206,8 @@ task('example', function() {
 EOF;
 
         @file_put_contents("$cwd/{$this->configFile}", $config);
-        println('Initialized project at '.$cwd);
+
+        $this->log->info(sprintf('Initialized project at "%s"', $cwd));
     }
 
     # Internal: Looks up the build config files from the root of the project
@@ -194,8 +220,8 @@ EOF;
         $configPath = ConfigFile::findConfigFile($this->configFile, getcwd());
 
         if (false === $configPath) {
-            fwrite(STDERR, sprintf(
-                "bob: Error: Filesystem boundary reached, no %s found.\n",
+            $this->log->err(sprintf(
+                "Filesystem boundary reached, no %s found.\n",
                 $this->configFile
             ));
             return false;
@@ -232,10 +258,12 @@ EOF;
             call_user_func($callback);
             return 0;
         } catch (\Exception $e) {
-            println('bob: Build failed: '.$e->getMessage(), STDERR);
+            $this->log->err(sprintf(
+                "Build failed: %s (use --trace to get a stack trace)", $e->getMessage())
+            );
 
             if ($this->trace) {
-                println($e->getTraceAsString());
+                $this->log->info($e->getTraceAsString());
             }
             return 1;
         }
@@ -288,6 +316,8 @@ Options:
     directory if none exists.
   -t|--tasks:
     Displays a fancy list of tasks and their descriptions
+  -C|--chdir <dir>:
+    Changes the working directory to <dir> before running tasks.
   -T|--trace:
     Logs trace messages to STDERR
   -f|--force:

@@ -17,9 +17,21 @@ function fail($msg)
     throw new BuildFailedException((string) $msg);
 }
 
+# Public: Prints a formatted message and then fails the build.
+#
+# msg  - Formatted message. See sprintf() for format specifiers.
+# args - Array of arguments passed to the format specifiers.
+#
+# Returns Nothing.
 function failf($msg, $args = array())
 {
     throw new BuildFailedException(vsprintf($msg, (array) $args));
+}
+
+# Returns a logger.
+function getLog()
+{
+    return \Bob::$application->log;
 }
 
 # Public: Defines the callback as a task with the given name.
@@ -68,7 +80,7 @@ function fileTask($target, $prerequisites = array(), $callback)
 function copyTask($from, $to)
 {
     return FileTask::defineTask($to, array($from), function($task) {
-        println("bob: copyTask('{$task->prerequisites[0]}' => '{$task->name}')", STDERR);
+        $task->log->info("copyTask('{$task->prerequisites[0]}' => '{$task->name}')");
 
         if (false === copy($task->prerequisites[0], $task->name)) {
             fail("Failed copying '{$task->prerequisites[0]}' => '{$task->name}'");
@@ -189,7 +201,7 @@ function sh($cmd, $callback = null, $options = array())
     $cmd = join(' ', (array) $cmd);
     $showCmd = strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd;
 
-    println("bob: sh($showCmd)", STDERR);
+    getLog()->info("sh($showCmd)");
 
     $timeout     = @$options["timeout"];
     $failOnError = @$options["failOnError"];
@@ -234,15 +246,15 @@ function php($argv, $callback = null, $options = array())
     return sh($argv, $callback, $options);
 }
 
-# Public: Takes a list of expressions and joins them to
-# a list of paths.
+# Public: Creates a new finder from the list of patterns.
 #
 # patterns - List of shell file patterns.
 #
-# Returns a list of paths.
+# Returns a new Finder.
 function fileList($patterns)
 {
     $patterns = (array) $patterns;
+
     $finder = new \Symfony\Component\Finder\Finder;
     $finder->files();
 

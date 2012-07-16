@@ -28,7 +28,8 @@ class Task
         $enable = true;
 
     protected
-        $reenable = false;
+        $reenable = false,
+        $log;
 
     # Public: Returns a task instance.
     #
@@ -78,6 +79,7 @@ class Task
     {
         $this->name        = $name;
         $this->application = $application;
+        $this->log         = $application->log;
 
         $this->description = TaskRegistry::$lastDescription;
         TaskRegistry::$lastDescription = '';
@@ -103,7 +105,7 @@ class Task
     {
         if (!$this->enable) {
             if ($this->application->trace) {
-                println("bob: {$this->inspect()} is not enabled.", STDERR);
+                $this->log->debug("{$this->inspect()} is not enabled");
             }
             return;
         }
@@ -113,14 +115,14 @@ class Task
         }
 
         if (!$this->application->forceRun and !$this->isNeeded()) {
-            $this->application->trace and println("bob: skipping {$this->inspect()}", STDERR);
+            $this->application->trace and $this->log->debug("Skipping {$this->inspect()}");
             return;
         }
 
         $this->application->invocationChain->push($this);
 
         if ($this->application->trace) {
-            println("bob: invoke {$this->inspect()}", STDERR);
+            $this->log->debug("Invoke {$this->inspect()}");
         }
 
         foreach ($this->prerequisites as $p) {
