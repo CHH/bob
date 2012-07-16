@@ -63,7 +63,7 @@ class Application
         $this->log = new Logger("bob");
 
         $stderrHandler = new StreamHandler(STDERR);
-        $stderrHandler->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%\n"));
+        $stderrHandler->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%" . PHP_EOL));
 
         $this->log->pushHandler($stderrHandler);
     }
