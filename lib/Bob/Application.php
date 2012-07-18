@@ -43,7 +43,9 @@ class Application
         # Logger instance.
         $log,
 
-        $invocationChain;
+        $invocationChain,
+
+        $verbose = false;
 
     # Public: Initialize the application.
     function __construct()
@@ -55,6 +57,7 @@ class Application
             array('T', 'trace', Getopt::NO_ARGUMENT),
             array('f', 'force', Getopt::NO_ARGUMENT),
             array('C', 'chdir', Getopt::REQUIRED_ARGUMENT),
+            array('v', 'verbose', Getopt::NO_ARGUMENT)
         ));
 
         $this->tasks = new TaskRegistry;
@@ -118,13 +121,9 @@ class Application
             return 0;
         }
 
-        if ($this->opts->getOption('force')) {
-            $this->forceRun = true;
-        }
-
-        if ($this->opts->getOption('trace')) {
-            $this->trace = true;
-        }
+        if ($this->opts->getOption('force'))   $this->forceRun = true;
+        if ($this->opts->getOption('trace'))   $this->trace = true;
+        if ($this->opts->getOption('verbose')) $this->verbose = true;
 
         return $this->withErrorHandling(array($this, 'runTasks'));
     }
@@ -159,12 +158,20 @@ class Application
                 throw new \Exception(sprintf('Task "%s" not found.', $taskName));
             }
 
+            if ($this->verbose) {
+                $this->log->info(sprintf(
+                    'Running Task "%s"', $taskName
+                ));
+            }
+
             FileUtils::chdir($this->projectDir, function() use ($task) {
                 return $task->invoke();
             });
         }
 
-        $this->log->info(sprintf('Build finished in %f seconds', microtime(true) - $start));
+        if ($this->verbose) {
+            $this->log->info(sprintf('Build finished in %f seconds', microtime(true) - $start));
+        }
     }
 
     function taskDefined($task)
@@ -322,6 +329,8 @@ Options:
     Logs trace messages to STDERR
   -f|--force:
     Force to run all tasks, even if they're not needed
+  -v|--verbose:
+    Be more verbose.
   -h|--help:
     Displays this message
 HELPTEXT;
