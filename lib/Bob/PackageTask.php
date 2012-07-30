@@ -51,18 +51,18 @@ class PackageTask
         }
         $file .= '.tar';
 
-        desc('Creates a package');
-        task('package', array($file));
+        BuildConfig\desc('Creates a package');
+        BuildConfig\task('package', array($file));
 
-        desc('Recreates the package, even if no file changed.');
-        task('repackage', function() use ($file) {
+        BuildConfig\desc('Recreates the package, even if no file changed.');
+        BuildConfig\task('repackage', function() use ($file) {
             unlink($file);
             unlink($file.'.gz');
             Task::get('package')->invoke();
         });
 
         # TODO: automatically exclude target files from prerequisites
-        fileTask($file, $this->prerequisites, function($task) {
+        BuildConfig\fileTask($file, $this->prerequisites, function($task) {
             file_exists($task->name)       and unlink($task->name);
             file_exists($task->name.'.gz') and unlink($task->name);
 

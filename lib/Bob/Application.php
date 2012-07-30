@@ -200,7 +200,7 @@ class Application
         $config = <<<'EOF'
 <?php
 
-namespace Bob;
+namespace Bob\BuildConfig;
 
 task('default', array('example'));
 

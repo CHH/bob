@@ -1,8 +1,11 @@
 <?php
 
-namespace Bob;
+namespace Bob\BuildConfig;
 
-use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Process,
+    Bob\FileTask,
+    Bob\Task,
+    Bob\TaskRegistry;
 
 class BuildFailedException extends \Exception
 {}
@@ -80,7 +83,7 @@ function fileTask($target, $prerequisites = array(), $callback)
 function copyTask($from, $to)
 {
     return FileTask::defineTask($to, array($from), function($task) {
-        $task->log->info("copyTask('{$task->prerequisites[0]}' => '{$task->name}')");
+        getLog()->info("copyTask('{$task->prerequisites[0]}' => '{$task->name}')");
 
         if (false === copy($task->prerequisites[0], $task->name)) {
             fail("Failed copying '{$task->prerequisites[0]}' => '{$task->name}'");
@@ -199,7 +202,7 @@ function template($file)
 function sh($cmd, $callback = null, $options = array())
 {
     $cmd = join(' ', (array) $cmd);
-    $showCmd = strlen($cmd) > 42 ? substr($cmd, 0, 42).'...' : $cmd;
+    $showCmd = strlen($cmd) > 42 ? "..." . substr($cmd, -42) : $cmd;
 
     getLog()->info("sh($showCmd)");
 

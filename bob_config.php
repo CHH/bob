@@ -1,16 +1,16 @@
 <?php
 
-# Put the `bob_config.php` into the "Bob" namespace,
+# Put the `bob_config.php` into the "Bob\BuildConfig" namespace
 # otherwise you would've to call the `task` and
-# `desc` functions with a `Bob\` prefix.
-namespace Bob;
+# `desc` functions with a `Bob\BuildConfig` prefix.
+namespace Bob\BuildConfig;
 
 use CHH\FileUtils;
 
 $pharFiles = fileList('*.php')->in(array('lib', 'bin', 'vendor'));
 
 $packageFiles = fileList('*')->in(__DIR__);
-$packageTask = new PackageTask(
+$packageTask = new \Bob\PackageTask(
     '/tmp/bob', trim(`git log -n 1 --format=%H`), $packageFiles
 );
 $packageTask->define();
