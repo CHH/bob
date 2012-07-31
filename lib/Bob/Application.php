@@ -87,7 +87,7 @@ class Application
         try {
             $this->opts->parse($argv);
         } catch (\UnexpectedValueException $e) {
-            println($this->formatUsage(), STDERR);
+            fwrite(STDERR, $this->formatUsage());
             return 1;
         }
 
@@ -97,7 +97,7 @@ class Application
         }
 
         if ($this->opts->getOption('help')) {
-            println($this->formatUsage(), STDERR);
+            fwrite(STDERR, $this->formatUsage());
             return 0;
         }
 
@@ -117,7 +117,7 @@ class Application
         }
 
         if ($this->opts->getOption('tasks')) {
-            println($this->formatTasksAndDescriptions(), STDERR);
+            fwrite(STDERR, $this->formatTasksAndDescriptions());
             return 0;
         }
 
@@ -291,7 +291,7 @@ EOF;
             $text .= sprintf("bob %s # %s\n", $task->name, $task->description);
         }
 
-        return rtrim($text);
+        return $text;
     }
 
     function formatUsage()
@@ -333,6 +333,7 @@ Options:
     Be more verbose.
   -h|--help:
     Displays this message
+
 HELPTEXT;
     }
 }
