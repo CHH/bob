@@ -288,7 +288,7 @@ EOF;
             if ($name === 'default' or !$task->description) {
                 continue;
             }
-            $text .= sprintf("bob %s # %s\n", $task->name, $task->description);
+            $text .= sprintf("bob %s\n\t%s\n", $task->name, $task->description);
         }
 
         return $text;
