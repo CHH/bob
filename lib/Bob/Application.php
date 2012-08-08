@@ -40,6 +40,9 @@ class Application
         # Public: Should tasks run even if they're not needed?
         $forceRun = false,
 
+        # Show all tasks in `--tasks`.
+        $showAllTasks = false,
+
         # Logger instance.
         $log,
 
@@ -54,6 +57,7 @@ class Application
             array('i', 'init', Getopt::NO_ARGUMENT),
             array('h', 'help', Getopt::NO_ARGUMENT),
             array('t', 'tasks', Getopt::NO_ARGUMENT),
+            array('A', 'all', Getopt::NO_ARGUMENT),
             array('T', 'trace', Getopt::NO_ARGUMENT),
             array('f', 'force', Getopt::NO_ARGUMENT),
             array('C', 'chdir', Getopt::REQUIRED_ARGUMENT),
@@ -91,6 +95,11 @@ class Application
             return 1;
         }
 
+        if ($this->opts->getOption('all'))     $this->showAllTasks = true;
+        if ($this->opts->getOption('force'))   $this->forceRun = true;
+        if ($this->opts->getOption('trace'))   $this->trace = true;
+        if ($this->opts->getOption('verbose')) $this->verbose = true;
+
         if ($this->opts->getOption('init')) {
             $this->initProject();
             return 0;
@@ -120,10 +129,6 @@ class Application
             fwrite(STDERR, $this->formatTasksAndDescriptions());
             return 0;
         }
-
-        if ($this->opts->getOption('force'))   $this->forceRun = true;
-        if ($this->opts->getOption('trace'))   $this->trace = true;
-        if ($this->opts->getOption('verbose')) $this->verbose = true;
 
         return $this->withErrorHandling(array($this, 'runTasks'));
     }
@@ -285,10 +290,21 @@ EOF;
         $text .= "(in {$this->projectDir})\n";
 
         foreach ($tasks as $name => $task) {
-            if ($name === 'default' or !$task->description) {
+            if ($name === 'default' || (!$task->description && !$this->showAllTasks)) {
                 continue;
             }
-            $text .= sprintf("bob %s\n\t%s\n", $task->name, $task->description);
+
+            if ($task instanceof FileTask) {
+                $text .= "File => {$task->name}";
+            } else {
+                $text .= "bob {$task->name}";
+            }
+
+            $text .= "\n";
+
+            if ($task->description) {
+                $text .= "\t{$task->description}\n";
+            }
         }
 
         return $text;
@@ -296,11 +312,11 @@ EOF;
 
     function formatUsage()
     {
-        $VERSION = \Bob::VERSION;
+        $version = \Bob::VERSION;
         $bin = basename($_SERVER['SCRIPT_NAME']);
 
         return <<<HELPTEXT
-bob $VERSION
+bob $version
 
 Usage:
   $bin
@@ -323,6 +339,8 @@ Options:
     directory if none exists.
   -t|--tasks:
     Displays a fancy list of tasks and their descriptions
+  -A|--all:
+    Shows all tasks, even file tasks and tasks without description.
   -C|--chdir <dir>:
     Changes the working directory to <dir> before running tasks.
   -T|--trace:
@@ -333,6 +351,7 @@ Options:
     Be more verbose.
   -h|--help:
     Displays this message
+
 
 HELPTEXT;
     }

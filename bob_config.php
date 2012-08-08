@@ -101,3 +101,4 @@ task('uninstall', function($task) {
     unlink("$prefix/bin/bob") and println("Erased bob successfully from $prefix");
 });
 
+task("foo", function() {});
