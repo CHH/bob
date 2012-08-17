@@ -4,14 +4,14 @@
         {
             "package": "chh/fileutils",
             "version": "dev-master",
-            "source-reference": "e432f9fa7b98504b0e12d23c2853824f523454dd",
-            "commit-date": "1335424874"
+            "source-reference": "ac4713821789e38fde0ac95c03414eb5ba3d64da",
+            "commit-date": "1345219151"
         },
         {
             "package": "monolog/monolog",
             "version": "dev-master",
-            "source-reference": "59fb9f41be22b246f5e5d3bd8a012ed77f44a7d0",
-            "commit-date": "1342167011"
+            "source-reference": "ae31045917db536eedee8c6b6abed5052d115763",
+            "commit-date": "1344607218"
         },
         {
             "package": "symfony/finder",

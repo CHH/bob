@@ -3,7 +3,7 @@
 namespace Bob;
 
 use Ulrichsg\Getopt,
-    CHH\FileUtils,
+    CHH\FileUtils\Path,
     Symfony\Component\Finder\Finder,
     Monolog\Logger,
     Monolog\Handler\StreamHandler,
@@ -169,7 +169,7 @@ class Application
                 ));
             }
 
-            FileUtils::chdir($this->projectDir, function() use ($task) {
+            Path::chdir($this->projectDir, function() use ($task) {
                 return $task->invoke();
             });
         }

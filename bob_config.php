@@ -5,7 +5,7 @@
 # `desc` functions with a `Bob\BuildConfig` prefix.
 namespace Bob\BuildConfig;
 
-use CHH\FileUtils;
+use CHH\FileUtils\Path;
 
 $pharFiles = fileList('*.php')->in(array('lib', 'bin', 'vendor'));
 
@@ -54,7 +54,7 @@ EOF;
 
     foreach ($task->prerequisites as $file) {
         $file = (string) $file;
-        $phar->addFile($file, FileUtils::relativize($file, $projectDir));
+        $phar->addFile($file, Path::relativize($file, $projectDir));
     }
 
     $phar->setStub($stub);
