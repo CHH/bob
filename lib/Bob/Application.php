@@ -78,7 +78,7 @@ class Application
 
     # Public: Parses the arguments list for options and
     # then does something useful depending on what is given.
-    #'))
+    #
     # argv - A list of arguments supplied on the CLI.
     #
     # Returns the desired exit status as Integer.
