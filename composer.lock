@@ -1,5 +1,5 @@
 {
-    "hash": "fae845ba58d598336c25e287f3a4fa4a",
+    "hash": "5d7021509a3731be91ff007fcd3ad312",
     "packages": [
         {
             "package": "chh/fileutils",
@@ -8,24 +8,24 @@
             "commit-date": "1345219151"
         },
         {
+            "package": "chh/optparse",
+            "version": "dev-master",
+            "source-reference": "3abf522b87b4952ce4afb6e1eed217fa22295f1b",
+            "commit-date": "1346199943"
+        },
+        {
             "package": "monolog/monolog",
             "version": "dev-master",
-            "source-reference": "ae31045917db536eedee8c6b6abed5052d115763",
-            "commit-date": "1344607218"
+            "source-reference": "75af99d3ceabe08e55f32d395f189fd807648950",
+            "commit-date": "1345916366"
         },
         {
             "package": "symfony/finder",
-            "version": "v2.0.16"
+            "version": "v2.0.17"
         },
         {
             "package": "symfony/process",
-            "version": "v2.0.16"
-        },
-        {
-            "package": "ulrichsg/getopt-php",
-            "version": "dev-master",
-            "source-reference": "11c0d3bb2df4f79004b085f495fe7a149efda9d5",
-            "commit-date": "1338474142"
+            "version": "v2.0.17"
         }
     ],
     "packages-dev": null,
@@ -36,7 +36,7 @@
     "stability-flags": {
         "symfony/finder": 0,
         "symfony/process": 0,
-        "ulrichsg/getopt-php": 20,
+        "chh/optparse": 20,
         "chh/fileutils": 20,
         "monolog/monolog": 20
     }

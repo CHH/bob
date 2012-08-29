@@ -2,7 +2,7 @@
 
 namespace Bob;
 
-use Ulrichsg\Getopt,
+use CHH\Optparse,
     CHH\FileUtils\Path,
     Symfony\Component\Finder\Finder,
     Monolog\Logger,
@@ -53,16 +53,17 @@ class Application
     # Public: Initialize the application.
     function __construct()
     {
-        $this->opts = new Getopt(array(
-            array('i', 'init', Getopt::NO_ARGUMENT),
-            array('h', 'help', Getopt::NO_ARGUMENT),
-            array('t', 'tasks', Getopt::NO_ARGUMENT),
-            array('A', 'all', Getopt::NO_ARGUMENT),
-            array('T', 'trace', Getopt::NO_ARGUMENT),
-            array('f', 'force', Getopt::NO_ARGUMENT),
-            array('C', 'chdir', Getopt::REQUIRED_ARGUMENT),
-            array('v', 'verbose', Getopt::NO_ARGUMENT)
-        ));
+        $this->opts = new Optparse\Parser;
+        $this->opts
+            ->addFlag('init', array("alias" => '-i'))
+            ->addFlag('help', array("alias" => '-h'))
+            ->addFlag('tasks', array("alias" => '-t'))
+            ->addFlag('chdir', array("alias" => '-C', "has_value" => true))
+            ->addFlagVar('all', $this->showAllTasks, array("alias" => '-A'))
+            ->addFlagVar('trace', $this->trace, array("alias" => '-T'))
+            ->addFlagVar('force', $this->forceRun, array("alias" => '-f'))
+            ->addFlagVar('verbose', $this->verbose, array("alias" => '-v'))
+        ;
 
         $this->tasks = new TaskRegistry;
         $this->invocationChain = new TaskInvocationChain;
@@ -77,40 +78,31 @@ class Application
 
     # Public: Parses the arguments list for options and
     # then does something useful depending on what is given.
-    #
+    #'))
     # argv - A list of arguments supplied on the CLI.
     #
     # Returns the desired exit status as Integer.
     function run($argv = null)
     {
-        if (null === $argv) {
-            $argv = $_SERVER['argv'];
-            array_shift($argv);
-        }
-
         try {
             $this->opts->parse($argv);
-        } catch (\UnexpectedValueException $e) {
+        } catch (Optparse\Exception $e) {
+            fwrite(STDERR, "{$e->getMessage()}\n\n");
             fwrite(STDERR, $this->formatUsage());
             return 1;
         }
 
-        if ($this->opts->getOption('all'))     $this->showAllTasks = true;
-        if ($this->opts->getOption('force'))   $this->forceRun = true;
-        if ($this->opts->getOption('trace'))   $this->trace = true;
-        if ($this->opts->getOption('verbose')) $this->verbose = true;
-
-        if ($this->opts->getOption('init')) {
+        if ($this->opts["init"]) {
             $this->initProject();
             return 0;
         }
 
-        if ($this->opts->getOption('help')) {
+        if ($this->opts["help"]) {
             fwrite(STDERR, $this->formatUsage());
             return 0;
         }
 
-        if ($dir = $this->opts->getOption("chdir")) {
+        if ($dir = $this->opts["chdir"]) {
             if (!is_dir($dir)) {
                 $this->log->err(sprintf('Dir not found: "%s"', $dir));
                 return 1;
@@ -125,7 +117,7 @@ class Application
             return 127;
         }
 
-        if ($this->opts->getOption('tasks')) {
+        if ($this->opts["tasks"]) {
             fwrite(STDERR, $this->formatTasksAndDescriptions());
             return 0;
         }
@@ -136,7 +128,7 @@ class Application
     protected function collectTasks()
     {
         $tasks = array();
-        $args = $this->opts->getOperands();
+        $args = $this->opts->args();
 
         foreach ($args as $arg) {
             if (preg_match('/^(\w+)=(.*)$/', $arg, $matches)) {
