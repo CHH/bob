@@ -17,7 +17,7 @@ class FileTask extends Task
     function isNeeded()
     {
         return !file_exists($this->name)
-               or $this->getTimestamp() > filemtime($this->name);
+               or $this->getTimestamp() > @filemtime($this->name);
     }
 
     # Internal: Returns the timestamp when the prerequisites were last modified.

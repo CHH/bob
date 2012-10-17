@@ -206,8 +206,13 @@ function sh($cmd, $callback = null, $options = array())
 
     getLog()->info("sh($showCmd)");
 
+    if (func_num_args() == 2 and is_array($callback) and !is_callable($callback)) {
+        $options = $callback;
+        $callback = null;
+    }
+
     $timeout     = @$options["timeout"];
-    $failOnError = @$options["failOnError"];
+    $failOnError = @$options["failOnError"] ?: @$options['fail_on_error'];
 
     $process = new Process($cmd);
     $process->setTimeout($timeout);
