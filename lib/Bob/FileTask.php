@@ -26,12 +26,14 @@ class FileTask extends Task
     function getTimestamp()
     {
         $lastModified = max(
-            array_map(
+            array_filter(array_map(
                 function($file) {
-                    return filemtime($file);
+                    if (file_exists($file)) {
+                        return @filemtime($file);
+                    }
                 },
                 $this->prerequisites
-            )
+            ))
         );
 
         return $lastModified;
