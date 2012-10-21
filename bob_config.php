@@ -42,7 +42,7 @@ fileTask('bin/bob.phar', $pharFiles, function($task) {
 
 Phar::mapPhar('bob.phar');
 
-require 'phar://bob.phar/bin/bob.php';
+require 'phar://bob.phar/bin/bootstrap.php';
 
 __HALT_COMPILER();
 EOF;

@@ -26,6 +26,6 @@
         }
     },
     "bin": [
-        "bin/bob.php"
+        "bin/bob"
     ]
 }
