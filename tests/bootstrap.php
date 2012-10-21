@@ -1,3 +1,4 @@
 <?php
 
-require __DIR__.'/../lib/bob.php';
+require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../lib/Bob.php';

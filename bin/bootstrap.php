@@ -3,7 +3,8 @@
 function includeIfExists($file)
 {
     if (file_exists($file)) {
-        return $file;
+        require_once $file;
+        return true;
     }
 }
 
