@@ -5,10 +5,16 @@ namespace Bob\BuildConfig;
 use Symfony\Component\Process\Process,
     Bob\FileTask,
     Bob\Task,
-    Bob\TaskRegistry;
+    Bob\TaskRegistry,
+    CHH\FileUtils\Path;
 
 class BuildFailedException extends \Exception
 {}
+
+function cd($path, $callback = null)
+{
+    return Path::chdir($path, $callback);
+}
 
 # Public: Lets the build fail with an Exception.
 #
