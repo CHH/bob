@@ -43,6 +43,11 @@ function getLog()
     return \Bob::$application->log;
 }
 
+function info($msg)
+{
+    getLog()->info($msg);
+}
+
 # Public: Defines the callback as a task with the given name.
 #
 # name          - Task Name.
