@@ -43,34 +43,34 @@ creating a PHAR package of Bob.
 
 #### Install into a [Composer](https://github.com/composer/composer)-enabled Project
 
-Simply add the `chh/bob` package to the `require` section in your
+Simply add the `chh/bob` package to the `require-dev` section in your
 `composer.json`:
 
     {
-        "require": {
+        "require-dev": {
             "chh/bob": "*@dev"
         }
     }
 
-Then run `composer install`.
+Then run `composer install --dev`.
 
 You can invoke Bob with:
 
-    php vendor/bin/bob.phar
+    php vendor/bin/bob
 
 or:
 
-    ./vendor/bin/bob.phar
+    ./vendor/bin/bob
 
 #### System-wide install (Unix-like OS only)
 
 To do a system-wide install, download either a [Release][tags] or
 clone the Repository with:
 
-    $ git clone git://github.com/CHH/Bob.git
+    $ git clone git://github.com/CHH/bob.git
     $ cd Bob
 
-[tags]: https://github.com/CHH/Bob/tags
+[tags]: https://github.com/CHH/bob/tags
 
 To install all of Bob's dependencies download Composer and run
 `composer install`:
@@ -218,7 +218,7 @@ Hacking on Bob
 There are lots of ways to improve Bob, **but the most useful for me** is
 to simply submit Issues to the [Issue Tracker][issues].
 
-[issues]: http://github.com/CHH/Bob/issues
+[issues]: http://github.com/CHH/bob/issues
 
 ### Contributing Code
 
