@@ -23,7 +23,7 @@ in your buildfiles.
    itself so the barrier to contribution to build files is as low as possible. 
    Also I think it's quite hilarious to use XML for a DSL with logic and such.
  - Bob has nothing like plugins. To add new functions to Bob's DSL just
-   put them into the `Bob` namespace and require the file somehow at the
+   put them into the `Bob\BuildConfig` namespace and require the file somehow at the
    beginning of your build file. **Simply put:** Bob's build configs are _only_ PHP.
  - Bob has **no** rich set of provided tasks and I do not plan to add
    this. _Bob is lightweight._
@@ -101,7 +101,7 @@ named `bob_tasks`, in the same directory as your `bob_config.php`. Files loaded 
 `bob_tasks` are treated the same way as regular Bob configs.
 
 It's important that you declare that this file belongs to the 
-`Bob` namespace with `namespace Bob;`, otherwise the DSL functions are
+`Bob\BuildConfig` namespace with `namespace Bob\BuildConfig;`, otherwise the DSL functions are
 not available.
 
 ---
