@@ -102,6 +102,15 @@ function copyTask($from, $to)
     });
 }
 
+function directoryTask($directory, $mode = 0777)
+{
+    return task($directory, function($task) use ($directory, $mode) {
+        if (!is_dir($directory)) {
+            mkdir($directory, $mode, true);
+        }
+    });
+}
+
 # Public: Defines the description of the subsequent task.
 #
 # desc - Description text, should explain in plain sentences
