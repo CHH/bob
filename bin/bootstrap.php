@@ -16,9 +16,9 @@ if ((!$loader = includeIfExists(__DIR__.'/../vendor/autoload.php')) && (!$loader
 
 require_once(__DIR__ . '/../lib/Bob.php');
 
-// This is the top-level application instance, which holds all
-// tasks and contains the logic for running them.
-Bob::$application = new \Bob\Application;
+$cli = new \Bob\Cli;
 
-exit(Bob::$application->run());
+Bob::$application = $cli->application;
+
+exit($cli->run());
 

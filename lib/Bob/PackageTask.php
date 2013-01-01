@@ -2,9 +2,9 @@
 
 namespace Bob;
 
-use Phar,
-    PharData,
-    ArrayIterator;
+use Phar;
+use PharData;
+use ArrayIterator;
 
 # Public: Provides tasks to make a package of your project. 
 #
@@ -20,8 +20,8 @@ use Phar,
 #   );
 #
 #   # define() defines all tasks on the application instance.
-#   $packageTask->define();
-class PackageTask
+#   $packageTask->register();
+class PackageTask implements TaskLibraryInterface
 {
     protected $file;
     protected $version;
@@ -42,7 +42,7 @@ class PackageTask
     # Public: Defines the task library's tasks.
     #
     # Returns nothing.
-    function define()
+    function register()
     {
         $file = $this->file;
 

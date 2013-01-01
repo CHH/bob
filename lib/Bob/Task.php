@@ -79,7 +79,7 @@ class Task
     {
         $this->name        = $name;
         $this->application = $application;
-        $this->log         = $application->log;
+        $this->log         = $application->logger();
 
         $this->description = TaskRegistry::$lastDescription;
         TaskRegistry::$lastDescription = '';

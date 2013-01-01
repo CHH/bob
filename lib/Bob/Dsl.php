@@ -40,7 +40,7 @@ function failf($msg, $args = array())
 # Returns a logger.
 function getLog()
 {
-    return \Bob::$application->log;
+    return \Bob::$application->logger();
 }
 
 function info($msg)

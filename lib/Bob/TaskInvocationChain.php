@@ -2,8 +2,8 @@
 
 namespace Bob;
 
-use SplStack,
-    SplObjectStorage;
+use SplStack;
+use SplObjectStorage;
 
 class TaskInvocationChain implements \IteratorAggregate
 {
