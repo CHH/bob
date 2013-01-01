@@ -20,3 +20,4 @@ class TaskRegistry extends \ArrayObject
         parent::offsetSet($task->name, $task);
     }
 }
+
