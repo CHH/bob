@@ -30,8 +30,10 @@ class Application
         # Public: Should tasks run even if they're not needed?
         $forceRun = false,
         $trace = false,
+        $invocationChain,
 
-        $invocationChain;
+        # Variables given as arguments via "var=value"
+        $env = array();
 
     protected $log;
 
@@ -49,6 +51,8 @@ class Application
 
     function execute($tasks)
     {
+        $this->prepareEnv();
+
         $tasks = (array) $tasks;
         $start = microtime(true);
 
@@ -92,6 +96,11 @@ class Application
     function setLogger(Logger $logger)
     {
         $this->log = $logger;
+    }
+
+    protected function prepareEnv()
+    {
+        $_ENV = array_merge($_ENV, $this->env);
     }
 
     # Internal: Looks up the build config files from the root of the project

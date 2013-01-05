@@ -13,7 +13,7 @@ $packageFiles = fileList('*')->in(__DIR__);
 $packageTask = new \Bob\PackageTask(
     '/tmp/bob', trim(`git log -n 1 --format=%H`), $packageFiles
 );
-$packageTask->define();
+$packageTask->register();
 
 # The "default" task is invoked when there's no
 # task explicitly given on the command line.
