@@ -2,14 +2,11 @@
 
 namespace Bob;
 
+use itertools;
+
 # Internal: Represents a file task.
 class FileTask extends Task
 {
-    static function defineTask($name, $prerequisites = null, $action = null)
-    {
-        return parent::defineTask($name, $prerequisites, $action);
-    }
-
     # Public: Checks if the target exists or one of the prerequisites is newer
     # than the target file.
     #
@@ -26,14 +23,14 @@ class FileTask extends Task
     function getTimestamp()
     {
         $lastModified = max(
-            array_filter(array_map(
+            iterator_to_array(itertools\filter(itertools\map(
                 function($file) {
                     if (file_exists($file)) {
                         return @filemtime($file);
                     }
                 },
                 $this->prerequisites
-            ))
+            )))
         );
 
         return $lastModified;

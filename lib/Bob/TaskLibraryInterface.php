@@ -4,6 +4,7 @@ namespace Bob;
 
 interface TaskLibraryInterface
 {
-    function register();
+    function register(Application $app);
+    function boot(Application $app);
 }
 

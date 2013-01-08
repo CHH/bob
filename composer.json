@@ -14,11 +14,13 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/finder": "2.*",
-        "symfony/process": "2.*",
+        "symfony/finder": "~2.0",
+        "symfony/process": "~2.0",
         "chh/optparse": "*@dev",
-        "chh/fileutils": "*@dev",
-        "monolog/monolog": "*@dev"
+        "chh/fileutils": "1.0.*@dev",
+        "monolog/monolog": "~1.0",
+        "pimple/pimple": "~1.0",
+        "chh/itertools": "~1.0"
     },
     "autoload": {
         "psr-0": {

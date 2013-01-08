@@ -3,9 +3,6 @@
 namespace Bob;
 
 use CHH\Optparse;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Formatter\LineFormatter;
 
 class Cli
 {
@@ -28,10 +25,10 @@ class Cli
             ->addFlag('help', array("alias" => '-h'))
             ->addFlag('tasks', array("alias" => '-t'))
             ->addFlag('chdir', array("alias" => '-C', "has_value" => true))
+            ->addFlag('verbose', array("alias" => '-v'))
             ->addFlagVar('all', $this->showAllTasks, array("alias" => '-A'))
             ->addFlagVar('trace', $this->trace, array("alias" => '-T'))
             ->addFlagVar('force', $this->forceRun, array("alias" => '-f'))
-            ->addFlagVar('verbose', $this->verbose, array("alias" => '-v'))
         ;
     }
 
@@ -45,7 +42,8 @@ class Cli
             return 1;
         }
 
-        $this->application->setLogger($this->logger());
+        $this->application['log.verbose'] = (bool) $this->opts['verbose'];
+
         $this->application->trace = $this->trace;
         $this->application->forceRun = $this->forceRun;
 
@@ -70,7 +68,7 @@ class Cli
             chdir($dir);
         }
 
-        $this->application->configLoadPath = array_merge($this->application->configLoadPath, explode(':', @$_SERVER['BOB_CONFIG_PATH']));
+        $this->application['config_load_path'] = array_merge($this->application['config_load_path'], explode(':', @$_SERVER['BOB_CONFIG_PATH']));
 
         try {
             $this->application->init();
@@ -89,16 +87,7 @@ class Cli
 
     function logger()
     {
-        if (null === $this->log) {
-            $this->log = new Logger("bob");
-
-            $stderrHandler = new StreamHandler(STDERR, $this->verbose ? Logger::DEBUG : Logger::WARNING);
-            $stderrHandler->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%" . PHP_EOL));
-
-            $this->log->pushHandler($stderrHandler);
-        }
-
-        return $this->log;
+        return $this->application['log'];
     }
 
     function withErrorHandling($callback)
@@ -193,7 +182,7 @@ HELPTEXT;
 
     protected function formatTasksAndDescriptions()
     {
-        $tasks = $this->application->tasks->getArrayCopy();
+        $tasks = $this->application['tasks']->getArrayCopy();
         ksort($tasks);
 
         $text = '';

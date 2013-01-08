@@ -5,15 +5,15 @@ namespace Bob;
 use CHH\FileUtils\Path;
 use Symfony\Component\Finder\Finder;
 use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Formatter\LineFormatter;
 
 # Public: The command line application. Contains the heavy lifting
 # of everything Bob does.
-class Application
+class Application extends \Pimple
 {
     # Public: Contains mappings from task name to a task instance.
     public
-        $tasks,
-
         # Public: The working directory where the bob utility was run from.
         $originalDirectory,
 
@@ -21,32 +21,106 @@ class Application
         # directory is set as working directory while tasks are executed.
         $projectDirectory,
 
-        $configFile = "bob_config.php",
-        $configLoadPath = array('./bob_tasks'),
-
         # List of paths of all loaded config files.
         $loadedConfigs = array(),
 
         # Public: Should tasks run even if they're not needed?
         $forceRun = false,
         $trace = false,
-        $invocationChain,
 
         # Variables given as arguments via "var=value"
         $env = array();
 
-    protected $log;
+    protected $taskLibraries = array();
 
     # Public: Initialize the application.
     function __construct()
     {
-        $this->tasks = new TaskRegistry;
-        $this->invocationChain = new TaskInvocationChain;
+        $app = $this;
+
+        $this['tasks'] = $this->share(function() {
+            return new TaskRegistry;
+        });
+
+        $this['config.load_path'] = array('./bob_tasks');
+        $this['config.file'] = 'bob_config.php';
+
+        $this['task_factory'] = $this->protect(function($name, $prerequisites = null, $action = null, $class = "\\Bob\\Task") use ($app) {
+            foreach (array_filter(array($prerequisites, $action, $class)) as $arg) {
+                switch (true) {
+                    case is_callable($arg):
+                        $action = $arg;
+                        break;
+                    case is_string($arg) and class_exists($arg):
+                        $class = $arg;
+                        break;
+                    case is_array($arg):
+                    case ($arg instanceof \Traversable):
+                    case ($arg instanceof \Iterator):
+                        $prerequisites = $arg;
+                        break;
+                }
+            }
+
+            if (empty($name)) {
+                throw new \InvalidArgumentException('Name cannot be empty');
+            }
+
+            if ($app->taskDefined($name)) {
+                $task = $app['tasks'][$name];
+            } else {
+                $task = new $class($name, $app);
+                $app->defineTask($task);
+            }
+
+            $task->enhance($prerequisites, $action);
+
+            return $task;
+        });
+
+        $this['log.verbose'] = false;
+
+        $this['log'] = $this->share(function() use ($app) {
+            $log = new Logger("bob");
+
+            $stderrHandler = new StreamHandler(STDERR, $app['log.verbose'] ? Logger::DEBUG : Logger::WARNING);
+            $stderrHandler->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%" . PHP_EOL));
+
+            $log->pushHandler($stderrHandler);
+
+            return $log;
+        });
+
+        $this['invocation_chain'] = $this->share(function() {
+            return new TaskInvocationChain;
+        });
+    }
+
+    function register(TaskLibraryInterface $taskLib)
+    {
+        $taskLib->register($this);
+        $this->taskLibraries[] = $taskLib;
+
+        return $this;
     }
 
     function init()
     {
         $this->loadConfig();
+
+        foreach ($this->taskLibraries as $taskLib) {
+            $taskLib->boot($this);
+        }
+    }
+
+    function task($name, $prerequisites = null, $action = null)
+    {
+        return $this['task_factory']($name, $prerequisites, $action);
+    }
+
+    function fileTask($target, $prerequisites, $action)
+    {
+        return $this['task_factory']($target, $prerequisites, $action, "\\Bob\\FileTask");
     }
 
     function execute($tasks)
@@ -57,11 +131,11 @@ class Application
         $start = microtime(true);
 
         foreach ($tasks as $taskName) {
-            if (!$task = $this->tasks[$taskName]) {
+            if (!$task = $this['tasks'][$taskName]) {
                 throw new \Exception(sprintf('Task "%s" not found.', $taskName));
             }
 
-            $this->log->info(sprintf(
+            $this['log']->info(sprintf(
                 'Running Task "%s"', $taskName
             ));
 
@@ -70,7 +144,7 @@ class Application
             });
         }
 
-        $this->logger()->info(sprintf('Build finished in %f seconds', microtime(true) - $start));
+        $this['log']->info(sprintf('Build finished in %f seconds', microtime(true) - $start));
     }
 
     function taskDefined($task)
@@ -79,23 +153,13 @@ class Application
             $task = $task->name;
         }
 
-        return (bool) $this->tasks[$task];
+        return (bool) $this['tasks'][$task];
     }
 
     function defineTask($task)
     {
-        $this->tasks[] = $task;
+        $this['tasks'][] = $task;
         return $this;
-    }
-
-    function logger()
-    {
-        return $this->log;
-    }
-
-    function setLogger(Logger $logger)
-    {
-        $this->log = $logger;
     }
 
     protected function prepareEnv()
@@ -110,10 +174,16 @@ class Application
     # Returns nothing.
     protected function loadConfig()
     {
-        $configPath = ConfigFile::findConfigFile($this->configFile, getcwd());
+        foreach ((array) $this['config.file'] as $file) {
+            $configPath = ConfigFile::findConfigFile($file, getcwd());
+
+            if (false !== $configPath) {
+                break;
+            }
+        }
 
         if (false === $configPath) {
-            $this->logger()->err(sprintf(
+            $this['log']->err(sprintf(
                 "Filesystem boundary reached, no %s found.\n",
                 $this->configFile
             ));
@@ -130,7 +200,7 @@ class Application
         # The project dir is the directory of the root config.
         $this->projectDirectory = dirname($configPath);
 
-        $configLoadPath = array_filter($this->configLoadPath, 'is_dir');
+        $configLoadPath = array_filter($this['config.load_path'], 'is_dir');
 
         if ($configLoadPath) {
             $cwd = getcwd();
@@ -143,7 +213,7 @@ class Application
             foreach ($finder as $file) {
                 include $file->getRealpath();
 
-                $this->logger()->info(sprintf('Loaded config "%s"', $file));
+                $this['log']->info(sprintf('Loaded config "%s"', $file));
                 $this->loadedConfigs[] = $file->getRealpath();
             }
 

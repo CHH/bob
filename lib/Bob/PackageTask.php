@@ -39,10 +39,13 @@ class PackageTask implements TaskLibraryInterface
         $this->prerequisites = $prerequisites;
     }
 
+    function register(Application $app)
+    {}
+
     # Public: Defines the task library's tasks.
     #
     # Returns nothing.
-    function register()
+    function boot(Application $app)
     {
         $file = $this->file;
 
@@ -58,7 +61,7 @@ class PackageTask implements TaskLibraryInterface
         BuildConfig\task('repackage', function() use ($file) {
             unlink($file);
             unlink($file.'.gz');
-            Task::get('package')->invoke();
+            BuildConfig\task('package')->invoke();
         });
 
         # TODO: automatically exclude target files from prerequisites

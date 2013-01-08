@@ -2,11 +2,10 @@
 
 namespace Bob\BuildConfig;
 
-use Symfony\Component\Process\Process,
-    Bob\FileTask,
-    Bob\Task,
-    Bob\TaskRegistry,
-    CHH\FileUtils\Path;
+use Symfony\Component\Process\Process;
+use Bob\TaskRegistry;
+use Bob\TaskLibraryInterface;
+use CHH\FileUtils\Path;
 
 class BuildFailedException extends \Exception
 {}
@@ -38,14 +37,19 @@ function failf($msg, $args = array())
 }
 
 # Returns a logger.
-function getLog()
+function logger()
 {
-    return \Bob::$application->logger();
+    return \Bob::$application['log'];
 }
 
 function info($msg)
 {
-    getLog()->info($msg);
+    logger()->info($msg);
+}
+
+function register(TaskLibraryInterface $taskLib)
+{
+    return \Bob::$application->register($taskLib);
 }
 
 # Public: Defines the callback as a task with the given name.
@@ -63,7 +67,7 @@ function info($msg)
 # Returns nothing.
 function task($name, $prerequisites = null, $callback = null)
 {
-    return Task::defineTask($name, $prerequisites, $callback);
+    return \Bob::$application->task($name, $prerequisites, $callback);
 }
 
 # Public: Config file function for creating a task which is only run
@@ -82,7 +86,7 @@ function task($name, $prerequisites = null, $callback = null)
 # Returns a Task instance.
 function fileTask($target, $prerequisites = array(), $callback)
 {
-    return FileTask::defineTask($target, $prerequisites, $callback);
+    return \Bob::$application->fileTask($target, $prerequisites, $callback);
 }
 
 # Copies the file only when it doesn't exists or was updated.
@@ -93,8 +97,8 @@ function fileTask($target, $prerequisites = array(), $callback)
 # Returns a Task instance.
 function copyTask($from, $to)
 {
-    return FileTask::defineTask($to, array($from), function($task) {
-        getLog()->info("copyTask('{$task->prerequisites[0]}' => '{$task->name}')");
+    return fileTask($to, array($from), function($task) {
+        logger()->info("copyTask('{$task->prerequisites[0]}' => '{$task->name}')");
 
         if (false === copy($task->prerequisites[0], $task->name)) {
             fail("Failed copying '{$task->prerequisites[0]}' => '{$task->name}'");
@@ -224,7 +228,7 @@ function sh($cmd, $callback = null, $options = array())
     $cmd = join(' ', (array) $cmd);
     $showCmd = strlen($cmd) > 42 ? "..." . substr($cmd, -42) : $cmd;
 
-    getLog()->info("sh($showCmd)");
+    logger()->info("sh($showCmd)");
 
     if (func_num_args() == 2 and is_array($callback) and !is_callable($callback)) {
         $options = $callback;

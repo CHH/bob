@@ -10,10 +10,10 @@ use CHH\FileUtils\Path;
 $pharFiles = fileList('*.php')->in(array('lib', 'bin', 'vendor'));
 
 $packageFiles = fileList('*')->in(__DIR__);
-$packageTask = new \Bob\PackageTask(
+
+register(new \Bob\PackageTask(
     '/tmp/bob', trim(`git log -n 1 --format=%H`), $packageFiles
-);
-$packageTask->register();
+));
 
 # The "default" task is invoked when there's no
 # task explicitly given on the command line.
@@ -28,7 +28,6 @@ task('phar', array('composer.lock', 'test', 'bin/bob.phar'));
 
 task('clean', function() {
     file_exists('bin/bob.phar') and unlink('bin/bob.phar');
-    file_exists('bin/bob')      and unlink('bin/bob');
 });
 
 fileTask('bin/bob.phar', $pharFiles, function($task) {
@@ -47,7 +46,7 @@ require 'phar://bob.phar/bin/bootstrap.php';
 __HALT_COMPILER();
 EOF;
 
-    $projectDir = \Bob::$application->projectDir;
+    $projectDir = \Bob::$application->projectDirectory;
 
     $phar = new \Phar($task->name, 0, basename($task->name));
     $phar->startBuffering();

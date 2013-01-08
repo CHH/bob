@@ -3,6 +3,7 @@
 namespace Bob;
 
 use Bob;
+use itertools;
 
 # Internal: Represents a single task.
 class Task
@@ -16,7 +17,7 @@ class Task
 
         # Public: The task's dependencies. When a task name is encountered then this
         # task gets run before this task.
-        $prerequisites = array(),
+        $prerequisites,
 
         # Public: The description.
         $description = '',
@@ -24,51 +25,9 @@ class Task
         # Public: An application instance which holds references
         # to all tasks.
         $application,
-
         $enable = true;
 
-    protected
-        $reenable = false,
-        $log;
-
-    # Public: Returns a task instance.
-    #
-    # Returns a task instance, Null when Task was not found.
-    static function get($name)
-    {
-        return Bob::$application->tasks[$name];
-    }
-
-    static function defineTask($name, $prerequisites = null, $action = null)
-    {
-        foreach (array_filter(array($prerequisites, $action)) as $arg) {
-            switch (true) {
-                case is_callable($arg):
-                    $action = $arg;
-                    break;
-                case is_array($arg):
-                case ($arg instanceof \Traversable):
-                case ($arg instanceof \Iterator):
-                    $prerequisites = $arg;
-                    break;
-            }
-        }
-
-        if (empty($name)) {
-            throw new \InvalidArgumentException('Name cannot be empty');
-        }
-
-        if (Bob::$application->taskDefined($name)) {
-            $task = Bob::$application->tasks[$name];
-        } else {
-            $task = new static($name, Bob::$application);
-        }
-
-        $task->enhance($prerequisites, $action);
-
-        Bob::$application->defineTask($task);
-        return $task;
-    }
+    protected $reenable = false;
 
     # Public: Initializes the task instance.
     #
@@ -79,12 +38,11 @@ class Task
     {
         $this->name        = $name;
         $this->application = $application;
-        $this->log         = $application->logger();
 
         $this->description = TaskRegistry::$lastDescription;
         TaskRegistry::$lastDescription = '';
 
-        $this->actions = new \SplDoublyLinkedList;
+        $this->clear();
     }
 
     # Child classes of Task should put here their custom logic to determine
@@ -105,31 +63,36 @@ class Task
     {
         if (!$this->enable) {
             if ($this->application->trace) {
-                $this->log->debug("{$this->inspect()} is not enabled");
+                $this->application['log']->debug("{$this->inspect()} is not enabled");
             }
             return;
         }
 
-        if (!$this->reenable and $this->application->invocationChain->has($this)) {
+        if (!$this->reenable and $this->application['invocation_chain']->has($this)) {
             return;
         }
 
         if (!$this->application->forceRun and !$this->isNeeded()) {
-            $this->application->trace and $this->log->debug("Skipping {$this->inspect()}");
+            $this->application->trace and $this->application['log']->debug("Skipping {$this->inspect()}");
             return;
         }
 
-        $this->application->invocationChain->push($this);
+        $this->application['invocation_chain']->push($this);
 
         if ($this->application->trace) {
-            $this->log->debug("Invoke {$this->inspect()}");
+            $this->application['log']->debug("Invoke {$this->inspect()}");
         }
 
-        foreach ($this->prerequisites as $p) {
-            if ($task = $this->application->tasks[$p]) {
-                $task->invoke();
+        $app = $this->application;
+
+        itertools\walk(
+            itertools\filter(itertools\to_iterator($this->prerequisites), function($p) use ($app) {
+                return $app->taskDefined((string) $p);
+            }),
+            function($p) use ($app) {
+                $app['tasks'][(string) $p]->invoke();
             }
-        }
+        );
 
         $this->execute();
         $this->reenable = false;
@@ -151,7 +114,7 @@ class Task
     function clear()
     {
         $this->actions = new \SplDoublyLinkedList;
-        $this->prerequisites = array();
+        $this->prerequisites = null;
     }
 
     function reenable()
@@ -162,43 +125,37 @@ class Task
     function enhance($deps = null, $action = null)
     {
         if ($deps) {
-            foreach ($deps as $d) {
-                $this->addPrerequisite($d);
+            $p = new \AppendIterator;
+
+            if ($this->prerequisites instanceof \Iterator) {
+                $p->append($this->prerequisites);
             }
+
+            $p->append(itertools\to_iterator($deps));
+
+            $this->prerequisites = $p;
         }
 
         if (is_callable($action)) {
-            $this->actions[] = $action;
+            $this->actions->push($action);
         }
-    }
-
-    function addPrerequisite($prerequisite)
-    {
-        $this->prerequisites[] = (string) $prerequisite;
-        return $this;
-    }
-
-    function getPrerequisites()
-    {
-        return $this->prerequisites;
     }
 
     function getTaskPrerequisites()
     {
-        $tasks = array();
+        $app = $this->application;
 
-        foreach ($this->prerequisites as $p) {
-            if ($this->application->taskDefined($p)) {
-                $tasks[] = $p;
+        return itertools\filter(
+            itertools\to_iterator($this->prerequisites),
+            function($task) use ($app) {
+                return $app->taskDefined($task);
             }
-        }
-
-        return $tasks;
+        );
     }
 
     function inspect()
     {
-        $prereqs = join(', ', $this->getTaskPrerequisites());
+        $prereqs = join(', ', iterator_to_array($this->getTaskPrerequisites()));
         $class = get_class($this);
         return "<$class {$this->name} => $prereqs>";
     }
