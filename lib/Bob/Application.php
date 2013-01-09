@@ -101,10 +101,14 @@ class Application extends \Pimple
         });
     }
 
-    function register(TaskLibraryInterface $taskLib)
+    function register(TaskLibraryInterface $taskLib, array $parameters = array())
     {
         $taskLib->register($this);
         $this->taskLibraries[] = $taskLib;
+
+        foreach ($parameters as $param => $value) {
+            $this[$param] = $value;
+        }
 
         return $this;
     }

@@ -47,9 +47,9 @@ function info($msg)
     logger()->info($msg);
 }
 
-function register(TaskLibraryInterface $taskLib)
+function register(TaskLibraryInterface $taskLib, array $parameters = array())
 {
-    return \Bob::$application->register($taskLib);
+    return \Bob::$application->register($taskLib, $parameters);
 }
 
 # Public: Defines the callback as a task with the given name.

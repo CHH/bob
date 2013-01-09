@@ -22,17 +22,19 @@ class FileTask extends Task
     # Returns the time as Unix Epoche represented by an Integer.
     function getTimestamp()
     {
-        $lastModified = max(
-            iterator_to_array(itertools\filter(itertools\map(
-                function($file) {
-                    if (file_exists($file)) {
-                        return @filemtime($file);
-                    }
-                },
-                $this->prerequisites
-            )))
-        );
+        $lastModifiedTimes = iterator_to_array(itertools\filter(itertools\map(
+            function($file) {
+                if (file_exists($file)) {
+                    return @filemtime($file);
+                }
+            },
+            $this->prerequisites
+        )));
 
-        return $lastModified;
+        if ($lastModifiedTimes) {
+            return max($lastModifiedTimes);
+        }
+
+        return 0;
     }
 }

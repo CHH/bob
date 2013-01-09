@@ -94,6 +94,10 @@ class Task
             }
         );
 
+        if ($this->prerequisites !== null) {
+            $this->prerequisites->rewind();
+        }
+
         $this->execute();
         $this->reenable = false;
     }

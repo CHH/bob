@@ -11,8 +11,8 @@ $pharFiles = fileList('*.php')->in(array('lib', 'bin', 'vendor'));
 
 $packageFiles = fileList('*')->in(__DIR__);
 
-register(new \Bob\PackageTask(
-    '/tmp/bob', trim(`git log -n 1 --format=%H`), $packageFiles
+register(new \Bob\Library\TestingLibrary, array(
+    'testing.dist_config' => 'phpunit.xml.dist'
 ));
 
 # The "default" task is invoked when there's no
@@ -66,13 +66,6 @@ EOF;
     ));
     unset($phar);
 });
-
-desc("Runs Bob's test suite");
-task("test", array('phpunit.xml'), function($task) {
-    sh('phpunit');
-});
-
-copyTask("phpunit.xml.dist", "phpunit.xml");
 
 fileTask('composer.lock', array('composer.json'), function() {
     sh('composer update');
