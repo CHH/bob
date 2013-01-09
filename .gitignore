@@ -1,4 +1,3 @@
-phpunit.xml
-vendor/
-!vendor/FileUtils.php
-!vendor/Getopt.php
+/phpunit.xml
+/vendor/
+/coverage/
