@@ -234,6 +234,7 @@ Here's a small example which registers a `test` task which uses PHPUnit:
 
 use Bob\Application;
 use Bob\TaskLibraryInterface;
+use Bob\BuildConfig as b;
 
 class TestTasks implements TaskLibraryInterface
 {
@@ -243,11 +244,12 @@ class TestTasks implements TaskLibraryInterface
     function boot(Application $app)
     {
         $app->fileTask("phpunit.xml", array("phpunit.dist.xml"), function($task) {
-            copy($task->prerequisites[0], $task->name);
+            copy($task->prerequisites->current(), $task->name);
         });
 
         $app->task("test", array("phpunit.xml"), function($task) {
-            sh("./vendor/bin/phpunit");
+            b\sh("./vendor/bin/phpunit");
+
         })->description = "Runs the test suite";
     }
 }
