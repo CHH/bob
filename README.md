@@ -41,14 +41,14 @@ If you plan to hack on Bob, please make sure you
 have set `phar.readonly` to `Off` in your `php.ini`. Otherwise you will have a tough luck
 creating a PHAR package of Bob.
 
-#### Install into a [Composer](https://github.com/composer/composer)-enabled Project
+#### Install into a [Composer](https://github.com/composer/composer)-enabled Project (recommended)
 
-Simply add the `chh/bob` package to the `require-dev` section in your
+Add the `chh/bob` package to the `require-dev` section in your
 `composer.json`:
 
     {
         "require-dev": {
-            "chh/bob": "*@dev"
+            "chh/bob": "1.0.*@dev"
         }
     }
 
@@ -78,7 +78,7 @@ To install all of Bob's dependencies download Composer and run
     $ wget http://getcomposer.org/composer.phar
     php composer.phar install
 
-Then run `php bin/bob.php install` and you're done.
+Then run `php bin/bob install` and you're done.
 
 By default the `bob` command is created in `/usr/local/bin`. To change
 this set a `PREFIX` environment variable, the command is then created
@@ -88,12 +88,12 @@ in `$PREFIX/bin`.
 
 You can output a usage message by running
 
-	$ php bob.phar --help
+	$ php vendor/bin/bob --help
 
 First run in your projects root directory Bob with the `--init` flag.
 This creates an empty `bob_config.php` with one example task:
 
-    $ php bob.phar --init
+    $ php vendor/bin/bob--init
 
 Bob loads your tasks from a special file named `bob_config.php` in your project's
 root directory. Bob also includes all files found in a directory
@@ -120,7 +120,7 @@ Now let's define our first task. This task will output "Hello World":
 
 Tasks are run by using their name as argument(s) on the command line:
 
-	$ php bob.phar hello
+	$ php vendor/bin/bob hello
 
 When Bob is invoked without tasks it tries to invoke
 the `default` task.
@@ -142,7 +142,7 @@ what the task is all about:
 
 To view all tasks and their descriptions pass the `--tasks` flag:
 
-	$ php bob.phar --tasks
+	$ php vendor/bin/bob --tasks
 	bob hello # Prints Hello World to the Command Line
 
 ---
@@ -185,7 +185,7 @@ Then put this into your `bob_config.php`:
 
 Let's run this task:
 
-    $ php bob.phar concat.txt
+    $ php vendor/bin/bob concat.txt
     Concatenating
 
 This will result in a `concat.txt` file in your project root:
@@ -197,20 +197,75 @@ This will result in a `concat.txt` file in your project root:
 
 Let's run it again, without modifying the prerequisites:
 
-    $ php bob.phar concat.txt
+    $ php vendor/bin/bob concat.txt
 
 See it? The callback was not run, because the prerequisites were not modified.
 
 Let's verify this:
 
     $ touch file1.txt
-    $ php bob.phar concat.txt
+    $ php vendor/bin/bob concat.txt
     Concatenating
 
 The prerequisites of a file task are also resolved as task names, so
 they can depend on other file tasks too. Or you can put regular task
 names into the prerequisites, but then you've to be careful to not
 accidentally treat them as files when looping through all prerequisites.
+
+### Packaging tasks for reusability
+
+Ever did write a collection of tasks which you want to put into a
+package and reuse across projects?
+
+Enter Task Libraries.
+
+All task libraries implement the `\Bob\TaskLibraryInterface` which
+defines two methods:
+
+* `register(\Bob\Application $app)`: Is called when the library is
+  registered in the app.
+* `boot(\Bob\Application $app)`: is called just before the Bob is run on
+  the command line. Register your tasks here.
+
+Here's a small example which registers a `test` task which uses PHPUnit:
+
+```php
+<?php
+
+use Bob\Application;
+use Bob\TaskLibraryInterface;
+
+class TestTasks implements TaskLibraryInterface
+{
+    function register(Application $app)
+    {}
+
+    function boot(Application $app)
+    {
+        $app->fileTask("phpunit.xml", array("phpunit.dist.xml"), function($task) {
+            copy($task->prerequisites[0], $task->name);
+        });
+
+        $app->task("test", array("phpunit.xml"), function($task) {
+            sh("./vendor/bin/phpunit");
+        })->description = "Runs the test suite";
+    }
+}
+```
+
+You can use task libraries by calling the `register` function within
+your build scripts:
+
+```php
+<?php
+
+namespace Bob\BuildConfig;
+
+register(new TestTasks);
+```
+
+You will now see the `test` task when you run `./vendor/bin/bob
+--tasks`.
 
 Hacking on Bob
 --------------
