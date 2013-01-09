@@ -181,6 +181,8 @@ class Application extends \Pimple
     # Returns nothing.
     protected function loadConfig()
     {
+        $configPath = false;
+
         foreach ((array) $this['config.file'] as $file) {
             $configPath = ConfigFile::findConfigFile($file, getcwd());
 
@@ -191,8 +193,8 @@ class Application extends \Pimple
 
         if (false === $configPath) {
             $this['log']->err(sprintf(
-                "Filesystem boundary reached, no %s found.\n",
-                $this->configFile
+                "Filesystem boundary reached, none of %s found.\n",
+                json_encode((array) $this['config.file'])
             ));
             return false;
         }

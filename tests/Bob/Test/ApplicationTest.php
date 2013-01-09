@@ -2,6 +2,9 @@
 
 namespace Bob\Test;
 
+use Monolog\Logger;
+use Monolog\Handler\TestHandler;
+
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
     protected $application;
@@ -9,6 +12,13 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     function setUp()
     {
         $this->application = new \Bob\Application;
+
+        $this->application['log'] = $this->application->share(function() {
+            $log = new Logger('bob');
+            $log->pushHandler(new TestHandler);
+
+            return $log;
+        });
     }
 
     function testTaskShort()
