@@ -125,15 +125,14 @@ class Task
     function enhance($deps = null, $action = null)
     {
         if ($deps) {
-            $p = new \AppendIterator;
-
             if ($this->prerequisites instanceof \Iterator) {
+                $p = new \AppendIterator;
                 $p->append($this->prerequisites);
+                $p->append(itertools\to_iterator($deps));
+                $this->prerequisites = $p;
+            } else {
+                $this->prerequisites = itertools\to_iterator($deps);
             }
-
-            $p->append(itertools\to_iterator($deps));
-
-            $this->prerequisites = $p;
         }
 
         if (is_callable($action)) {

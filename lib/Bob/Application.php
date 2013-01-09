@@ -45,8 +45,12 @@ class Application extends \Pimple
         $this['config.load_path'] = array('./bob_tasks');
         $this['config.file'] = 'bob_config.php';
 
-        $this['task_factory'] = $this->protect(function($name, $prerequisites = null, $action = null, $class = "\\Bob\\Task") use ($app) {
-            foreach (array_filter(array($prerequisites, $action, $class)) as $arg) {
+        $this['task_factory'] = $this->protect(function($name) use ($app) {
+            $action = null;
+            $prerequisites = null;
+            $class = "\\Bob\\Task";
+
+            foreach (array_filter(array_slice(func_get_args(), 1)) as $arg) {
                 switch (true) {
                     case is_callable($arg):
                         $action = $arg;
