@@ -68,7 +68,7 @@ class Cli
             chdir($dir);
         }
 
-        $this->application['config_load_path'] = array_merge($this->application['config_load_path'], explode(':', @$_SERVER['BOB_CONFIG_PATH']));
+        $this->application['config.load_path'] = array_merge($this->application['config.load_path'], explode(':', @$_SERVER['BOB_CONFIG_PATH']));
 
         try {
             $this->application->init();
@@ -213,7 +213,7 @@ HELPTEXT;
     {
         $cwd = $_SERVER['PWD'];
 
-        if (file_exists("$cwd/{$this->configFile}")) {
+        if (file_exists("$cwd/{$this->application['config.file']}")) {
             $this->logger()->err('Project already has a bob_config.php');
             return;
         }
@@ -233,7 +233,7 @@ task('example', function() {
 });
 EOF;
 
-        @file_put_contents("$cwd/{$this->configFile}", $config);
+        @file_put_contents("$cwd/{$this->application['config.file']}", $config);
 
         $this->logger()->info(sprintf('Initialized project at "%s"', $cwd));
     }
