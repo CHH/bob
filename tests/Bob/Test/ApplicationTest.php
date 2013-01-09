@@ -46,5 +46,30 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($task, $this->application->task('foo'));
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    function testExecuteThrowsExceptionWhenTaskNotFound()
+    {
+        $this->application->execute('foo');
+    }
+
+    function testExecute()
+    {
+        $invoked = 0;
+
+        $this->application->task('foo', array('bar'), function() use (&$invoked) {
+            $invoked++;
+        });
+
+        $this->application->task('bar', function() use (&$invoked) {
+            $invoked++;
+        });
+
+        $this->application->execute('foo');
+
+        $this->assertEquals(2, $invoked);
+    }
 }
 

@@ -44,11 +44,12 @@ class Application extends \Pimple
 
         $this['config.load_path'] = array('./bob_tasks');
         $this['config.file'] = 'bob_config.php';
+        $this['default_task_class'] = "\\Bob\\Task";
 
         $this['task_factory'] = $this->protect(function($name) use ($app) {
             $action = null;
             $prerequisites = null;
-            $class = "\\Bob\\Task";
+            $class = $app['default_task_class'];
 
             foreach (array_filter(array_slice(func_get_args(), 1)) as $arg) {
                 switch (true) {
@@ -136,16 +137,18 @@ class Application extends \Pimple
 
         foreach ($tasks as $taskName) {
             if (!$task = $this['tasks'][$taskName]) {
-                throw new \Exception(sprintf('Task "%s" not found.', $taskName));
+                throw new \InvalidArgumentException(sprintf('Task "%s" not found.', $taskName));
             }
 
             $this['log']->info(sprintf(
                 'Running Task "%s"', $taskName
             ));
 
-            Path::chdir($this->projectDirectory, function() use ($task) {
-                return $task->invoke();
-            });
+            if ($this->projectDirectory) {
+                Path::chdir($this->projectDirectory, array($task, 'invoke'));
+            } else {
+                $task->invoke();
+            }
         }
 
         $this['log']->info(sprintf('Build finished in %f seconds', microtime(true) - $start));
