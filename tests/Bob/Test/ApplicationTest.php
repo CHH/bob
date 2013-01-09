@@ -81,5 +81,20 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(2, $invoked);
     }
+
+    function taskExecuteSetsWorkingDirectoryToProjectDirectory()
+    {
+        $cwd = "";
+
+        $this->application->task('foo', function() use (&$cwd) {
+            $cwd = getcwd();
+        });
+
+        $this->application->projectDirectory = __DIR__;
+
+        $this->application->execute('foo');
+
+        $this->assertEquals(__DIR__, $cwd);
+    }
 }
 
