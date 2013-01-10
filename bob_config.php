@@ -30,6 +30,22 @@ task('clean', function() {
     file_exists('bin/bob.phar') and unlink('bin/bob.phar');
 });
 
+task('release', function($task) {
+    if (!$version = @$_ENV['version'] ?: @$_SERVER['BOB_VERSION']) {
+        failf('No version given');
+    }
+
+    info(sprintf('----> Setting version to "%s"', $version));
+
+    $contents = preg_replace(
+        '/(\s*)(const VERSION = ".+")/',
+        sprintf('\1const VERSION = "%s"', $version),
+        file_get_contents('lib/Bob.php')
+    );
+
+    file_put_contents('lib/Bob.php', $contents);
+});
+
 fileTask('bin/bob.phar', $pharFiles, function($task) {
     if (file_exists($task->name)) {
         unlink($task->name);

@@ -22,6 +22,7 @@ class Cli
         $this->opts = new Optparse\Parser;
         $this->opts
             ->addFlag('init', array("alias" => '-i'))
+            ->addFlag('version')
             ->addFlag('help', array("alias" => '-h'))
             ->addFlag('tasks', array("alias" => '-t'))
             ->addFlag('chdir', array("alias" => '-C', "has_value" => true))
@@ -46,6 +47,11 @@ class Cli
 
         $this->application->trace = $this->trace;
         $this->application->forceRun = $this->forceRun;
+
+        if ($this->opts['version']) {
+            printf("Bob %s\n", \Bob::VERSION);
+            return 0;
+        }
 
         if ($this->opts["init"]) {
             return $this->initProject() ? 0 : 1;
