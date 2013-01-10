@@ -93,7 +93,7 @@ You can output a usage message by running
 First run in your projects root directory Bob with the `--init` flag.
 This creates an empty `bob_config.php` with one example task:
 
-    $ php vendor/bin/bob--init
+    $ php vendor/bin/bob --init
 
 Bob loads your tasks from a special file named `bob_config.php` in your project's
 root directory. Bob also includes all files found in a directory

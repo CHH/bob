@@ -48,8 +48,7 @@ class Cli
         $this->application->forceRun = $this->forceRun;
 
         if ($this->opts["init"]) {
-            $this->initProject();
-            return 0;
+            return $this->initProject() ? 0 : 1;
         }
 
         if ($this->opts["help"]) {
@@ -211,11 +210,9 @@ HELPTEXT;
 
     protected function initProject()
     {
-        $cwd = $_SERVER['PWD'];
-
-        if (file_exists("$cwd/{$this->application['config.file']}")) {
-            $this->logger()->err('Project already has a bob_config.php');
-            return;
+        if (file_exists("bob_config.php")) {
+            fwrite(STDERR, "Project already has a bob_config.php\n");
+            return false;
         }
 
         $config = <<<'EOF'
@@ -233,9 +230,10 @@ task('example', function() {
 });
 EOF;
 
-        @file_put_contents("$cwd/{$this->application['config.file']}", $config);
+        @file_put_contents("bob_config.php", $config);
 
-        $this->logger()->info(sprintf('Initialized project at "%s"', $cwd));
+        printf("Initialized project at \"%s\"\n", getcwd());
+        return true;
     }
 }
 
