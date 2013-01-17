@@ -185,17 +185,17 @@ class Application extends \Pimple
     # Returns nothing.
     protected function loadConfig()
     {
-        $configPath = false;
+        $rootConfigPath = false;
 
         foreach ((array) $this['config.file'] as $file) {
-            $configPath = ConfigFile::findConfigFile($file, getcwd());
+            $rootConfigPath = ConfigFile::findConfigFile($file, getcwd());
 
-            if (false !== $configPath) {
+            if (false !== $rootConfigPath) {
                 break;
             }
         }
 
-        if (false === $configPath) {
+        if (false === $rootConfigPath) {
             $this['log']->err(sprintf(
                 "Filesystem boundary reached, none of %s found.\n",
                 json_encode((array) $this['config.file'])
@@ -203,16 +203,16 @@ class Application extends \Pimple
             return false;
         }
 
-        include $configPath;
-        $this->loadedConfigs[] = $configPath;
+        $this->loadConfigFile($rootConfigPath);
 
         # Save the original working directory, the working directory
         # gets set to the project directory while running tasks.
         $this->originalDirectory = getcwd();
 
         # The project dir is the directory of the root config.
-        $this->projectDirectory = dirname($configPath);
+        $this->projectDirectory = dirname($rootConfigPath);
 
+        # Search for additional configs in the config load paths
         $configLoadPath = array_filter($this['config.load_path'], 'is_dir');
 
         if ($configLoadPath) {
@@ -224,16 +224,34 @@ class Application extends \Pimple
                 ->in($configLoadPath);
 
             foreach ($finder as $file) {
-                include $file->getRealpath();
-
-                $this['log']->info(sprintf('Loaded config "%s"', $file));
-                $this->loadedConfigs[] = $file->getRealpath();
+                $this->loadConfigFile($file);
             }
 
             chdir($cwd);
         }
 
         return true;
+    }
+
+    # Load config file in its own scope
+    protected function loadConfigFile($file)
+    {
+        if (in_array($file, $this->loadedConfigs)) {
+            $this['log']->info(sprintf('Skipping: Already loaded config "%s"', $file));
+            return;
+        }
+
+        $file = (string) $file;
+        $app = $this;
+
+        $config = function() use ($file, $app) {
+            include($file);
+        };
+
+        $config();
+
+        $this['log']->info(sprintf('Loaded config "%s"', $file));
+        $this->loadedConfigs[] = $file;
     }
 }
 

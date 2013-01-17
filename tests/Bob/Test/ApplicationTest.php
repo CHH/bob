@@ -19,6 +19,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
             return $log;
         });
+
+        \Bob::$application = $this->application;
     }
 
     function testTaskShort()
@@ -82,7 +84,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $invoked);
     }
 
-    function taskExecuteSetsWorkingDirectoryToProjectDirectory()
+    function testExecuteSetsWorkingDirectoryToProjectDirectory()
     {
         $cwd = "";
 
@@ -95,6 +97,66 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->application->execute('foo');
 
         $this->assertEquals(__DIR__, $cwd);
+    }
+
+    function testLoadDefaultRootConfig()
+    {
+        $cwd = getcwd();
+        chdir(__DIR__ . '/fixtures');
+
+        $this->application->init();
+
+        $this->assertTrue($this->application->taskDefined('baz'));
+        $this->assertContains(__DIR__ . '/fixtures/bob_config.php', $this->application->loadedConfigs);
+
+        chdir($cwd);
+    }
+
+    function testLoadCustomRootConfig()
+    {
+        $cwd = getcwd();
+        chdir(__DIR__ . '/fixtures');
+
+        $this->application['config.file'] = "Bobfile.php";
+
+        $this->application->init();
+
+        $this->assertTrue($this->application->taskDefined('foobar'));
+        $this->assertContains(__DIR__ . '/fixtures/Bobfile.php', $this->application->loadedConfigs);
+
+        chdir($cwd);
+    }
+
+    function testMultipleRootConfigNamesChoosesFirstFound()
+    {
+        $cwd = getcwd();
+        chdir(__DIR__ . '/fixtures');
+
+        $this->application['config.file'] = array("Bobfile.php", "bob_config.php");
+
+        $this->application->init();
+
+        $this->assertTrue($this->application->taskDefined('foobar'));
+        $this->assertContains(__DIR__ . '/fixtures/Bobfile.php', $this->application->loadedConfigs);
+
+        chdir($cwd);
+    }
+
+    function testLoadConfigsFromLoadPath()
+    {
+        $cwd = getcwd();
+        chdir(__DIR__ . '/fixtures');
+
+        $this->application['config.load_path'] = array(__DIR__ . '/fixtures/tasks');
+        $this->application->init();
+
+        $this->assertTrue($this->application->taskDefined('foo'));
+        $this->assertTrue($this->application->taskDefined('bar'));
+
+        $this->assertContains(__DIR__ . '/fixtures/tasks/foo.php', $this->application->loadedConfigs);
+        $this->assertContains(__DIR__ . '/fixtures/tasks/bar.php', $this->application->loadedConfigs);
+
+        chdir($cwd);
     }
 }
 
