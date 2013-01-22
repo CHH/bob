@@ -9,8 +9,6 @@ use CHH\FileUtils\Path;
 
 $pharFiles = fileList('*.php')->in(array('lib', 'bin', 'vendor'));
 
-$packageFiles = fileList('*')->in(__DIR__);
-
 register(new \Bob\Library\TestingLibrary, array(
     'testing.dist_config' => 'phpunit.xml.dist'
 ));
