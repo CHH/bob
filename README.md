@@ -1,6 +1,10 @@
 Bob, your friendly builder
 ==========================
 
+[![Build Status](https://travis-ci.org/CHH/bob.png?branch=master)](https://travis-ci.org/CHH/bob)
+
+- - -
+
 This is Bob. Bob is a lightweight project automation tool in PHP similar to Rake.
 
 Bob _can_ be used as general build tool, but _really shines_ when used in PHP 
