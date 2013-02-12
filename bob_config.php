@@ -33,11 +33,19 @@ task('release', function($task) {
         failf('No version given');
     }
 
-    info(sprintf('----> Setting version to "%s"', $version));
+    if (substr($version, 0, 1) === 'v') {
+        $version = substr($version, 1);
+    }
+
+    if (!@$_ENV['skip-branching']) {
+        sh(sprintf('git checkout -b "release/%s"', $version));
+    }
+
+    info(sprintf('----> Setting version to "v%s"', $version));
 
     $contents = preg_replace(
         '/(\s*)(const VERSION = ".+")/',
-        sprintf('\1const VERSION = "%s"', $version),
+        sprintf('\1const VERSION = "v%s"', $version),
         file_get_contents('lib/Bob.php')
     );
 

@@ -1,5 +1,5 @@
 {
-    "hash": "1d010dc265bf3a1ed01bfaa09a7413a5",
+    "hash": "00588c458db685af972880b7c1f57495",
     "packages": [
         {
             "name": "chh/fileutils",
@@ -772,7 +772,7 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "chh/fileutils": 20
-    }
+    "stability-flags": [
+
+    ]
 }

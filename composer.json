@@ -17,7 +17,7 @@
         "symfony/finder": "~2.0",
         "symfony/process": "~2.0",
         "chh/optparse": "~0.1",
-        "chh/fileutils": "1.0.*@dev",
+        "chh/fileutils": "~1.0",
         "monolog/monolog": "~1.0",
         "pimple/pimple": "~1.0",
         "chh/itertools": "~1.0"
