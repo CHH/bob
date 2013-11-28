@@ -4,6 +4,30 @@ Bob, your friendly builder
 [![Build Status](https://travis-ci.org/CHH/bob.png?branch=master)](https://travis-ci.org/CHH/bob)
 
 - - -
+## Hello World
+
+Put this in a file named `bob_config.php` in your project's root:
+
+```php
+<?php
+
+namespace Bob\BuildConfig;
+
+task('default', ['hello']);
+
+task('hello', function() {
+	echo "Hello World!\n";
+});
+```
+
+Run this on your shell:
+
+```
+$ php composer.phar require chh/bob:~1.0@dev
+$ vendor/bin/bob
+```
+
+## What is Bob?
 
 This is Bob. Bob is a lightweight project automation tool in PHP similar to Rake.
 
