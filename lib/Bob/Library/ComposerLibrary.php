@@ -26,11 +26,11 @@ class ComposerLibrary implements TaskLibraryInterface
         });
 
         $app->task('composer:install', array('composer.phar'), function() {
-            b\php(array('composer.phar', 'install'));
+            b\php(array('composer.phar', 'install'), null, array('failOnError' => true));
         });
 
         $app->task('composer:update', array('composer.phar'), function() {
-            b\php(array('composer.phar', 'update'));
+            b\php(array('composer.phar', 'update'), null, array('failOnError' => true));
         });
 
         $app->fileTask('composer.lock', array('composer.phar', 'composer.json'), function($task) use ($app) {
