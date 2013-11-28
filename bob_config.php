@@ -13,6 +13,8 @@ register(new \Bob\Library\TestingLibrary, array(
     'testing.dist_config' => 'phpunit.xml.dist'
 ));
 
+register(new \Bob\Library\ComposerLibrary);
+
 # The "default" task is invoked when there's no
 # task explicitly given on the command line.
 task('default', array('phar'));
@@ -43,10 +45,12 @@ task('release', function($task) {
 
     info(sprintf('----> Setting version to "v%s"', $version));
 
+    $contents = file_get_contents('lib/Bob.php');
+
     $contents = preg_replace(
         '/(\s*)(const VERSION = ".+")/',
         sprintf('\1const VERSION = "v%s"', $version),
-        file_get_contents('lib/Bob.php')
+        $contents
     );
 
     file_put_contents('lib/Bob.php', $contents);
@@ -87,10 +91,6 @@ EOF;
         'Regenerated Archive "%s" with %d entries', basename($task->name), count($phar)
     ));
     unset($phar);
-});
-
-fileTask('composer.lock', array('composer.json'), function() {
-    sh('composer update');
 });
 
 desc('Does a system install of Bob, by default to /usr/local/bin');

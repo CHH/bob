@@ -1,3 +1,4 @@
 /phpunit.xml
 /vendor/
 /coverage/
+/composer.phar
